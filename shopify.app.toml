@@ -1,3 +1,27 @@
-# This file stores configurations for your Shopify app.
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-scopes = "write_products"
+name = "Poly & Bark Extensibility(PBE)"
+client_id = "f1115783b0f51ee3fe7c0b50d2bdbfe6"
+application_url = "https://risks-happiness-rising-rangers.trycloudflare.com"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = ""
+
+[auth]
+redirect_urls = [
+  "https://risks-happiness-rising-rangers.trycloudflare.com/auth/callback",
+  "https://risks-happiness-rising-rangers.trycloudflare.com/auth/shopify/callback",
+  "https://risks-happiness-rising-rangers.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-01"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "poly-bark-dev-plus.myshopify.com"
