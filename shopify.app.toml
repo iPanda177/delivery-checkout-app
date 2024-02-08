@@ -2,7 +2,7 @@
 
 client_id = "f1115783b0f51ee3fe7c0b50d2bdbfe6"
 name = "Poly & Bark Extensibility(PBE)"
-application_url = "https://hot-karma-coral-moves.trycloudflare.com"
+application_url = "https://dining-checklist-paint-suit.trycloudflare.com"
 embedded = true
 
 [build]
@@ -16,9 +16,9 @@ scopes = "read_cart_transforms,write_cart_transforms,read_assigned_fulfillment_o
 
 [auth]
 redirect_urls = [
-  "https://hot-karma-coral-moves.trycloudflare.com/auth/callback",
-  "https://hot-karma-coral-moves.trycloudflare.com/auth/shopify/callback",
-  "https://hot-karma-coral-moves.trycloudflare.com/api/auth/callback"
+  "https://dining-checklist-paint-suit.trycloudflare.com/auth/callback",
+  "https://dining-checklist-paint-suit.trycloudflare.com/auth/shopify/callback",
+  "https://dining-checklist-paint-suit.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
