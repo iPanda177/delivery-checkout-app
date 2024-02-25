@@ -1,6 +1,6 @@
 import { json } from "@remix-run/node";
 import { useLoaderData, Link, useNavigate } from "@remix-run/react";
-import { authenticate } from "../shopify.server";
+import { authenticate } from "../../shopify.server";
 import {
   Card,
   EmptyState,
@@ -13,7 +13,7 @@ import {
   InlineStack,
 } from "@shopify/polaris";
 
-import { getQRCodes } from "../models/QRCode.server";
+import { getQRCodes } from "../../models/QRCode.server";
 import { AlertDiamondIcon, ImageIcon } from "@shopify/polaris-icons";
 
 export async function loader({ request }) {
@@ -76,7 +76,7 @@ const QRTableRow = ({ qrCode }) => (
       />
     </IndexTable.Cell>
     <IndexTable.Cell>
-      <Link to={`qrcodes/${qrCode.id}`}>{truncate(qrCode.title)}</Link>
+      <Link to={`/app/qrcodes/${qrCode.id}`}>{truncate(qrCode.title)}</Link>
     </IndexTable.Cell>
     <IndexTable.Cell>
       {qrCode.productDeleted ? (
@@ -114,7 +114,7 @@ export default function Index() {
         <Layout.Section>
           <Card padding="0">
             {qrCodes.length === 0 ? (
-              <EmptyQRCodeState onAction={() => navigate("qrcodes/new")} />
+              <EmptyQRCodeState onAction={() => navigate("/app/qrcodes/new")} />
             ) : (
               <QRTable qrCodes={qrCodes} />
             )}

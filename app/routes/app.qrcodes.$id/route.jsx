@@ -7,7 +7,7 @@ import {
   useSubmit,
   useNavigate,
 } from "@remix-run/react";
-import { authenticate } from "../shopify.server";
+import { authenticate } from "../../shopify.server";
 import {
   Card,
   Bleed,
@@ -27,8 +27,8 @@ import {
 } from "@shopify/polaris";
 import { ImageIcon } from "@shopify/polaris-icons";
 
-import db from "../db.server";
-import { getQRCode, validateQRCode } from "../models/QRCode.server";
+import db from "../../db.server";
+import { getQRCode, validateQRCode } from "../../models/QRCode.server";
 
 export async function loader({ request, params }) {
   const { admin } = await authenticate.admin(request);
@@ -126,7 +126,7 @@ export default function QRCodeForm() {
   return (
     <Page>
       <ui-title-bar title={qrCode.id ? "Edit QR code" : "Create new QR code"}>
-        <button variant="breadcrumb" onClick={() => navigate("/app")}>
+        <button variant="breadcrumb" onClick={() => navigate("/app/qrcodes")}>
           QR codes
         </button>
       </ui-title-bar>
