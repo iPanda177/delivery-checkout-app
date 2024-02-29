@@ -2,7 +2,7 @@
 
 client_id = "f1115783b0f51ee3fe7c0b50d2bdbfe6"
 name = "Poly & Bark Extensibility(PBE)"
-application_url = "https://wide-challenges-leading-rogers.trycloudflare.com"
+application_url = "https://core-gba-azerbaijan-monitors.trycloudflare.com"
 embedded = true
 
 [build]
@@ -16,9 +16,9 @@ scopes = "read_cart_transforms,write_cart_transforms,read_assigned_fulfillment_o
 
 [auth]
 redirect_urls = [
-  "https://wide-challenges-leading-rogers.trycloudflare.com/auth/callback",
-  "https://wide-challenges-leading-rogers.trycloudflare.com/auth/shopify/callback",
-  "https://wide-challenges-leading-rogers.trycloudflare.com/api/auth/callback"
+  "https://core-gba-azerbaijan-monitors.trycloudflare.com/auth/callback",
+  "https://core-gba-azerbaijan-monitors.trycloudflare.com/auth/shopify/callback",
+  "https://core-gba-azerbaijan-monitors.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
