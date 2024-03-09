@@ -23,6 +23,7 @@ export default function App() {
         <Link to="/app" rel="home">
           Home
         </Link>
+        <Link to="/app/shipping">Shipping & Delivery</Link>
         <Link to="/app/qrcodes">QR Code Generator</Link>
       </ui-nav-menu>
       <Outlet />
