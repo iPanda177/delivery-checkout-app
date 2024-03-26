@@ -2,7 +2,7 @@
 
 client_id = "f1115783b0f51ee3fe7c0b50d2bdbfe6"
 name = "Poly & Bark Extensibility(PBE)"
-application_url = "https://items-tend-annotation-void.trycloudflare.com"
+application_url = "https://downloading-pete-rebate-php.trycloudflare.com"
 embedded = true
 
 [build]
@@ -16,9 +16,9 @@ scopes = "read_cart_transforms,write_cart_transforms,read_assigned_fulfillment_o
 
 [auth]
 redirect_urls = [
-  "https://items-tend-annotation-void.trycloudflare.com/auth/callback",
-  "https://items-tend-annotation-void.trycloudflare.com/auth/shopify/callback",
-  "https://items-tend-annotation-void.trycloudflare.com/api/auth/callback"
+  "https://downloading-pete-rebate-php.trycloudflare.com/auth/callback",
+  "https://downloading-pete-rebate-php.trycloudflare.com/auth/shopify/callback",
+  "https://downloading-pete-rebate-php.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
