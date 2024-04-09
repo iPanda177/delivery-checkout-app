@@ -1,7 +1,9 @@
-import { json } from "stream/consumers";
 import db from "../db.server";
+// @ts-ignore
+import type {GraphQLClient} from "@shopify/shopify-app-remix/build/ts/server/clients/types";
+import type {AdminOperations} from "@shopify/admin-api-client";
 
-export async function getShopLocations(shop, graphql) {
+export async function getShopLocations(shop: string, graphql: GraphQLClient<AdminOperations>) {
   const response = await graphql(
     `
       query fulfillmentLocations {
@@ -26,14 +28,12 @@ export async function getShopLocations(shop, graphql) {
   return locations;
 }
 
-export async function getShippingRule(id, graphql) {
+export async function getShippingRule(id: number, graphql: GraphQLClient<AdminOperations>) {
   const dbRuleData = await db.shippingRules.findFirst({ where: { id } });
 
   if (!dbRuleData) {
     return null;
   }
 
-  return supplementRuleData(id, graphql);
+  return dbRuleData;
 }
-
-async function supplementRuleData(id, graphql) {}

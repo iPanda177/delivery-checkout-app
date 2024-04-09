@@ -34,23 +34,18 @@ model QRCode {
 }
 
 model ShippingRules {
-  id                     Int          @id @default(autoincrement())
-  ruleName               String       @default("Rule")
-  locationIds            LocationId[]
-  isDefault              Boolean      @default(false)
+  id                     Int     @id @default(autoincrement())
+  ruleName               String  @default("Rule")
+  locationIds            String
+  isDefault              Boolean @default(false)
   zipRangeStart          String
   zipRangeEnd            String
   etaDaysSmallParcelLow  Int
   etaDaysSmallParcelHigh Int
   etaDaysFreightLow      Int
   etaDaysFreightHigh     Int
-  extendedAreaEligible   Boolean      @default(true)
+  extendedAreaEligible   Boolean @default(true)
   addOnProductId         String
 
   @@map("Shipping Rules")
-}
-
-model LocationId {
-  id           String          @id @unique
-  zipCodeRules ShippingRules[]
 }

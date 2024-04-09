@@ -1,29 +1,37 @@
-import { Page, Layout, Card, IndexTable, Text } from "@shopify/polaris";
-
-import db from "../../db.server";
-
 import { json } from "@remix-run/node";
 import { useLoaderData, Link, useNavigate } from "@remix-run/react";
+import {
+  Page,
+  Layout,
+  Card,
+  IndexTable,
+  Text
+} from "@shopify/polaris";
+
+import db from "../../db.server";
+import type { ShippingRules } from "@prisma/client";
 
 export async function loader() {
   return json(
-    await db.ShippingRules.findMany({
+    await db.shippingRules.findMany({
       orderBy: { zipRangeStart: "asc" },
     })
   );
 }
 
-function truncate(str, { length = 25 } = {}) {
-  if (!str) return "";
-  if (str.length <= length) return str;
-  return str.slice(0, length) + "…";
-}
+export default function Index() {
+  const navigate = useNavigate();
 
-const ZipCodeTable = () => {
-  const shippingRules = useLoaderData<typeof loader>();
+  const truncate = (str: string, { length = 25 } = {}) => {
+    if (!str) return "";
+    if (str.length <= length) return str;
+    return str.slice(0, length) + "…";
+  }
 
-  return (
-    <>
+  const ZipCodeTable = () => {
+    const shippingRules = useLoaderData<typeof loader>();
+
+    return (
       <IndexTable
         resourceName={{
           singular: "Zip Code Range",
@@ -42,39 +50,60 @@ const ZipCodeTable = () => {
         ]}
         itemCount={shippingRules.length}
         sortable={[false, true, true]}
+        selectable={false}
       >
-        {shippingRules.map((shippingRule: typeof loader) => (
+        {shippingRules.map((shippingRule: ShippingRules) => (
           <ZipCodeTableRow key={shippingRule.id} shippingRule={shippingRule} />
         ))}
       </IndexTable>
-    </>
+    );
+  };
+
+  const ZipCodeTableRow = ({
+     shippingRule
+  } : {
+    shippingRule: ShippingRules
+  }) => (
+    <IndexTable.Row id={String(shippingRule.id)} position={shippingRule.id}>
+      <IndexTable.Cell>
+        <Link to={`/app/shipping/rules/${shippingRule.id}`}>
+          {truncate(shippingRule.ruleName)}
+        </Link>
+      </IndexTable.Cell>
+
+      <IndexTable.Cell>
+        <Text as="span">{shippingRule.zipRangeStart}</Text>
+      </IndexTable.Cell>
+
+      <IndexTable.Cell>
+        <Text as="span">{shippingRule.zipRangeEnd}</Text>
+      </IndexTable.Cell>
+
+      <IndexTable.Cell>
+        <Text as="span">{shippingRule.etaDaysSmallParcelLow}</Text>
+      </IndexTable.Cell>
+
+      <IndexTable.Cell>
+        <Text as="span">{shippingRule.etaDaysSmallParcelHigh}</Text>
+      </IndexTable.Cell>
+
+      <IndexTable.Cell>
+        <Text as="span">{shippingRule.etaDaysFreightLow}</Text>
+      </IndexTable.Cell>
+
+      <IndexTable.Cell>
+        <Text as="span">{shippingRule.etaDaysFreightHigh}</Text>
+      </IndexTable.Cell>
+
+      <IndexTable.Cell>
+        <Text as="span">{shippingRule.extendedAreaEligible}</Text>
+      </IndexTable.Cell>
+
+      <IndexTable.Cell>
+        <Text as="span">{shippingRule.addOnProductId}</Text>
+      </IndexTable.Cell>
+    </IndexTable.Row>
   );
-};
-
-const ZipCodeTableRow = ({ shippingRule }) => (
-  <IndexTable.Row id={shippingRule.id} position={shippingRule.id}>
-    <IndexTable.Cell>
-      <Link to={`/app/shipping/rules/${shippingRule.id}`}>
-        {truncate(shippingRule.ruleName)}
-      </Link>
-    </IndexTable.Cell>
-    <IndexTable.Cell>
-      <Text as="span">{shippingRule.zipRangeStart}</Text>
-    </IndexTable.Cell>
-    <IndexTable.Cell>
-      <Text as="span">{shippingRule.zipRangeEnd}</Text>
-    </IndexTable.Cell>
-    <IndexTable.Cell>
-      <Text as="span">{shippingRule.etaDaysSmallParcelLow}</Text>
-    </IndexTable.Cell>
-    <IndexTable.Cell></IndexTable.Cell>
-    <IndexTable.Cell></IndexTable.Cell>
-    <IndexTable.Cell></IndexTable.Cell>
-  </IndexTable.Row>
-);
-
-export default function Index() {
-  const navigate = useNavigate();
 
   return (
     <Page fullWidth>
@@ -86,6 +115,7 @@ export default function Index() {
           Add New Rule
         </button>
       </ui-title-bar>
+
       <Layout>
         <Layout.Section>
           <Card padding="0">

@@ -5,18 +5,63 @@ import {
   EmptySearchResult,
   Combobox,
   Text,
-  AutoSelection,
+  AutoSelection, InlineStack,
 } from "@shopify/polaris";
-import { useState, useCallback, useMemo } from "react";
+import {useState, useCallback, useMemo, useEffect} from "react";
+import {Location, RuleState} from "~/types/types";
 
-export default function LocationSelectCombobox(data, setData) {
-  const { formState } = data;
-  const { setFormState } = setData;
-  //const { selectedLocations } = formState;
-
-  const [selectedTags, setSelectedTags] = useState<string[]>(["Rustic"]);
+export default function LocationSelectCombobox({
+  locations,
+  ruleState,
+  setRuleState
+}: {
+  locations: Location[];
+  ruleState: RuleState;
+  setRuleState: (ruleState: RuleState) => void;
+}) {
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [value, setValue] = useState("");
-  const [suggestion, setSuggestion] = useState("");
+  const [suggestion, setSuggestion] = useState<string | undefined>("");
+
+  useEffect(() => {
+    const selectedLocationsNames = locations
+      .filter((location) => ruleState.locationIds.split(',').includes(location.id))
+      .map((location) => location.name);
+
+    setSelectedTags(selectedLocationsNames);
+  }, [ruleState, locations]);
+
+  const suggestions = useMemo(
+    () => locations.map((location) => location.name),
+    [locations],
+  );
+
+  const handleChange = useCallback(
+    (value: string) => {
+      const suggestion =
+        value &&
+        suggestions.find((suggestion) =>
+          suggestion.toLowerCase().startsWith(value.toLowerCase()),
+        );
+
+      setValue(value);
+      setSuggestion(suggestion);
+    },
+    [suggestions],
+  );
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === 'Enter' || event.key === 'Tab') {
+        setValue(suggestion || value);
+        setSuggestion('');
+      } else if (event.key === 'Backspace') {
+        setValue(value);
+        setSuggestion('');
+      }
+    },
+    [value, suggestion],
+  );
 
   const handleActiveOptionChange = useCallback(
     (activeOption: string) => {
@@ -40,11 +85,18 @@ export default function LocationSelectCombobox(data, setData) {
       } else {
         nextSelectedTags.add(selected);
       }
+
+      const selectedLocationIds = locations
+        .filter((location) => nextSelectedTags.has(location.name))
+        .map((location) => location.id)
+        .join(',');
+
+      setRuleState({ ...ruleState, locationIds: selectedLocationIds });
       setSelectedTags([...nextSelectedTags]);
       setValue("");
       setSuggestion("");
     },
-    [selectedTags]
+    [selectedTags, locations, ruleState, setRuleState]
   );
 
   const removeTag = useCallback(
@@ -55,9 +107,8 @@ export default function LocationSelectCombobox(data, setData) {
   );
 
   const getAllTags = useCallback(() => {
-    const savedTags = ["Rustic", "Antique", "Vinyl", "Vintage", "Refurbished"];
-    return [...new Set([...savedTags, ...selectedTags].sort())];
-  }, [selectedTags]);
+    return [...new Set([...suggestions, ...selectedTags].sort())];
+  }, [selectedTags, suggestions]);
 
   const formatOptionText = useCallback(
     (option: string) => {
@@ -104,13 +155,13 @@ export default function LocationSelectCombobox(data, setData) {
 
   const verticalContentMarkup =
     selectedTags.length > 0 ? (
-      <BlockStack spacing="extraTight" alignment="center">
+      <InlineStack gap={"100"} align="start">
         {selectedTags.map((tag) => (
           <Tag key={`option-${tag}`} onRemove={removeTag(tag)}>
             {tag}
           </Tag>
         ))}
-      </BlockStack>
+      </InlineStack>
     ) : null;
 
   const optionMarkup =
@@ -157,10 +208,10 @@ export default function LocationSelectCombobox(data, setData) {
     ) : null;
 
   return (
-    <div style={{ height: "225px" }}>
-      <Combobox
-        allowMultiple
-        activator={
+    <Combobox
+      allowMultiple
+      activator={
+        <div onKeyDown={handleKeyDown}>
           <Combobox.TextField
             autoComplete="off"
             label="Search locations "
@@ -169,12 +220,12 @@ export default function LocationSelectCombobox(data, setData) {
             suggestion={suggestion}
             placeholder="Search locations"
             verticalContent={verticalContentMarkup}
-            onChange={setValue}
+            onChange={handleChange}
           />
-        }
-      >
-        {listboxMarkup}
-      </Combobox>
-    </div>
+        </div>
+      }
+    >
+      {listboxMarkup}
+    </Combobox>
   );
 }
