@@ -1,72 +1,70 @@
-import {Autocomplete, Icon} from "@shopify/polaris";
-import {SearchIcon} from "@shopify/polaris-icons";
+import {Autocomplete, Button, Icon, InlineStack, Text, Thumbnail} from "@shopify/polaris";
+import {ImageIcon, SearchIcon} from "@shopify/polaris-icons";
 import {useCallback, useMemo, useState} from "react";
+import {RuleState} from "~/types/types";
 
-export default function ProductAddonAutocomplete({}) {
-  const deselectedOptions = useMemo(
-    () => [
-      {value: 'rustic', label: 'Rustic'},
-      {value: 'antique', label: 'Antique'},
-      {value: 'vinyl', label: 'Vinyl'},
-      {value: 'vintage', label: 'Vintage'},
-      {value: 'refurbished', label: 'Refurbished'},
-    ],
-    [],
-  );
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState('');
-  const [options, setOptions] = useState(deselectedOptions);
+export default function ProductAddonAutocomplete({
+  ruleState,
+  setRuleState,
+}: {
+  ruleState: RuleState;
+  setRuleState: (ruleState: RuleState) => void;
+}) {
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
-  const updateText = useCallback(
-    (value: string) => {
-      setInputValue(value);
+  async function selectProduct() {
+    const products = await window.shopify.resourcePicker({
+      type: "product",
+      action: "select", // customized action verb, either 'select' or 'add',
+    });
 
-      if (value === '') {
-        setOptions(deselectedOptions);
-        return;
-      }
+    if (products) {
+      console.log(products);
+      const { id } = products[0].variants[0];
+      const { title } = products[0];
+      const productImage = products[0].images[0];
 
-      const filterRegex = new RegExp(value, 'i');
-      const resultOptions = deselectedOptions.filter((option) =>
-        option.label.match(filterRegex),
-      );
-      setOptions(resultOptions);
-    },
-    [deselectedOptions],
-  );
-
-  const updateSelection = useCallback(
-    (selected: string[]) => {
-      const selectedValue = selected.map((selectedItem) => {
-        const matchedOption = options.find((option) => {
-          return option.value.match(selectedItem);
+      if (id) {
+        setRuleState({
+          ...ruleState,
+          addOnProductId: id,
         });
-        return matchedOption && matchedOption.label;
-      });
 
-      setSelectedOptions(selected);
-      setInputValue(selectedValue[0] || '');
-    },
-    [options],
-  );
+        setSelectedProduct({
+          productTitle: title,
+          productImage: productImage && productImage.originalSrc ? productImage.originalSrc : null,
+          productAlt: productImage && productImage.altText ? productImage.altText : null,
+        })
+      }
+    }
+  }
 
-  const textField = (
-    <Autocomplete.TextField
-      onChange={updateText}
-      label="Product Selector"
-      value={inputValue}
-      prefix={<Icon source={SearchIcon} tone="base" />}
-      placeholder="Select product"
-      autoComplete="off"
-    />
-  );
+  const handleRemove = () => {
+    setRuleState({
+      ...ruleState,
+      addOnProductId: '',
+    });
 
-  return (
-    <Autocomplete
-      options={options}
-      selected={selectedOptions}
-      onSelect={updateSelection}
-      textField={textField}
-    />
+    setSelectedProduct(null);
+  }
+
+
+  return selectedProduct ? (
+  <InlineStack blockAlign="center" align="space-between">
+    <InlineStack blockAlign="center" gap="500">
+      <Thumbnail
+        source={selectedProduct.productImage || ImageIcon}
+        alt={selectedProduct.productAlt || 'Product image'}
+        size={'large'}
+      />
+      <Text as="span" variant="headingLg" fontWeight="semibold">
+        {selectedProduct.productTitle}
+      </Text>
+    </InlineStack>
+
+    <Button variant="plain" tone="critical" onClick={() => handleRemove()}>Remove</Button>
+  </InlineStack>
+  ): (
+    <Button variant="primary" onClick={selectProduct} disabled={!ruleState.extendedAreaEligible}>Pick a product</Button>
   );
 }

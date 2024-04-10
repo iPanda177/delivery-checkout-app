@@ -34,18 +34,44 @@ model QRCode {
 }
 
 model ShippingRules {
-  id                     Int     @id @default(autoincrement())
-  ruleName               String  @default("Rule")
-  locationIds            String
-  isDefault              Boolean @default(false)
+  id                     Int                      @id @default(autoincrement())
+  ruleName               String                   @default("Rule")
+  locations              LocationToShippingRule[]
+  isDefault              Boolean                  @default(false)
+  zipCodeRanges          ZipCodeRanges[]
   zipRangeStart          String
   zipRangeEnd            String
   etaDaysSmallParcelLow  Int
   etaDaysSmallParcelHigh Int
   etaDaysFreightLow      Int
   etaDaysFreightHigh     Int
-  extendedAreaEligible   Boolean @default(true)
+  extendedAreaEligible   Boolean                  @default(true)
   addOnProductId         String
 
   @@map("Shipping Rules")
+}
+
+model Location {
+  id            Int                      @id @default(autoincrement())
+  locationId    String
+  locationName  String
+  shippingRules LocationToShippingRule[]
+}
+
+model LocationToShippingRule {
+  id             Int           @id @default(autoincrement())
+  shippingRuleId Int
+  locationId     Int
+  shippingRule   ShippingRules @relation(fields: [shippingRuleId], references: [id])
+  location       Location      @relation(fields: [locationId], references: [id])
+
+  @@unique([shippingRuleId, locationId])
+}
+
+model ZipCodeRanges {
+  id              Int            @id @default(autoincrement())
+  zipRangeStart   String
+  zipRangeEnd     String
+  ShippingRules   ShippingRules? @relation(fields: [shippingRulesId], references: [id])
+  shippingRulesId Int
 }

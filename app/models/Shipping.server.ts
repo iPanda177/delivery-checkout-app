@@ -3,7 +3,7 @@ import db from "../db.server";
 import type {GraphQLClient} from "@shopify/shopify-app-remix/build/ts/server/clients/types";
 import type {AdminOperations} from "@shopify/admin-api-client";
 
-export async function getShopLocations(shop: string, graphql: GraphQLClient<AdminOperations>) {
+export async function getShopLocations(graphql: GraphQLClient<AdminOperations>) {
   const response = await graphql(
     `
       query fulfillmentLocations {

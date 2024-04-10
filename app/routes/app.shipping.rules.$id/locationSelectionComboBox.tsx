@@ -1,5 +1,4 @@
 import {
-  BlockStack,
   Tag,
   Listbox,
   EmptySearchResult,
@@ -8,28 +7,26 @@ import {
   AutoSelection, InlineStack,
 } from "@shopify/polaris";
 import {useState, useCallback, useMemo, useEffect} from "react";
-import {Location, RuleState} from "~/types/types";
+import {Location, LocationGraphQLResponse, RuleState} from "~/types/types";
 
 export default function LocationSelectCombobox({
   locations,
-  ruleState,
-  setRuleState
+  selectedLocations,
+  setSelectedLocations,
 }: {
-  locations: Location[];
-  ruleState: RuleState;
-  setRuleState: (ruleState: RuleState) => void;
+  locations: LocationGraphQLResponse[];
+  selectedLocations: Location[];
+  setSelectedLocations: (selectedLocations: Location[]) => void;
 }) {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [value, setValue] = useState("");
   const [suggestion, setSuggestion] = useState<string | undefined>("");
 
   useEffect(() => {
-    const selectedLocationsNames = locations
-      .filter((location) => ruleState.locationIds.split(',').includes(location.id))
-      .map((location) => location.name);
+    const selectedLocationsNames = selectedLocations.map((location) => location.locationName);
 
     setSelectedTags(selectedLocationsNames);
-  }, [ruleState, locations]);
+  }, [locations, selectedLocations]);
 
   const suggestions = useMemo(
     () => locations.map((location) => location.name),
@@ -86,17 +83,18 @@ export default function LocationSelectCombobox({
         nextSelectedTags.add(selected);
       }
 
-      const selectedLocationIds = locations
+      const selectedLocations = locations
         .filter((location) => nextSelectedTags.has(location.name))
-        .map((location) => location.id)
-        .join(',');
+        .map((location) => {
+          return { locationId: location.id, locationName: location.name }
+        })
 
-      setRuleState({ ...ruleState, locationIds: selectedLocationIds });
+      setSelectedLocations(selectedLocations);
       setSelectedTags([...nextSelectedTags]);
       setValue("");
       setSuggestion("");
     },
-    [selectedTags, locations, ruleState, setRuleState]
+    [selectedTags, locations, setSelectedLocations]
   );
 
   const removeTag = useCallback(
@@ -106,7 +104,7 @@ export default function LocationSelectCombobox({
     [updateSelection]
   );
 
-  const getAllTags = useCallback(() => {
+  const getAllWarehouses = useCallback(() => {
     return [...new Set([...suggestions, ...selectedTags].sort())];
   }, [selectedTags, suggestions]);
 
@@ -141,7 +139,7 @@ export default function LocationSelectCombobox({
 
   const options = useMemo(() => {
     let list;
-    const allTags = getAllTags();
+    const allTags = getAllWarehouses();
     const filterRegex = new RegExp(escapeSpecialRegExCharacters(value), "i");
 
     if (value) {
@@ -151,7 +149,7 @@ export default function LocationSelectCombobox({
     }
 
     return [...list];
-  }, [value, getAllTags, escapeSpecialRegExCharacters]);
+  }, [value, getAllWarehouses, escapeSpecialRegExCharacters]);
 
   const verticalContentMarkup =
     selectedTags.length > 0 ? (
@@ -182,7 +180,7 @@ export default function LocationSelectCombobox({
         })
       : null;
 
-  const noResults = value && !getAllTags().includes(value);
+  const noResults = value && !getAllWarehouses().includes(value);
 
   const actionMarkup = noResults ? (
     <Listbox.Action value={value}>{`Add "${value}"`}</Listbox.Action>

@@ -5,16 +5,37 @@ export type ShippingRulesActionData = {
 }
 
 export type ShippingRulesLoaderData = {
-    locations?: Location[];
-    ruleState?: ShippingRules;
-    error?: { id: string };
+  locations?: LocationGraphQLResponse[];
+  ruleState?: ShippingRules;
+  error?: { id: string };
+};
+
+export type LocationGraphQLResponse = {
+  id: string;
+  hasActiveInventory: boolean;
+  isActive: boolean;
+  name: string;
 };
 
 export type Location = {
-    id: string;
-    hasActiveInventory: boolean;
-    isActive: boolean;
-    name: string;
-};
+  locationId: string;
+  locationName: string;
+}
 
 export type RuleState = ShippingRules & { madeChanges?: boolean };
+
+export type ZipCodeRange = {
+  zipRangeStart: string;
+  zipRangeEnd: string;
+
+}
+
+export type ValidationErrors = {
+  zipRangeStartEmpty?: boolean;
+  zipRangeEndLessThanStart?: boolean;
+  ruleNameEmpty?: boolean;
+  etaDaysSmallParcelLowEmpty?: boolean;
+  etaDaysSmallParcelHighEmpty?: boolean;
+  etaDaysFreightLowEmpty?: boolean;
+  etaDaysFreightHighEmpty?: boolean;
+};
