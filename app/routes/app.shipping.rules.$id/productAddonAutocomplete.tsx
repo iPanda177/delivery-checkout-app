@@ -1,34 +1,42 @@
-import {Autocomplete, Button, Icon, InlineStack, Text, Thumbnail} from "@shopify/polaris";
-import {ImageIcon, SearchIcon} from "@shopify/polaris-icons";
-import {useCallback, useMemo, useState} from "react";
-import {RuleState} from "~/types/types";
+import { Button, InlineStack, Text, Thumbnail} from "@shopify/polaris";
+import { ImageIcon } from "@shopify/polaris-icons";
+import { useEffect, useState } from "react";
+import type { DispatchFunction, RuleState } from "~/types/types";
 
 export default function ProductAddonAutocomplete({
   ruleState,
-  setRuleState,
+  dispatch,
+  variantData
 }: {
   ruleState: RuleState;
-  setRuleState: (ruleState: RuleState) => void;
+  dispatch: DispatchFunction;
+  variantData?: { displayName: string; image?: { url?: string; altText?: string } };
 }) {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+
+  useEffect(() => {
+    if (variantData) {
+      setSelectedProduct({
+        productTitle: variantData.displayName,
+        productImage: variantData.image && variantData.image.url ? variantData.image.url : null,
+        productAlt: variantData.image && variantData.image.altText ? variantData.image.altText : null,
+      });
+    }
+  }, [variantData])
 
   async function selectProduct() {
     const products = await window.shopify.resourcePicker({
       type: "product",
-      action: "select", // customized action verb, either 'select' or 'add',
+      action: "select",
     });
 
     if (products) {
-      console.log(products);
       const { id } = products[0].variants[0];
       const { title } = products[0];
       const productImage = products[0].images[0];
 
       if (id) {
-        setRuleState({
-          ...ruleState,
-          addOnProductId: id,
-        });
+        dispatch({ type: "SET_RULE_STATE", payload: { ...ruleState, addOnProductId: id, madeChanges: true } })
 
         setSelectedProduct({
           productTitle: title,
@@ -40,12 +48,10 @@ export default function ProductAddonAutocomplete({
   }
 
   const handleRemove = () => {
-    setRuleState({
-      ...ruleState,
-      addOnProductId: '',
-    });
+    dispatch({ type: "SET_RULE_STATE", payload: { ...ruleState, addOnProductId: '' } })
 
     setSelectedProduct(null);
+    dispatch({ type: "SET_RULE_STATE", payload: { ...ruleState, madeChanges: true } })
   }
 
 

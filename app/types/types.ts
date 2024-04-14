@@ -1,4 +1,5 @@
-import type { ShippingRules } from "@prisma/client";
+import type { ShippingRules, Location, ZipCodeRanges } from "@prisma/client";
+import {Dispatch} from "react";
 
 export type ShippingRulesActionData = {
   success: boolean;
@@ -6,7 +7,8 @@ export type ShippingRulesActionData = {
 
 export type ShippingRulesLoaderData = {
   locations?: LocationGraphQLResponse[];
-  ruleState?: ShippingRules;
+  ruleState?: ShippingRules & { zipCodeRanges: ZipCodeRanges[], locations: Location };
+  variantData?: { displayName: string; image?: { url?: string; altText?: string } };
   error?: { id: string };
 };
 
@@ -17,7 +19,8 @@ export type LocationGraphQLResponse = {
   name: string;
 };
 
-export type Location = {
+export type LocationT = {
+  id?: number;
   locationId: string;
   locationName: string;
 }
@@ -39,3 +42,26 @@ export type ValidationErrors = {
   etaDaysFreightLowEmpty?: boolean;
   etaDaysFreightHighEmpty?: boolean;
 };
+
+export type dbRuleData = ShippingRules & { zipCodeRanges: ZipCodeRanges[], locations: Location };
+
+export type ShippingRulesReducerState = {
+  locations: LocationGraphQLResponse[] | null;
+  ruleState: RuleState | null;
+  selectedLocations: LocationT[],
+  zipCodeRanges: ZipCodeRange[];
+  error: String | null;
+  validationErrors: ValidationErrors;
+  isLoading: boolean,
+};
+
+export type Action =
+  | { type: "SET_LOCATIONS"; payload: LocationGraphQLResponse[] | null }
+  | { type: "SET_RULE_STATE"; payload: RuleState | null }
+  | { type: "SET_SELECTED_LOCATIONS"; payload: LocationT[] }
+  | { type: "SET_ZIP_CODE_RANGES"; payload: ZipCodeRange[] }
+  | { type: "SET_ERROR"; payload: string | null }
+  | { type: "SET_VALIDATION_ERRORS"; payload: ValidationErrors }
+  | { type: "SET_IS_LOADING"; payload: boolean };
+
+export type DispatchFunction = Dispatch<Action>;

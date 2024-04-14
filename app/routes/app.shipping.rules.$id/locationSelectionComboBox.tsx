@@ -7,16 +7,18 @@ import {
   AutoSelection, InlineStack,
 } from "@shopify/polaris";
 import {useState, useCallback, useMemo, useEffect} from "react";
-import {Location, LocationGraphQLResponse, RuleState} from "~/types/types";
+import type {LocationT, LocationGraphQLResponse, RuleState, DispatchFunction} from "~/types/types";
 
 export default function LocationSelectCombobox({
   locations,
+  ruleState,
   selectedLocations,
-  setSelectedLocations,
+  dispatch,
 }: {
   locations: LocationGraphQLResponse[];
-  selectedLocations: Location[];
-  setSelectedLocations: (selectedLocations: Location[]) => void;
+  ruleState: RuleState;
+  selectedLocations: LocationT[];
+  dispatch: DispatchFunction;
 }) {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [value, setValue] = useState("");
@@ -89,12 +91,13 @@ export default function LocationSelectCombobox({
           return { locationId: location.id, locationName: location.name }
         })
 
-      setSelectedLocations(selectedLocations);
+      dispatch({ type: "SET_SELECTED_LOCATIONS", payload: selectedLocations })
       setSelectedTags([...nextSelectedTags]);
       setValue("");
       setSuggestion("");
+      dispatch({ type: "SET_RULE_STATE", payload: { ...ruleState, madeChanges: true } })
     },
-    [selectedTags, locations, setSelectedLocations]
+    [selectedTags, locations]
   );
 
   const removeTag = useCallback(

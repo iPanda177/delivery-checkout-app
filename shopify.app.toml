@@ -2,7 +2,7 @@
 
 client_id = "f1115783b0f51ee3fe7c0b50d2bdbfe6"
 name = "Poly & Bark Extensibility(PBE)"
-application_url = "https://crisis-proprietary-alliance-quilt.trycloudflare.com"
+application_url = "https://joy-rocket-en-underground.trycloudflare.com"
 embedded = true
 
 [build]
@@ -15,9 +15,9 @@ scopes = "read_cart_transforms,write_cart_transforms,read_assigned_fulfillment_o
 
 [auth]
 redirect_urls = [
-  "https://crisis-proprietary-alliance-quilt.trycloudflare.com/auth/callback",
-  "https://crisis-proprietary-alliance-quilt.trycloudflare.com/auth/shopify/callback",
-  "https://crisis-proprietary-alliance-quilt.trycloudflare.com/api/auth/callback"
+  "https://joy-rocket-en-underground.trycloudflare.com/auth/callback",
+  "https://joy-rocket-en-underground.trycloudflare.com/auth/shopify/callback",
+  "https://joy-rocket-en-underground.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

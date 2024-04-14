@@ -1,0 +1,11 @@
+query RunInput {
+  cart {
+    lines {
+      id
+      quantity
+      extra_product_id: attribute(key: "_extra_product_id") {
+        value
+      }
+    }
+  }
+}

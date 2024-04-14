@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer } from "react";
 import { json, redirect } from "@remix-run/node";
 import { authenticate } from "~/shopify.server";
-import { getShippingRule, getShopLocations } from "~/models/Shipping.server";
+import { getProductVariantData, getShippingRule, getShopLocations } from "~/models/Shipping.server";
 import {
   useLoaderData,
   useSubmit,
@@ -22,6 +22,7 @@ import {
   Banner,
   Button
 } from "@shopify/polaris";
+import { PlusIcon } from "@shopify/polaris-icons";
 
 import LocationSelectCombobox from "./locationSelectionComboBox";
 import ProductAddonAutocomplete from "./productAddonAutocomplete";
@@ -29,16 +30,15 @@ import ProductAddonAutocomplete from "./productAddonAutocomplete";
 import db from "../../db.server";
 
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
-import type {
-  Location,
-  LocationGraphQLResponse,
+import {
+  LocationT,
   RuleState,
   ShippingRulesActionData,
   ShippingRulesLoaderData,
-  ValidationErrors,
-  ZipCodeRange
+  ZipCodeRange,
+  ShippingRulesReducerState,
+  Action, ValidationErrors
 } from "~/types/types";
-import {PlusIcon} from "@shopify/polaris-icons";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { admin } = await authenticate.admin(request);
@@ -51,7 +51,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       return json({ error: { id: "Rule not found" } }, { status: 404 });
     }
 
-    return json({ ...{ locations }, ruleState });
+    let variantData = null
+
+    if (ruleState.addOnProductId) {
+      variantData = await getProductVariantData(ruleState.addOnProductId, admin.graphql);
+    }
+
+    return json({ ...{ locations }, ruleState, variantData });
   }
 
   const ruleState = {
@@ -59,7 +65,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     ruleName: '',
     locations: [],
     isDefault: false,
-    zipCodeRanges: [],
+    zipCodeRanges: [{ zipRangeStart: '', zipRangeEnd: '' }],
     zipRangeStart: '',
     zipRangeEnd: '',
     etaDaysSmallParcelLow: 0,
@@ -79,12 +85,19 @@ export async function action({ request, params }: ActionFunctionArgs) {
       ...Object.fromEntries(await request.formData()),
     };
 
-    const selectedLocationsArray = JSON.parse(data.selectedLocations);
-    const zipCodeRangesData = JSON.parse(data.zipCodeRanges);
-    console.log(zipCodeRangesData)
+    const selectedLocationsArray = JSON.parse(data.selectedLocations as string);
+    const zipCodeRangesData = JSON.parse(data.zipCodeRanges as string);
 
     if (data.action === "delete") {
-      await db.qRCode.delete({ where: { id: Number(params.id) } });
+      await db.locationToShippingRule.deleteMany({
+        where: { shippingRuleId: Number(params.id) }
+      });
+
+      await db.zipCodeRanges.deleteMany({
+        where: { shippingRulesId: Number(params.id) }
+      });
+
+      await db.shippingRules.delete({ where: { id: Number(params.id) } });
       return redirect("/app/shipping");
     }
 
@@ -103,17 +116,57 @@ export async function action({ request, params }: ActionFunctionArgs) {
       };
 
       if (params.id !== 'new') {
+        await db.locationToShippingRule.deleteMany({
+          where: { shippingRuleId: Number(params.id) }
+        });
+
+        await db.zipCodeRanges.deleteMany({
+          where: { shippingRulesId: Number(params.id) }
+        });
+
         await db.shippingRules.update({
           where: { id: Number(params.id) },
           data: ruleData,
         });
+
+        await Promise.all(selectedLocationsArray.map(
+          async (location: LocationT) => {
+            const createdLocation = await db.location.create({
+              data: {
+                locationId: location.locationId,
+                locationName: location.locationName,
+              },
+            });
+
+            await db.locationToShippingRule.create({
+              data: {
+                locationId: createdLocation.id,
+                shippingRuleId: Number(params.id),
+              },
+            });
+
+            return createdLocation;
+          },
+        ));
+
+        await Promise.all(zipCodeRangesData.map(
+          async (zipCodeRange: ZipCodeRange) => (
+            await db.zipCodeRanges.create({
+              data: {
+                zipRangeStart: zipCodeRange.zipRangeStart,
+                zipRangeEnd: zipCodeRange.zipRangeEnd,
+                shippingRulesId: Number(params.id)
+              }
+            })
+          )
+        ))
       } else {
         const createdShippingRule  = await db.shippingRules.create({
           data: ruleData,
         });
 
         await Promise.all(selectedLocationsArray.map(
-          async (location: Location) => {
+          async (location: LocationT) => {
             const createdLocation = await db.location.create({
               data: {
                 locationId: location.locationId,
@@ -132,17 +185,17 @@ export async function action({ request, params }: ActionFunctionArgs) {
           },
         ));
 
-        // await Promise.all(zipCodeRangesData.map(
-        //   async (zipCodeRange: ZipCodeRange) => (
-        //     await db.zipCodeRanges.create({
-        //       data: {
-        //         zipRangeStart: zipCodeRange.zipRangeStart,
-        //         zipRangeEnd: zipCodeRange.zipRangeEnd,
-        //         shippingRulesId: createdShippingRule.id
-        //       }
-        //     })
-        //   )
-        // ))
+        await Promise.all(zipCodeRangesData.map(
+          async (zipCodeRange: ZipCodeRange) => (
+            await db.zipCodeRanges.create({
+              data: {
+                zipRangeStart: zipCodeRange.zipRangeStart,
+                zipRangeEnd: zipCodeRange.zipRangeEnd,
+                shippingRulesId: createdShippingRule.id
+              }
+            })
+          )
+        ))
       }
 
       return json({ success: true });
@@ -153,105 +206,140 @@ export async function action({ request, params }: ActionFunctionArgs) {
   }
 }
 
+const initialState: ShippingRulesReducerState = {
+  locations: null,
+  ruleState: null,
+  selectedLocations: [],
+  zipCodeRanges: [],
+  error: null,
+  validationErrors: {},
+  isLoading: false,
+};
+
+function reducer(state: ShippingRulesReducerState, action: Action) {
+  switch (action.type) {
+    case "SET_LOCATIONS":
+      return { ...state, locations: action.payload };
+    case "SET_RULE_STATE":
+      return { ...state, ruleState: action.payload };
+    case "SET_SELECTED_LOCATIONS":
+      return { ...state, selectedLocations: action.payload };
+    case "SET_ZIP_CODE_RANGES":
+      return { ...state, zipCodeRanges: action.payload };
+    case "SET_ERROR":
+      return { ...state, error: action.payload };
+    case "SET_VALIDATION_ERRORS":
+      return { ...state, validationErrors: action.payload };
+    case "SET_IS_LOADING":
+      return { ...state, isLoading: action.payload };
+    default:
+      return state;
+  }
+}
+
 export default function ShippingRuleForm() {
   const loaderData = useLoaderData<ShippingRulesLoaderData>();
   const actionData = useActionData<ShippingRulesActionData>();
 
-  const [locations, setLocations] = useState<LocationGraphQLResponse[] | null>(null);
-  const [ruleState, setRuleState] = useState<RuleState | null>(null);
-  const [selectedLocations, setSelectedLocations] = useState<Location[]>([]);
-  const [zipCodeRanges, setZipCodeRanges] = useState<ZipCodeRange[]>([{ zipRangeStart: '', zipRangeEnd: '' }]);
-  const [error, setError] = useState<String | null>(null);
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const navigate = useNavigate();
   const submit = useSubmit();
 
   useEffect(() => {
     if (loaderData.error) {
-      setError(loaderData.error.id);
+      dispatch({ type: "SET_ERROR", payload: loaderData.error.id });
     }
 
     if (loaderData.locations) {
-      setLocations(loaderData.locations);
+      dispatch({ type: "SET_LOCATIONS", payload: loaderData.locations });
     }
 
     if (loaderData.ruleState) {
       const editedRuleState: RuleState = { ...loaderData.ruleState };
       editedRuleState.madeChanges = false;
 
-      setRuleState(loaderData.ruleState);
+      dispatch({ type: "SET_RULE_STATE", payload: editedRuleState });
+      dispatch({ type: "SET_ZIP_CODE_RANGES", payload: loaderData.ruleState.zipCodeRanges });
+      dispatch({ type: "SET_SELECTED_LOCATIONS", payload: loaderData.ruleState.locations });
     }
   }, [loaderData])
 
   useEffect(() => {
     if (actionData && actionData.success) {
-      setIsLoading(false);
+      dispatch({ type: "SET_IS_LOADING", payload: false });
 
       shopify.toast.show("Rule created");
+      navigate("/app/shipping");
     } else if (actionData && !actionData.success) {
-      setIsLoading(false);
+      dispatch({ type: "SET_IS_LOADING", payload: false });
 
       shopify.toast.show("Error creating rule", { isError: true });
     }
   }, [actionData])
 
   const handleZipCodeRangeChange = (index: number, type: 'start' | 'end', value: string) => {
-    const updatedZipCodeRanges = [...zipCodeRanges];
+    const updatedZipCodeRanges = [...state.zipCodeRanges];
     updatedZipCodeRanges[index][type === 'start' ? 'zipRangeStart' : 'zipRangeEnd'] = value;
 
-    setZipCodeRanges(updatedZipCodeRanges);
+    dispatch({ type: "SET_ZIP_CODE_RANGES", payload: updatedZipCodeRanges });
+  }
+
+  const handleAddingZipCodeRange = () => {
+    dispatch({ type: "SET_ZIP_CODE_RANGES", payload: [...state.zipCodeRanges, { zipRangeStart: '', zipRangeEnd: '' }] });
+    dispatch({ type: "SET_RULE_STATE", payload: { ...state.ruleState, madeChanges: true } });
   }
 
   const handlePageAction = (actionType: 'save' | 'delete') => {
-    if (zipCodeRanges.some(zipCodeRange => zipCodeRange.zipRangeStart === '')) {
-      setValidationErrors({ ...validationErrors, zipRangeStartEmpty: true });
-    }
+    const validationErrors: ValidationErrors = {};
 
-    if (zipCodeRanges.some(zipCodeRange => zipCodeRange.zipRangeEnd < zipCodeRange.zipRangeStart)) {
-      setValidationErrors({ ...validationErrors, zipRangeEndLessThanStart: true });
-    }
+    switch (true) {
+      case state.zipCodeRanges.some(zipCodeRange => zipCodeRange.zipRangeStart === ''):
+        validationErrors.zipRangeStartEmpty = true;
 
-    if (ruleState!.ruleName === '') {
-      setValidationErrors({ ...validationErrors, ruleNameEmpty: true });
-    }
+      case state.zipCodeRanges.some(zipCodeRange => zipCodeRange.zipRangeEnd < zipCodeRange.zipRangeStart):
+        validationErrors.zipRangeEndLessThanStart = true;
 
-    if (ruleState!.etaDaysSmallParcelLow === 0) {
-      setValidationErrors({ ...validationErrors, etaDaysSmallParcelLowEmpty: true });
-    }
+      case state.ruleState!.ruleName === '':
+        validationErrors.ruleNameEmpty = true;
 
-    if (ruleState!.etaDaysSmallParcelHigh === 0) {
-      setValidationErrors({ ...validationErrors, etaDaysSmallParcelHighEmpty: true });
-    }
+      case state.ruleState!.etaDaysSmallParcelLow === 0:
+        validationErrors.etaDaysSmallParcelLowEmpty = true;
 
-    if (ruleState!.etaDaysFreightLow === 0) {
-      setValidationErrors({ ...validationErrors, etaDaysFreightLowEmpty: true });
-    }
+      case state.ruleState!.etaDaysSmallParcelHigh === 0:
+        validationErrors.etaDaysSmallParcelHighEmpty = true;
 
-    if (ruleState!.etaDaysFreightHigh === 0) {
-      setValidationErrors({ ...validationErrors, etaDaysFreightHighEmpty: true });
+      case state.ruleState!.etaDaysFreightLow === 0:
+        validationErrors.etaDaysFreightLowEmpty = true;
+
+      case state.ruleState!.etaDaysFreightHigh === 0:
+        validationErrors.etaDaysFreightHighEmpty = true;
+
+      default:
+        break;
     }
 
     if (Object.keys(validationErrors).length > 0) {
+      console.log(validationErrors)
+      dispatch({ type: "SET_VALIDATION_ERRORS", payload: validationErrors });
       return;
     }
 
-    const lowestZipCodeStart = Math.min(...zipCodeRanges.map(zipCodeRange => Number(zipCodeRange.zipRangeStart)));
-    const highestZipCodeEnd = Math.max(...zipCodeRanges.map(zipCodeRange => Number(zipCodeRange.zipRangeEnd)));
+    const lowestZipCodeStart = Math.min(...state.zipCodeRanges.map((zipCodeRange: ZipCodeRange) => Number(zipCodeRange.zipRangeStart)));
+    const highestZipCodeEnd = Math.max(...state.zipCodeRanges.map((zipCodeRange: ZipCodeRange) => Number(zipCodeRange.zipRangeEnd)));
 
     const updatedRuleState = {
-      ...ruleState,
+      ...state.ruleState,
       zipRangeStart: String(lowestZipCodeStart),
       zipRangeEnd: String(highestZipCodeEnd),
     };
 
-    setIsLoading(true);
+    dispatch({ type: "SET_IS_LOADING", payload: true });
 
     submit({
       ...updatedRuleState,
-      selectedLocations: JSON.stringify([...selectedLocations]),
-      zipCodeRanges: JSON.stringify([...zipCodeRanges]),
+      selectedLocations: JSON.stringify([...state.selectedLocations]),
+      zipCodeRanges: JSON.stringify([...state.zipCodeRanges]),
       action: actionType
     }, { method: "post" });
   }
@@ -260,7 +348,7 @@ export default function ShippingRuleForm() {
     <Page narrowWidth>
       <ui-title-bar
         title={
-          ruleState && ruleState.id ? "Edit Shipping Rule" : "Create New Shipping Rule"
+          state.ruleState && state.ruleState.id ? "Edit Shipping Rule" : "Create New Shipping Rule"
         }
       >
         <button variant="breadcrumb" onClick={() => navigate("/app/shipping")}>
@@ -268,7 +356,7 @@ export default function ShippingRuleForm() {
         </button>
       </ui-title-bar>
 
-      {error && (
+      {state.error && (
         <>
           <Banner
             title="Error: Rule not found"
@@ -283,7 +371,7 @@ export default function ShippingRuleForm() {
         </>
       )}
 
-      {locations && ruleState && (
+      {state.locations && state.ruleState && (
         <Layout>
           <Layout.Section>
             <BlockStack gap="500">
@@ -299,15 +387,15 @@ export default function ShippingRuleForm() {
                     label="title"
                     labelHidden
                     autoComplete="off"
-                    value={ruleState.ruleName}
-                    onChange={(name) => setRuleState({...ruleState, ruleName: name, madeChanges: true})}
-                    error={validationErrors.ruleNameEmpty ? 'Rule name cannot be empty' : undefined}
+                    value={state.ruleState.ruleName}
+                    onChange={(name) => dispatch({ type: "SET_RULE_STATE", payload: { ...state.ruleState, ruleName: name, madeChanges: true }})}
+                    error={state.validationErrors.ruleNameEmpty ? 'Rule name cannot be empty' : undefined}
                   />
 
                   <Checkbox
                     label="Default Rule"
-                    checked={ruleState.isDefault}
-                    onChange={(value) => setRuleState({...ruleState, isDefault: value, madeChanges: true})}
+                    checked={state.ruleState.isDefault}
+                    onChange={(value) => dispatch({ type: "SET_RULE_STATE", payload: { ...state.ruleState, isDefault: value, madeChanges: true }})}
                   />
                 </BlockStack>
               </Card>
@@ -319,9 +407,10 @@ export default function ShippingRuleForm() {
                   </Text>
 
                   <LocationSelectCombobox
-                    locations={locations}
-                    selectedLocations={selectedLocations}
-                    setSelectedLocations={setSelectedLocations}
+                    locations={state.locations}
+                    ruleState={state.ruleState}
+                    selectedLocations={state.selectedLocations}
+                    dispatch={dispatch}
                   />
 
                   <Bleed marginInlineStart="200" marginInlineEnd="200">
@@ -334,14 +423,14 @@ export default function ShippingRuleForm() {
                     </Text>
 
                     <Button
-                      onClick={() => setZipCodeRanges([...zipCodeRanges, { zipRangeStart: '', zipRangeEnd: '' }])}
+                      onClick={() => handleAddingZipCodeRange()}
                       icon={PlusIcon}
                     >
                       Add Zip Code Range
                     </Button>
                   </InlineStack>
 
-                  {zipCodeRanges.map((zipCodeRange, index) => (
+                  {state.zipCodeRanges.map((zipCodeRange: ZipCodeRange, index: number) => (
                     <BlockStack gap="500" key={index}>
                       <Text as={"h3"} variant="headingMd">
                         Zip Code Range {index + 1}
@@ -352,7 +441,7 @@ export default function ShippingRuleForm() {
                           label="Starting Zip Code"
                           value={zipCodeRange.zipRangeStart}
                           onChange={(code) => handleZipCodeRangeChange(index, 'start', code)}
-                          error={validationErrors.zipRangeStartEmpty ? 'Starting zip code cannot be empty' : undefined}
+                          error={state.validationErrors.zipRangeStartEmpty ? 'Starting zip code cannot be empty' : undefined}
                           autoComplete="off"
                         />
 
@@ -360,7 +449,7 @@ export default function ShippingRuleForm() {
                           label="Ending Zip Code"
                           value={zipCodeRange.zipRangeEnd}
                           onChange={(code) => handleZipCodeRangeChange(index, 'end', code)}
-                          error={validationErrors.zipRangeEndLessThanStart ? 'Ending zip code must be greater than starting zip code' : undefined}
+                          error={state.validationErrors.zipRangeEndLessThanStart ? 'Ending zip code must be greater than starting zip code' : undefined}
                           autoComplete="off"
                         />
                       </InlineStack>
@@ -379,18 +468,18 @@ export default function ShippingRuleForm() {
                     <TextField
                       label="ETA Days Small Parcel Low"
                       type="number"
-                      value={String(ruleState.etaDaysSmallParcelLow)}
-                      onChange={(value) => setRuleState({...ruleState, etaDaysSmallParcelLow: Number(value), madeChanges: true})}
-                      error={validationErrors.etaDaysSmallParcelLowEmpty ? 'ETA days small parcel low cannot be empty' : undefined}
+                      value={String(state.ruleState.etaDaysSmallParcelLow)}
+                      onChange={(value) => dispatch({ type: "SET_RULE_STATE", payload: { ...state.ruleState, etaDaysSmallParcelLow: Number(value), madeChanges: true }})}
+                      error={state.validationErrors.etaDaysSmallParcelLowEmpty ? 'ETA days small parcel low cannot be empty' : undefined}
                       autoComplete="off"
                     />
 
                     <TextField
                       label="ETA Days Small Parcel High"
                       type="number"
-                      value={String(ruleState.etaDaysSmallParcelHigh)}
-                      onChange={(value) => setRuleState({...ruleState, etaDaysSmallParcelHigh: Number(value), madeChanges: true})}
-                      error={validationErrors.etaDaysSmallParcelHighEmpty ? 'ETA days small parcel high cannot be empty' : undefined}
+                      value={String(state.ruleState.etaDaysSmallParcelHigh)}
+                      onChange={(value) => dispatch({ type: "SET_RULE_STATE", payload: { ...state.ruleState, etaDaysSmallParcelHigh: Number(value), madeChanges: true }})}
+                      error={state.validationErrors.etaDaysSmallParcelHighEmpty ? 'ETA days small parcel high cannot be empty' : undefined}
                       autoComplete="off"
                     />
                   </InlineStack>
@@ -403,18 +492,18 @@ export default function ShippingRuleForm() {
                     <TextField
                       label="ETA Days Freight Low"
                       type="number"
-                      value={String(ruleState.etaDaysFreightLow)}
-                      onChange={(value) => setRuleState({...ruleState, etaDaysFreightLow: Number(value), madeChanges: true})}
-                      error={validationErrors.etaDaysFreightLowEmpty ? 'ETA days freight low cannot be empty' : undefined}
+                      value={String(state.ruleState.etaDaysFreightLow)}
+                      onChange={(value) => dispatch({ type: "SET_RULE_STATE", payload: { ...state.ruleState, etaDaysFreightLow: Number(value), madeChanges: true }})}
+                      error={state.validationErrors.etaDaysFreightLowEmpty ? 'ETA days freight low cannot be empty' : undefined}
                       autoComplete="off"
                     />
 
                     <TextField
                       label="ETA Days Freight High"
                       type="number"
-                      value={String(ruleState.etaDaysFreightHigh)}
-                      onChange={(value) => setRuleState({...ruleState, etaDaysFreightHigh: Number(value), madeChanges: true})}
-                      error={validationErrors.etaDaysFreightHighEmpty ? 'ETA days freight high cannot be empty' : undefined}
+                      value={String(state.ruleState.etaDaysFreightHigh)}
+                      onChange={(value) => dispatch({ type: "SET_RULE_STATE", payload: { ...state.ruleState, etaDaysFreightHigh: Number(value), madeChanges: true }})}
+                      error={state.validationErrors.etaDaysFreightHighEmpty ? 'ETA days freight high cannot be empty' : undefined}
                       autoComplete="off"
                     />
                   </InlineStack>
@@ -425,13 +514,14 @@ export default function ShippingRuleForm() {
 
                   <Checkbox
                     label="Requires Delivery Surcharge / Product Addon"
-                    checked={ruleState.extendedAreaEligible}
-                    onChange={(value) => setRuleState({...ruleState, extendedAreaEligible: value, madeChanges: true})}
+                    checked={state.ruleState.extendedAreaEligible}
+                    onChange={(value) => dispatch({ type: "SET_RULE_STATE", payload: { ...state.ruleState, extendedAreaEligible: value, madeChanges: true }})}
                   />
 
                   <ProductAddonAutocomplete
-                    ruleState={ruleState}
-                    setRuleState={setRuleState}
+                    ruleState={state.ruleState}
+                    dispatch={dispatch}
+                    variantData={loaderData.variantData}
                   />
                 </BlockStack>
               </Card>
@@ -443,8 +533,8 @@ export default function ShippingRuleForm() {
               secondaryActions={[
                 {
                   content: "Delete",
-                  loading: isLoading,
-                  disabled: ruleState.id === null,
+                  loading: state.isLoading,
+                  disabled: state.ruleState.id === null,
                   destructive: true,
                   outline: true,
                   onAction: () => handlePageAction('delete')
@@ -452,8 +542,8 @@ export default function ShippingRuleForm() {
               ]}
               primaryAction={{
                 content: "Save",
-                loading: isLoading,
-                disabled: !ruleState.madeChanges,
+                loading: state.isLoading,
+                disabled: !state.ruleState.madeChanges,
                 onAction: () => handlePageAction('save'),
               }}
             />

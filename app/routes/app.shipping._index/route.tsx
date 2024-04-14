@@ -5,7 +5,7 @@ import {
   Layout,
   Card,
   IndexTable,
-  Text
+  Text, Badge
 } from "@shopify/polaris";
 
 import db from "../../db.server";
@@ -96,7 +96,9 @@ export default function Index() {
       </IndexTable.Cell>
 
       <IndexTable.Cell>
-        <Text as="span">{shippingRule.extendedAreaEligible}</Text>
+        <Text as="span">
+          <Badge size={"large"} tone={shippingRule.extendedAreaEligible ? "success" : undefined}>{shippingRule.extendedAreaEligible ? "true" : "false"}</Badge>
+          </Text>
       </IndexTable.Cell>
 
       <IndexTable.Cell>
