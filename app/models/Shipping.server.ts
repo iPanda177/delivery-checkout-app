@@ -3,6 +3,7 @@ import db from "../db.server";
 import type {GraphQLClient} from "@shopify/shopify-app-remix/build/ts/server/clients/types";
 import type {AdminOperations} from "@shopify/admin-api-client";
 import {dbRuleData} from "~/types/types";
+import {ShippingRules} from "@prisma/client";
 
 export async function getShopLocations(graphql: GraphQLClient<AdminOperations>) {
   const response = await graphql(
@@ -39,12 +40,27 @@ export async function getProductVariantData(id: string, graphql: GraphQLClient<A
             url
             altText
           }
+          inventoryItem {
+            id
+            inventoryLevel(locationId: $locationId) {
+              edges {
+                node {
+                  available
+                  location {
+                    id
+                  }
+                }
+              }
+
+            }
+          }
         }
       }
     `,
     {
       variables: {
         id: id,
+        locationId: "gid://shopify/Location/1",
       },
     }
   );
@@ -81,4 +97,12 @@ export async function getShippingRule(id: number, graphql: GraphQLClient<AdminOp
   dbRuleData.locations = uniqueLocationsArray;
 
   return dbRuleData;
+}
+
+export async function prepareShipmentsArray(shippingRules: ShippingRules[], productIds: string[], graphql: GraphQLClient<AdminOperations>) {
+  const shopifyLocations = await getShopLocations(graphql);
+
+  productIds.forEach(async (id) => {
+    const productVariantData = await getProductVariantData(id, graphql);
+  });
 }

@@ -59,6 +59,9 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
+      remix-utils:
+        specifier: ^7.6.0
+        version: 7.6.0(@remix-run/node@2.5.1)(@remix-run/react@2.5.1)(react@18.2.0)(zod@3.22.4)
       tiny-invariant:
         specifier: ^1.3.1
         version: 1.3.1
@@ -10830,6 +10833,49 @@ packages:
   /remedial@1.0.8:
     resolution: {integrity: sha512-/62tYiOe6DzS5BqVsNpH/nkGlX45C/Sp6V+NtiN6JQNS1Viay7cWkazmRkrQrdFj2eshDe96SIQNIoMxqhzBOg==}
 
+  /remix-utils@7.6.0(@remix-run/node@2.5.1)(@remix-run/react@2.5.1)(react@18.2.0)(zod@3.22.4):
+    resolution: {integrity: sha512-BPhCUEy+nwrhDDDg2v3+LFSszV6tluMbeSkbffj2o4tqZxt5Kn69Y9sNpGxYLAj8gjqeYDuxjv55of+gYnnykA==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      '@remix-run/cloudflare': ^2.0.0
+      '@remix-run/deno': ^2.0.0
+      '@remix-run/node': ^2.0.0
+      '@remix-run/react': ^2.0.0
+      '@remix-run/router': ^1.7.2
+      crypto-js: ^4.1.1
+      intl-parse-accept-language: ^1.0.0
+      is-ip: ^5.0.1
+      react: ^18.0.0
+      zod: ^3.22.4
+    peerDependenciesMeta:
+      '@remix-run/cloudflare':
+        optional: true
+      '@remix-run/deno':
+        optional: true
+      '@remix-run/node':
+        optional: true
+      '@remix-run/react':
+        optional: true
+      '@remix-run/router':
+        optional: true
+      crypto-js:
+        optional: true
+      intl-parse-accept-language:
+        optional: true
+      is-ip:
+        optional: true
+      react:
+        optional: true
+      zod:
+        optional: true
+    dependencies:
+      '@remix-run/node': 2.5.1(typescript@5.3.3)
+      '@remix-run/react': 2.5.1(react-dom@18.2.0)(react@18.2.0)(typescript@5.3.3)
+      react: 18.2.0
+      type-fest: 4.15.0
+      zod: 3.22.4
+    dev: false
+
   /remove-trailing-separator@1.1.0:
     resolution: {integrity: sha512-/hS+Y0u3aOfIETiaiirUFwDBDzmXPvO+jAfKTitUngIPzdKc6Z0LoFjM/CK5PL4C+eKwHohlHAb6H0VFfmmUsw==}
 
@@ -11857,6 +11903,11 @@ packages:
   /type-fest@3.13.1:
     resolution: {integrity: sha512-tLq3bSNx+xSpwvAJnzrK0Ep5CLNWjvFTOp71URMaAEWBfRb9nnJiBoUe0tF8bI4ZFO3omgBR6NvnbzVUT3Ly4g==}
     engines: {node: '>=14.16'}
+    dev: false
+
+  /type-fest@4.15.0:
+    resolution: {integrity: sha512-tB9lu0pQpX5KJq54g+oHOLumOx+pMep4RaM6liXh2PKmVRFF+/vAtUP0ZaJ0kOySfVNjF6doBWPHhBhISKdlIA==}
+    engines: {node: '>=16'}
     dev: false
 
   /type-is@1.6.18:

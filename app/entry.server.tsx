@@ -3,8 +3,9 @@ import { renderToPipeableStream } from "react-dom/server";
 import { RemixServer } from "@remix-run/react";
 import {
   createReadableStreamFromReadable,
-  type EntryContext,
+  type EntryContext, HandleDataRequestFunction,
 } from "@remix-run/node";
+import { cors } from "remix-utils/cors";
 import { isbot } from "isbot";
 import { addDocumentResponseHeaders } from "./shopify.server";
 
@@ -35,6 +36,7 @@ export default async function handleRequest(
           const stream = createReadableStreamFromReadable(body);
 
           responseHeaders.set("Content-Type", "text/html");
+          responseHeaders.set("Access-Control-Allow-Origin", "*")
           resolve(
             new Response(stream, {
               headers: responseHeaders,
@@ -56,3 +58,10 @@ export default async function handleRequest(
     setTimeout(abort, ABORT_DELAY);
   });
 }
+
+export let handleDataRequest: HandleDataRequestFunction = async (
+  response,
+  { request },
+) => {
+  return await cors(request, response);
+};
