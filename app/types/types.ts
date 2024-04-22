@@ -43,7 +43,7 @@ export type ValidationErrors = {
   etaDaysFreightHighEmpty?: boolean;
 };
 
-export type dbRuleData = ShippingRules & { zipCodeRanges: ZipCodeRanges[], locations: Location };
+export type dbRuleData = ShippingRules & { zipCodeRanges: ZipCodeRanges[], locations: Location[] };
 
 export type ShippingRulesReducerState = {
   locations: LocationGraphQLResponse[] | null;

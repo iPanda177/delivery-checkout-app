@@ -2,7 +2,7 @@
 
 client_id = "f1115783b0f51ee3fe7c0b50d2bdbfe6"
 name = "Poly & Bark Extensibility(PBE)"
-application_url = "https://lucky-cfr-shop-wicked.trycloudflare.com"
+application_url = "https://suffered-myself-sin-js.trycloudflare.com"
 embedded = true
 
 [build]
@@ -15,9 +15,9 @@ scopes = "read_cart_transforms,write_cart_transforms,read_assigned_fulfillment_o
 
 [auth]
 redirect_urls = [
-  "https://lucky-cfr-shop-wicked.trycloudflare.com/auth/callback",
-  "https://lucky-cfr-shop-wicked.trycloudflare.com/auth/shopify/callback",
-  "https://lucky-cfr-shop-wicked.trycloudflare.com/api/auth/callback"
+  "https://suffered-myself-sin-js.trycloudflare.com/auth/callback",
+  "https://suffered-myself-sin-js.trycloudflare.com/auth/shopify/callback",
+  "https://suffered-myself-sin-js.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

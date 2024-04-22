@@ -111,20 +111,50 @@ Learn more about data fetching with Hooks: https://reactjs.org/link/hooks-data-f
 `)+`No matching component was found for:
 `+("  "+S.join(" > "))}return null}function FE(e,t){if(!tr)throw new Error("Test selector API is not supported by this renderer.");for(var n=Xo(e,t),a=[],r=0;r<n.length;r++)a.push(Ls(n[r]));for(var i=a.length-1;i>0;i--)for(var u=a[i],o=u.x,s=o+u.width,f=u.y,m=f+u.height,S=i-1;S>=0;S--)if(i!==S){var x=a[S],N=x.x,A=N+x.width,U=x.y,I=U+x.height;if(o>=N&&f>=U&&s<=A&&m<=I){a.splice(i,1);break}else if(o===N&&u.width===x.width&&!(I<f)&&!(U>m)){U>f&&(x.height+=U-f,x.y=f),I<m&&(x.height=m-U),a.splice(i,1);break}else if(f===U&&u.height===x.height&&!(A<o)&&!(N>s)){N>o&&(x.width+=N-o,x.x=o),A<s&&(x.width=s-N),a.splice(i,1);break}}return a}function BE(e,t){if(!tr)throw new Error("Test selector API is not supported by this renderer.");for(var n=sd(e),a=th(n,t),r=Array.from(a),i=0;i<r.length;){var u=r[i++];if(!Pr(u)){if(u.tag===$){var o=u.stateNode;if(pi(o))return!0}for(var s=u.child;s!==null;)r.push(s),s=s.sibling}}return!1}var Jo=[];function VE(){tr&&Jo.forEach(function(e){return e()})}function wE(e,t,n,a){if(!tr)throw new Error("Test selector API is not supported by this renderer.");var r=Xo(e,t),i=js(r,n,a),u=i.disconnect,o=i.observe,s=i.unobserve,f=function(){var m=Xo(e,t);r.forEach(function(S){m.indexOf(S)<0&&s(S)}),m.forEach(function(S){r.indexOf(S)<0&&o(S)})};return Jo.push(f),{disconnect:function(){var m=Jo.indexOf(f);m>=0&&Jo.splice(m,1),u()}}}var YE=M.ReactCurrentActQueue;function PE(e){{var t=typeof IS_REACT_ACT_ENVIRONMENT!="undefined"?IS_REACT_ACT_ENVIRONMENT:void 0,n=typeof jest!="undefined";return Cl&&n&&t!==!1}}function nh(){{var e=typeof IS_REACT_ACT_ENVIRONMENT!="undefined"?IS_REACT_ACT_ENVIRONMENT:void 0;return!e&&YE.current!==null&&h("The current testing environment is not configured to support act(...)"),e}}var qE=Math.ceil,dd=M.ReactCurrentDispatcher,pd=M.ReactCurrentOwner,ht=M.ReactCurrentBatchConfig,Da=M.ReactCurrentActQueue,Mt=0,vd=1,on=2,ia=4,cr=0,el=1,ai=2,Zo=3,tl=4,ah=5,md=6,Te=Mt,Cn=null,yt=null,Bt=z,Xa=z,hd=Cr(z),Vt=cr,nl=null,yd=z,Wo=z,al=z,Io=z,rl=null,An=null,gd=0,rh=500,ih=1/0,QE=500,fr=null;function Yi(){ih=kt()+QE}function uh(){return ih}var $o=!1,Sd=null,Pi=null,ri=!1,Mr=null,il=z,bd=[],Ed=null,GE=50,ul=0,Cd=null,Rd=!1,es=!1,KE=50,qi=0,ts=null,ll=st,ns=z,lh=!1;function as(){return Cn}function vn(){return(Te&(on|ia))!==Mt?kt():(ll!==st||(ll=kt()),ll)}function Ar(e){var t=e.mode;if((t&Ye)===le)return fe;if((Te&on)!==Mt&&Bt!==z)return bu(Bt);var n=RS()!==CS;if(n){if(ht.transition!==null){var a=ht.transition;a._updatedFibers||(a._updatedFibers=new Set),a._updatedFibers.add(e)}return ns===Gt&&(ns=jp()),ns}var r=ma();if(r!==Gt)return r;var i=Rl();return i}function kE(e){var t=e.mode;return(t&Ye)===le?fe:Cg()}function At(e,t,n,a){EC(),lh&&h("useInsertionEffect must not schedule updates."),Rd&&(es=!0),Eu(e,n,a),(Te&on)!==z&&e===Cn?xC(t):(ha&&Vp(e,t,n),TC(t),e===Cn&&((Te&on)===Mt&&(al=Ee(al,n)),Vt===tl&&zr(e,Bt)),zn(e,a),n===fe&&Te===Mt&&(t.mode&Ye)===le&&!Da.isBatchingLegacy&&(Yi(),$p()))}function XE(e,t,n){var a=e.current;a.lanes=t,Eu(e,t,n),zn(e,n)}function JE(e){return(Te&on)!==Mt}function zn(e,t){var n=e.callbackNode;hg(e,t);var a=Pl(e,e===Cn?Bt:z);if(a===z){n!==null&&Ch(n),e.callbackNode=null,e.callbackPriority=Gt;return}var r=Gr(a),i=e.callbackPriority;if(i===r&&!(Da.current!==null&&n!==Nd)){n==null&&i!==fe&&h("Expected scheduled callback to exist. This error is likely caused by a bug in React. Please file an issue.");return}n!=null&&Ch(n);var u;if(r===fe)e.tag===gi?(Da.isBatchingLegacy!==null&&(Da.didScheduleLegacyUpdate=!0),iS(ch.bind(null,e))):Ip(ch.bind(null,e)),Tl?Da.current!==null?Da.current.push(Ba):zs(function(){(Te&(on|ia))===Mt&&Ba()}):ss(Gl,Ba),u=null;else{var o;switch(qp(a)){case ja:o=Gl;break;case Cu:o=Gp;break;case Ru:o=Ri;break;case xc:o=Kp;break;default:o=Ri;break}u=ss(o,oh.bind(null,e))}e.callbackPriority=r,e.callbackNode=u}function oh(e,t){if(rb(),ll=st,ns=z,(Te&(on|ia))!==Mt)throw new Error("Should not already be working.");var n=e.callbackNode,a=Ja();if(a&&e.callbackNode!==n)return null;var r=Pl(e,e===Cn?Bt:z);if(r===z)return null;var i=!ql(e,r)&&!Eg(e,r)&&!t,u=i?sC(e,r):us(e,r);if(u!==cr){if(u===ai){var o=Sc(e);o!==z&&(r=o,u=xd(e,o))}if(u===el){var s=nl;throw ii(e,z),zr(e,r),zn(e,kt()),s}if(u===md)zr(e,r);else{var f=!ql(e,r),m=e.current.alternate;if(f&&!WE(m)){if(u=us(e,r),u===ai){var S=Sc(e);S!==z&&(r=S,u=xd(e,S))}if(u===el){var x=nl;throw ii(e,z),zr(e,r),zn(e,kt()),x}}e.finishedWork=m,e.finishedLanes=r,ZE(e,u,r)}}return zn(e,kt()),e.callbackNode===n?oh.bind(null,e):null}function xd(e,t){var n=rl;if(ev(e)){var a=ii(e,t);a.flags|=Nn,ag(e.containerInfo)}var r=us(e,t);if(r!==ai){var i=An;An=n,i!==null&&sh(i)}return r}function sh(e){An===null?An=e:An.push.apply(An,e)}function ZE(e,t,n){switch(t){case cr:case el:throw new Error("Root did not complete. This is a bug in React.");case ai:{ui(e,An,fr);break}case Zo:{if(zr(e,n),Lp(n)&&!Rh()){var a=gd+rh-kt();if(a>10){var r=Pl(e,z);if(r!==z)break;var i=e.suspendedLanes;if(!Ci(i,n)){var u=vn();Bp(e,i);break}e.timeoutHandle=El(ui.bind(null,e,An,fr),a);break}}ui(e,An,fr);break}case tl:{if(zr(e,n),bg(n))break;if(!Rh()){var o=vg(e,n),s=o,f=kt()-s,m=bC(f)-f;if(m>10){e.timeoutHandle=El(ui.bind(null,e,An,fr),m);break}}ui(e,An,fr);break}case ah:{ui(e,An,fr);break}default:throw new Error("Unknown root exit status.")}}function WE(e){for(var t=e;;){if(t.flags&$a){var n=t.updateQueue;if(n!==null){var a=n.stores;if(a!==null)for(var r=0;r<a.length;r++){var i=a[r],u=i.getSnapshot,o=i.value;try{if(!Qn(u(),o))return!1}catch(f){return!1}}}}var s=t.child;if(t.subtreeFlags&$a&&s!==null){s.return=t,t=s;continue}if(t===e)return!0;for(;t.sibling===null;){if(t.return===null||t.return===e)return!0;t=t.return}t.sibling.return=t.return,t=t.sibling}return!0}function zr(e,t){t=Ql(t,Io),t=Ql(t,al),xg(e,t)}function ch(e){if(ib(),(Te&(on|ia))!==Mt)throw new Error("Should not already be working.");Ja();var t=Pl(e,z);if(!qn(t,fe))return zn(e,kt()),null;var n=us(e,t);if(e.tag!==gi&&n===ai){var a=Sc(e);a!==z&&(t=a,n=xd(e,a))}if(n===el){var r=nl;throw ii(e,z),zr(e,t),zn(e,kt()),r}if(n===md)throw new Error("Root did not complete. This is a bug in React.");var i=e.current.alternate;return e.finishedWork=i,e.finishedLanes=t,ui(e,An,fr),zn(e,kt()),null}function IE(e,t){t!==z&&(Rc(e,Ee(t,fe)),zn(e,kt()),(Te&(on|ia))===Mt&&(Yi(),Ba()))}function $E(e){var t=ma(),n=ht.transition;try{return ht.transition=null,Kt(Ru),e()}finally{Kt(t),ht.transition=n}}function eC(e,t){var n=Te;Te|=vd;try{return e(t)}finally{Te=n,Te===Mt&&!Da.isBatchingLegacy&&(Yi(),$p())}}function tC(e,t,n,a,r){var i=ma(),u=ht.transition;try{return ht.transition=null,Kt(ja),e(t,n,a,r)}finally{Kt(i),ht.transition=u,Te===Mt&&Yi()}}function rs(e){Mr!==null&&Mr.tag===gi&&(Te&(on|ia))===Mt&&Ja();var t=Te;Te|=vd;var n=ht.transition,a=ma();try{return ht.transition=null,Kt(ja),e?e():void 0}finally{Kt(a),ht.transition=n,Te=t,(Te&(on|ia))===Mt&&Ba()}}function nC(){return(Te&(on|ia))!==Mt}function aC(e){var t=Te;Te|=vd;var n=ht.transition,a=ma();try{ht.transition=null,Kt(ja),e()}finally{Kt(a),ht.transition=n,Te=t,Te===Mt&&(Yi(),Ba())}}function is(e,t){$t(hd,Xa,e),Xa=Ee(Xa,t),yd=Ee(yd,t)}function Td(e){Xa=hd.current,dn(hd,e)}function ii(e,t){e.finishedWork=null,e.finishedLanes=z;var n=e.timeoutHandle;if(n!==gr&&(e.timeoutHandle=gr,Ns(n)),yt!==null)for(var a=yt.return;a!==null;){var r=a.alternate;jm(r,a),a=a.return}Cn=e;var i=li(e.current,null);return yt=i,Bt=Xa=yd=t,Vt=cr,nl=null,Wo=z,al=z,Io=z,rl=null,An=null,zS(),ga.discardPendingWarnings(),i}function fh(e,t){do{var n=yt;try{if(to(),Vv(),Sn(),pd.current=null,n===null||n.return===null){Vt=el,nl=t,yt=null;return}if(bt&&n.mode&Je&&Lo(n,!0),dt)if(xi(),t!==null&&typeof t=="object"&&typeof t.then=="function"){var a=t;Zg(n,a,Bt)}else Jg(n,t,Bt);cb(e,n.return,n,t,Bt),mh(n)}catch(r){t=r,yt===n&&n!==null?(n=n.return,yt=n):n=yt;continue}return}while(!0)}function dh(){var e=dd.current;return dd.current=No,e===null?No:e}function ph(e){dd.current=e}function rC(){gd=kt()}function ol(e){Wo=Ee(e,Wo)}function iC(){Vt===cr&&(Vt=Zo)}function Dd(){(Vt===cr||Vt===Zo||Vt===ai)&&(Vt=tl),Cn!==null&&(bc(Wo)||bc(al))&&zr(Cn,Bt)}function uC(e){Vt!==tl&&(Vt=ai),rl===null?rl=[e]:rl.push(e)}function lC(){return Vt===cr}function us(e,t){var n=Te;Te|=on;var a=dh();if(Cn!==e||Bt!==t){if(ha){var r=e.memoizedUpdaters;r.size>0&&(sl(e,Bt),r.clear()),wp(e,t)}fr=Yp(),ii(e,t)}Zp(t);do try{oC();break}catch(i){fh(e,i)}while(!0);if(to(),Te=n,ph(a),yt!==null)throw new Error("Cannot commit an incomplete root. This error is likely caused by a bug in React. Please file an issue.");return Wp(),Cn=null,Bt=z,Vt}function oC(){for(;yt!==null;)vh(yt)}function sC(e,t){var n=Te;Te|=on;var a=dh();if(Cn!==e||Bt!==t){if(ha){var r=e.memoizedUpdaters;r.size>0&&(sl(e,Bt),r.clear()),wp(e,t)}fr=Yp(),Yi(),ii(e,t)}Zp(t);do try{cC();break}catch(i){fh(e,i)}while(!0);return to(),ph(a),Te=n,yt!==null?(tS(),cr):(Wp(),Cn=null,Bt=z,Vt)}function cC(){for(;yt!==null&&!Mg();)vh(yt)}function vh(e){var t=e.alternate;Rt(e);var n;(e.mode&Je)!==le?(jf(e),n=_d(t,e,Xa),Lo(e,!0)):n=_d(t,e,Xa),Sn(),e.memoizedProps=e.pendingProps,n===null?mh(e):yt=n,pd.current=null}function mh(e){var t=e;do{var n=t.alternate,a=t.return;if((t.flags&Ua)===k){Rt(t);var r=void 0;if((t.mode&Je)===le?r=Hm(n,t,Xa):(jf(t),r=Hm(n,t,Xa),Lo(t,!1)),Sn(),r!==null){yt=r;return}}else{var i=Pb(n,t);if(i!==null){i.flags&=nu,yt=i;return}if((t.mode&Je)!==le){Lo(t,!1);for(var u=t.actualDuration,o=t.child;o!==null;)u+=o.actualDuration,o=o.sibling;t.actualDuration=u}if(a!==null)a.flags|=Ua,a.subtreeFlags=k,a.deletions=null;else{Vt=md,yt=null;return}}var s=t.sibling;if(s!==null){yt=s;return}t=a,yt=t}while(t!==null);Vt===cr&&(Vt=ah)}function ui(e,t,n){var a=ma(),r=ht.transition;try{ht.transition=null,Kt(ja),fC(e,t,n,a)}finally{ht.transition=r,Kt(a)}return null}function fC(e,t,n,a){do Ja();while(Mr!==null);if(CC(),(Te&(on|ia))!==Mt)throw new Error("Should not already be working.");var r=e.finishedWork,i=e.finishedLanes;if(Pg(i),r===null)return kp(),null;if(i===z&&h("root.finishedLanes should not be empty during a commit. This is a bug in React."),e.finishedWork=null,e.finishedLanes=z,r===e.current)throw new Error("Cannot commit the same tree as before. This error is likely caused by a bug in React. Please file an issue.");e.callbackNode=null,e.callbackPriority=Gt;var u=Ee(r.lanes,r.childLanes);Tg(e,u),e===Cn&&(Cn=null,yt=null,Bt=z),((r.subtreeFlags&Ie)!==k||(r.flags&Ie)!==k)&&(ri||(ri=!0,Ed=n,ss(Ri,function(){return Ja(),null})));var o=(r.subtreeFlags&(Ce|mt|We|Ie))!==k,s=(r.flags&(Ce|mt|We|Ie))!==k;if(o||s){var f=ht.transition;ht.transition=null;var m=ma();Kt(ja);var S=Te;Te|=ia,pd.current=null;var x=Zb(e,r);cm(),fE(e,r,i),iu(e.containerInfo),e.current=r,Wg(i),dE(r,e,i),Ig(),Ag(),Te=S,Kt(m),ht.transition=f}else e.current=r,cm();var N=ri;if(ri?(ri=!1,Mr=e,il=i):(qi=0,ts=null),u=e.pendingLanes,u===z&&(Pi=null),N||Sh(e.current,!1),Fg(r.stateNode,a),ha&&e.memoizedUpdaters.clear(),VE(),zn(e,kt()),t!==null)for(var A=e.onRecoverableError,U=0;U<t.length;U++){var I=t[U],oe=I.stack,ne=I.digest;A(I.value,{componentStack:oe,digest:ne})}if($o){$o=!1;var ke=Sd;throw Sd=null,ke}return qn(il,fe)&&e.tag!==gi&&Ja(),u=e.pendingLanes,qn(u,fe)?(ab(),e===Cd?ul++:(ul=0,Cd=e)):ul=0,Ba(),kp(),null}function Ja(){if(Mr!==null){var e=qp(il),t=Ng(Ru,e),n=ht.transition,a=ma();try{return ht.transition=null,Kt(t),pC()}finally{Kt(a),ht.transition=n}}return!1}function dC(e){bd.push(e),ri||(ri=!0,ss(Ri,function(){return Ja(),null}))}function pC(){if(Mr===null)return!1;var e=Ed;Ed=null;var t=Mr,n=il;if(Mr=null,il=z,(Te&(on|ia))!==Mt)throw new Error("Cannot flush passive effects while already rendering.");Rd=!0,es=!1,$g(n);var a=Te;Te|=ia,SE(t.current),mE(t,t.current,n,e);{var r=bd;bd=[];for(var i=0;i<r.length;i++){var u=r[i];eE(t,u)}}eS(),Sh(t.current,!0),Te=a,Ba(),es?t===ts?qi++:(qi=0,ts=t):qi=0,Rd=!1,es=!1,Bg(t);{var o=t.current.stateNode;o.effectDuration=0,o.passiveEffectDuration=0}return!0}function hh(e){return Pi!==null&&Pi.has(e)}function vC(e){Pi===null?Pi=new Set([e]):Pi.add(e)}function mC(e){$o||($o=!0,Sd=e)}var hC=mC;function yh(e,t,n){var a=ti(n,t),r=dm(e,a,fe),i=Tr(e,r,fe),u=vn();i!==null&&(Eu(i,fe,u),zn(i,u))}function $e(e,t,n){if(kb(n),cl(!1),e.tag===se){yh(e,e,n);return}var a=null;for(a=t;a!==null;){if(a.tag===se){yh(a,e,n);return}else if(a.tag===ge){var r=a.type,i=a.stateNode;if(typeof r.getDerivedStateFromError=="function"||typeof i.componentDidCatch=="function"&&!hh(i)){var u=ti(n,e),o=Pf(a,u,fe),s=Tr(a,o,fe),f=vn();s!==null&&(Eu(s,fe,f),zn(s,f));return}}a=a.return}h(`Internal React error: Attempted to capture a commit phase error inside a detached tree. This indicates a bug in React. Likely causes include deleting the same fiber more than once, committing an already-finished tree, or an inconsistent return pointer.
 
+<<<<<<< HEAD
 Error message:
+=======
+  // node_modules/.pnpm/@shopify+ui-extensions@2024.4.1/node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/Button/Button.mjs
+  var Button = createRemoteComponent("Button");
+
+  // node_modules/.pnpm/@shopify+ui-extensions@2024.4.1/node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/Choice/Choice.mjs
+  var Choice = createRemoteComponent("Choice");
+>>>>>>> d6b445f (shipment logic finished, toggle button group for shipments added, extra product adding logic implemented)
 
 %s`,n)}function yC(e,t,n){var a=e.pingCache;a!==null&&a.delete(t);var r=vn();Bp(e,n),DC(e),Cn===e&&Ci(Bt,n)&&(Vt===tl||Vt===Zo&&Lp(Bt)&&kt()-gd<rh?ii(e,z):Io=Ee(Io,n)),zn(e,r)}function gh(e,t){t===Gt&&(t=kE(e));var n=vn(),a=bn(e,t);a!==null&&(Eu(a,t,n),zn(a,n))}function gC(e){var t=e.memoizedState,n=Gt;t!==null&&(n=t.retryLane),gh(e,n)}function SC(e,t){var n=Gt,a;switch(e.tag){case we:a=e.stateNode;var r=e.memoizedState;r!==null&&(n=r.retryLane);break;case Et:a=e.stateNode;break;default:throw new Error("Pinged unknown suspense boundary type. This is probably a bug in React.")}a!==null&&a.delete(t),gh(e,n)}function bC(e){return e<120?120:e<480?480:e<1080?1080:e<1920?1920:e<3e3?3e3:e<4320?4320:qE(e/1960)*1960}function EC(){if(ul>GE)throw ul=0,Cd=null,new Error("Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. React limits the number of nested updates to prevent infinite loops.");qi>KE&&(qi=0,ts=null,h("Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render."))}function CC(){ga.flushLegacyContextWarning(),ga.flushPendingUnsafeLifecycleWarnings()}function Sh(e,t){Rt(e),ls(e,Oe,OE),t&&ls(e,xe,NE),ls(e,Oe,DE),t&&ls(e,xe,_E),Sn()}function ls(e,t,n){for(var a=e,r=null;a!==null;){var i=a.subtreeFlags&t;a!==r&&a.child!==null&&i!==k?a=a.child:((a.flags&t)!==k&&n(a),a.sibling!==null?a=a.sibling:a=r=a.return)}}var os=null;function bh(e){{if((Te&on)!==Mt||!(e.mode&Ye))return;var t=e.tag;if(t!==yn&&t!==se&&t!==ge&&t!==Me&&t!==ze&&t!==ct&&t!==Le)return;var n=W(e)||"ReactComponent";if(os!==null){if(os.has(n))return;os.add(n)}else os=new Set([n]);var a=Gn;try{Rt(e),h("Can't perform a React state update on a component that hasn't mounted yet. This indicates that you have a side-effect in your render function that asynchronously later calls tries to update the component. Move this work to useEffect instead.")}finally{a?Rt(e):Sn()}}}var _d;{var RC=null;_d=function(e,t,n){var a=Oh(RC,t);try{return Mm(e,t,n)}catch(i){if(pS()||i!==null&&typeof i=="object"&&typeof i.then=="function")throw i;if(to(),Vv(),jm(e,t),Oh(t,a),t.mode&Je&&jf(t),Vm(null,Mm,null,e,t,n),Gb()){var r=wm();typeof r=="object"&&r!==null&&r._suppressLogging&&typeof i=="object"&&i!==null&&!i._suppressLogging&&(i._suppressLogging=!0)}throw i}}}var Eh=!1,Od;Od=new Set;function xC(e){if(Du&&!eb())switch(e.tag){case Me:case ze:case Le:{var t=yt&&W(yt)||"Unknown",n=t;if(!Od.has(n)){Od.add(n);var a=W(e)||"Unknown";h("Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://reactjs.org/link/setstate-in-render",a,t,t)}break}case ge:{Eh||(h("Cannot update during an existing state transition (such as within `render`). Render methods should be a pure function of props and state."),Eh=!0);break}}}function sl(e,t){if(ha){var n=e.memoizedUpdaters;n.forEach(function(a){Vp(e,a,t)})}}var Nd={};function ss(e,t){{var n=Da.current;return n!==null?(n.push(t),Nd):Qp(e,t)}}function Ch(e){if(e!==Nd)return Ug(e)}function Rh(){return Da.current!==null}function TC(e){{if(e.mode&Ye){if(!nh())return}else if(!PE()||Te!==Mt||e.tag!==Me&&e.tag!==ze&&e.tag!==Le)return;if(Da.current===null){var t=Gn;try{Rt(e),h(`An update to %s inside a test was not wrapped in act(...).
 
 When testing, code that causes React state updates should be wrapped into act(...):
 
+<<<<<<< HEAD
 act(() => {
   /* fire events that update state */
 });
 /* assert on the output */
+=======
+  // node_modules/.pnpm/@shopify+ui-extensions@2024.4.1/node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/InlineLayout/InlineLayout.mjs
+  var InlineLayout = createRemoteComponent("InlineLayout");
+
+  // node_modules/.pnpm/@shopify+ui-extensions@2024.4.1/node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/InlineStack/InlineStack.mjs
+  var InlineStack = createRemoteComponent("InlineStack");
+>>>>>>> d6b445f (shipment logic finished, toggle button group for shipments added, extra product adding logic implemented)
 
 This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act`,W(e))}finally{t?Rt(e):Sn()}}}}function DC(e){e.tag!==gi&&nh()&&Da.current===null&&h(`A suspended resource finished loading inside a test, but the event was not wrapped in act(...).
 
+<<<<<<< HEAD
 When testing, code that resolves suspended data should be wrapped into act(...):
+=======
+  // node_modules/.pnpm/@shopify+ui-extensions@2024.4.1/node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/ToggleButton/ToggleButton.mjs
+  var ToggleButton = createRemoteComponent("ToggleButton");
+
+  // node_modules/.pnpm/@shopify+ui-extensions@2024.4.1/node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/ToggleButtonGroup/ToggleButtonGroup.mjs
+  var ToggleButtonGroup = createRemoteComponent("ToggleButtonGroup");
+
+  // node_modules/.pnpm/@shopify+ui-extensions@2024.4.1/node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/View/View.mjs
+  var View = createRemoteComponent("View");
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/render.mjs
+  var import_react6 = __toESM(require_react(), 1);
+>>>>>>> d6b445f (shipment logic finished, toggle button group for shipments added, extra product adding logic implemented)
 
 act(() => {
   /* finish loading suspended data */
@@ -145,6 +175,7 @@ Check the render method of \``+v+"`."}return""}}function He(v){{if(v!==void 0){v
 
 Check your code at `+O+":"+Y+"."}return""}}var Nn={};function $n(v){{var O=mr();if(!O){var Y=typeof v=="string"?v:v.displayName||v.name;Y&&(O=`
 
+<<<<<<< HEAD
 Check the top-level render call using <`+Y+">.")}return O}}function cn(v,O){{if(!v._store||v._store.validated||v.key!=null)return;v._store.validated=!0;var Y=$n(O);if(Nn[Y])return;Nn[Y]=!0;var te="";v&&v._owner&&v._owner!==et.current&&(te=" It was passed a child from "+De(v._owner.type)+"."),ce(v),be('Each child in a list should have a unique "key" prop.%s%s See https://reactjs.org/link/warning-keys for more information.',Y,te),ce(null)}}function qt(v,O){{if(typeof v!="object")return;if(ut(v))for(var Y=0;Y<v.length;Y++){var te=v[Y];da(te)&&cn(te,O)}else if(da(v))v._store&&(v._store.validated=!0);else if(v){var je=_e(v);if(typeof je=="function"&&je!==v.entries)for(var Oe=je.call(v),xe;!(xe=Oe.next()).done;)da(xe.value)&&cn(xe.value,O)}}}function Un(v){{var O=v.type;if(O==null||typeof O=="string")return;var Y;if(typeof O=="function")Y=O.propTypes;else if(typeof O=="object"&&(O.$$typeof===L||O.$$typeof===Q))Y=O.propTypes;else return;if(Y){var te=De(O);ca(Y,v.props,"prop",te,v)}else if(O.PropTypes!==void 0&&!It){It=!0;var je=De(O);be("Component %s declared `PropTypes` instead of `propTypes`. Did you misspell the property assignment?",je||"Unknown")}typeof O.getDefaultProps=="function"&&!O.getDefaultProps.isReactClassApproved&&be("getDefaultProps is only used on classic React.createClass definitions. Use a static property named `defaultProps` instead.")}}function pa(v){{for(var O=Object.keys(v.props),Y=0;Y<O.length;Y++){var te=O[Y];if(te!=="children"&&te!=="key"){ce(v),be("Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.",te),ce(null);break}}v.ref!==null&&(ce(v),be("Invalid attribute `ref` supplied to `React.Fragment`."),ce(null))}}function $a(v,O,Y,te,je,Oe){{var xe=Ae(v);if(!xe){var Ce="";(v===void 0||typeof v=="object"&&v!==null&&Object.keys(v).length===0)&&(Ce+=" You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports.");var mt=He(je);mt?Ce+=mt:Ce+=mr();var We;v===null?We="null":ut(v)?We="array":v!==void 0&&v.$$typeof===c?(We="<"+(De(v.type)||"Unknown")+" />",Ce=" Did you accidentally export a JSX literal instead of a component?"):We=typeof v,be("React.jsx: type is invalid -- expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s",We,Ce)}var Ie=k(v,O,Y,je,Oe);if(Ie==null)return Ie;if(xe){var vt=O.children;if(vt!==void 0)if(te)if(ut(vt)){for(var Ma=0;Ma<vt.length;Ma++)qt(vt[Ma],v);Object.freeze&&Object.freeze(vt)}else be("React.jsx: Static children should always be an array. You are likely explicitly calling React.jsxs or React.jsxDEV. Use the Babel transform instead.");else qt(vt,v)}return v===R?pa(Ie):Un(Ie),Ie}}function tu(v,O,Y){return $a(v,O,Y,!0)}function nu(v,O,Y){return $a(v,O,Y,!1)}var Ua=nu,_t=tu;bs.Fragment=R,bs.jsx=Ua,bs.jsxs=_t})()});var Wi=Hr((Nx,xy)=>{"use strict";xy.exports=Ry()});function Xi(d){if(d==null||typeof d!="object")return!1;let c=Object.getPrototypeOf(d);return c==null||c===Object.prototype}function _a(d){return d!=null&&d.kind===3}var dl="__current",Gd={},yR=[];function Jd(d,{strict:c=!0,components:y}={}){let R=0,g={strict:c,mounted:!1,channel:d,children:yR,nodes:new WeakSet,parents:new WeakMap,tops:new WeakMap,components:new WeakMap,fragments:new WeakMap};c&&Object.freeze(y);let M={kind:0,options:c?Object.freeze({strict:c,components:y}):{strict:c,components:y},get children(){return g.children},createComponent(K,...F){if(y&&y.indexOf(K)<0)throw new Error(`Unsupported component: ${K}`);let[L,h,...B]=F,Q=L!=null?L:{},ve=[],tt={};if(L)for(let me of Object.keys(L))me!=="children"&&(tt[me]=Fr(uy(L[me])));if(h)if(Array.isArray(h))for(let me of h)ve.push(Jt(me,M));else{ve.push(Jt(h,M));for(let me of B)ve.push(Jt(me,M))}let Qe=`${R++}`,Re={externalProps:c?Object.freeze(Q):Q,internalProps:tt,children:c?Object.freeze(ve):ve},_e=la({kind:1,get children(){return Re.children},get props(){return Re.externalProps},get remoteProps(){return Re.internalProps},remove:()=>ty(_e),updateProps:me=>bR(_e,me,Re,g),append:(...me)=>vs(_e,me.map(be=>Jt(be,M)),Re,g),appendChild:me=>ms(_e,Jt(me,M),Re,g),removeChild:me=>hs(_e,me,Re,g),replaceChildren:(...me)=>Kd(_e,me.map(be=>Jt(be,M)),Re,g),insertBefore:(me,be)=>Ji(_e,Jt(me,M),be,Re,g),insertChildBefore:(me,be)=>Ji(_e,Jt(me,M),be,Re,g)},Gd);g.components.set(_e,Re),Object.defineProperty(_e,"type",{value:K,configurable:!1,writable:!1,enumerable:!0}),kd(_e,g),Xd(_e,Qe,M);for(let me of Re.children)vl(_e,me,g);return _e},createText(K=""){let F=`${R++}`,L={text:K},h=Q=>SR(B,Q,L,g),B=la({kind:2,get text(){return L.text},update:h,updateText:h,remove:()=>ty(B)},Gd);return kd(B,g),Xd(B,F,M),B},createFragment(){let K=`${R++}`,F={children:c?Object.freeze([]):[]},L=la({kind:3,get children(){return F.children},append:(...h)=>vs(L,h.map(B=>Jt(B,M)),F,g),appendChild:h=>ms(L,Jt(h,M),F,g),removeChild:h=>hs(L,h,F,g),replaceChildren:(...h)=>Kd(L,h.map(B=>Jt(B,M)),F,g),insertBefore:(h,B)=>Ji(L,Jt(h,M),B,F,g),insertChildBefore:(h,B)=>Ji(L,Jt(h,M),B,F,g)},Gd);return g.fragments.set(L,F),kd(L,g),Xd(L,K,M),L},append:(...K)=>vs(M,K.map(F=>Jt(F,M)),g,g),appendChild:K=>ms(M,Jt(K,M),g,g),replaceChildren:(...K)=>Kd(M,K.map(F=>Jt(F,M)),g,g),removeChild:K=>hs(M,K,g,g),insertBefore:(K,F)=>Ji(M,Jt(K,M),F,g,g),insertChildBefore:(K,F)=>Ji(M,Jt(K,M),F,g,g),mount(){return g.mounted?Promise.resolve():(g.mounted=!0,Promise.resolve(d(0,g.children.map(ml))))}};return M}function gR(d,{tops:c}){var y;return((y=c.get(d))===null||y===void 0?void 0:y.kind)===0}function iy(d,c){let y=R=>{if("children"in R)for(let g of R.children)c(g),y(g)};y(d)}function pl(d,c,{remote:y,local:R}){let{mounted:g,channel:M}=c;g&&(d.kind===0||gR(d,c))&&y(M),R()}function SR(d,c,y,R){return pl(d,R,{remote:g=>g(3,d.id,c),local:()=>{y.text=c}})}var jr=Symbol("ignore");function bR(d,c,y,R){let{strict:g}=R,{internalProps:M,externalProps:K}=y,F={},L=[],h=!1;for(let B of Object.keys(c)){if(B==="children")continue;let Q=K[B],ve=c[B],tt=M[B],Qe=uy(ve);if(tt===Qe&&(Qe==null||typeof Qe!="object"))continue;let[Re,_e]=Zd(tt,Qe);_e&&L.push(..._e),Re!==jr&&(h=!0,F[B]=Re,_a(Q)&&Wd(Q,R),_a(ve)&&vl(d,ve,R))}return pl(d,R,{remote:B=>{h&&B(4,d.id,F)},local:()=>{let B=la(la({},K),c);y.externalProps=g?Object.freeze(B):B,y.internalProps=la(la({},y.internalProps),F);for(let[Q,ve]of L)Q[dl]=ve}})}function Zd(d,c,y=new Set){return y.has(d)?[jr]:(y.add(d),typeof d=="function"&&dl in d?[typeof c=="function"?jr:Fr(c),[[d,c]]]:Array.isArray(d)?RR(d,c,y):Xi(d)&&!_a(d)?CR(d,c,y):[d===c?jr:c])}function Fr(d,c=new Map){let y=c.get(d);if(y)return y;if(_a(d))return c.set(d,d),d;if(Array.isArray(d)){let R=[];c.set(d,R);for(let g of d)R.push(Fr(g,c));return R}if(Xi(d)){let R={};c.set(d,R);for(let g of Object.keys(d))R[g]=Fr(d[g],c);return R}if(typeof d=="function"){let R=(...g)=>R[dl](...g);return Object.defineProperty(R,dl,{enumerable:!1,configurable:!1,writable:!0,value:d}),c.set(d,R),R}return c.set(d,d),d}function Zi(d,c=new Set){if(!c.has(d)){if(c.add(d),Array.isArray(d))return d.reduce((y,R)=>{let g=Zi(R,c);return g?[...y,...g]:y},[]);if(Xi(d))return Object.keys(d).reduce((y,R)=>{let g=Zi(d[R],c);return g?[...y,...g]:y},[]);if(typeof d=="function")return dl in d?[d]:void 0}}function ty(d){var c;(c=d.parent)===null||c===void 0||c.removeChild(d)}function vs(d,c,y,R){for(let g of c)ms(d,g,y,R)}function ms(d,c,y,R){var g;let{nodes:M,strict:K}=R;if(!M.has(c))throw new Error("Cannot append a node that was not created by this remote root");let F=c.parent,L=(g=F==null?void 0:F.children.indexOf(c))!==null&&g!==void 0?g:-1;return pl(d,R,{remote:h=>{h(1,d.id,L<0?d.children.length:d.children.length-1,ml(c),F?F.id:!1)},local:()=>{vl(d,c,R);let h;if(F){let B=ly(F,R),Q=[...B.children];Q.splice(L,1),F===d?h=Q:(B.children=K?Object.freeze(Q):Q,h=[...y.children])}else h=[...y.children];h.push(c),y.children=K?Object.freeze(h):h}})}function Kd(d,c,y,R){for(let g of d.children)hs(d,g,y,R);vs(d,c,y,R)}function hs(d,c,y,R){let{strict:g}=R;return pl(d,R,{remote:M=>M(2,d.id,d.children.indexOf(c)),local:()=>{Wd(c,R);let M=[...y.children];M.splice(M.indexOf(c),1),y.children=g?Object.freeze(M):M}})}function Ji(d,c,y,R,g){var M;let{strict:K,nodes:F}=g;if(!F.has(c))throw new Error("Cannot insert a node that was not created by this remote root");let L=c.parent,h=(M=L==null?void 0:L.children.indexOf(c))!==null&&M!==void 0?M:-1;return pl(d,g,{remote:B=>{let Q=y==null?d.children.length-1:d.children.indexOf(y);B(1,d.id,Q<h||h<0?Q:Q-1,ml(c),L?L.id:!1)},local:()=>{vl(d,c,g);let B;if(L){let Q=ly(L,g),ve=[...Q.children];ve.splice(h,1),L===d?B=ve:(Q.children=K?Object.freeze(ve):ve,B=[...R.children])}else B=[...R.children];y==null?B.push(c):B.splice(B.indexOf(y),0,c),R.children=K?Object.freeze(B):B}})}function Jt(d,c){return typeof d=="string"?c.createText(d):d}function vl(d,c,y){let{tops:R,parents:g}=y,M=d.kind===0?d:R.get(d);R.set(c,M),g.set(c,d),ny(c,y),iy(c,K=>{R.set(K,M),ny(K,y)})}function ny(d,c){if(d.kind!==1)return;let y=d.props;y&&Object.values(y).forEach(R=>{_a(R)&&vl(d,R,c)})}function Wd(d,c){let{tops:y,parents:R}=c;y.delete(d),R.delete(d),iy(d,g=>{y.delete(g),ay(g,c)}),ay(d,c)}function ay(d,c){if(d.kind!==1)return;let y=d.remoteProps;for(let R of Object.keys(y!=null?y:{})){let g=y[R];_a(g)&&Wd(g,c)}}function kd(d,{parents:c,tops:y,nodes:R}){R.add(d),Object.defineProperty(d,"parent",{get(){return c.get(d)},configurable:!0,enumerable:!0}),Object.defineProperty(d,"top",{get(){return y.get(d)},configurable:!0,enumerable:!0})}function ml(d){return d.kind===2?{id:d.id,kind:d.kind,text:d.text}:{id:d.id,kind:d.kind,type:d.type,props:d.remoteProps,children:d.children.map(c=>ml(c))}}function uy(d){return _a(d)?ER(d):d}function ER(d){return{id:d.id,kind:d.kind,get children(){return d.children.map(c=>ml(c))}}}function ly(d,c){return d.kind===0?c:d.kind===3?c.fragments.get(d):c.components.get(d)}function Xd(d,c,y){Object.defineProperty(d,"id",{value:c,configurable:!0,writable:!1,enumerable:!1}),Object.defineProperty(d,"root",{value:y,configurable:!0,writable:!1,enumerable:!1})}function CR(d,c,y){if(!Xi(c)){var R;return[Fr(c),(R=Zi(d))===null||R===void 0?void 0:R.map(F=>[F,void 0])]}let g=!1,M=[],K={};for(let F in d){let L=d[F];if(!(F in c)){g=!0;let ve=Zi(L);ve&&M.push(...ve.map(tt=>[tt,void 0]))}let h=c[F],[B,Q]=Zd(L,h,y);Q&&M.push(...Q),B!==jr&&(g=!0,K[F]=B)}for(let F in c)F in K||(g=!0,K[F]=Fr(c[F]));return[g?K:jr,M]}function RR(d,c,y){if(!Array.isArray(c)){var R;return[Fr(c),(R=Zi(d))===null||R===void 0?void 0:R.map(B=>[B,void 0])]}let g=!1,M=[],K=c.length,F=d.length,L=Math.max(F,K),h=[];for(let B=0;B<L;B++){let Q=d[B],ve=c[B];if(B<K){if(B>=F){g=!0,h[B]=Fr(ve);continue}let[tt,Qe]=Zd(Q,ve,y);if(Qe&&M.push(...Qe),tt===jr){h[B]=Q;continue}g=!0,h[B]=tt}else{g=!0;let tt=Zi(Q);tt&&M.push(...tt.map(Qe=>[Qe,void 0]))}}return[g?h:jr,M]}function oy(){return(c,y)=>{var R;function g(...M){return ki(this,null,function*(){if(M.length===1)return y(...M);let[{channel:K,components:F},L]=M,h=Jd(K,{components:F,strict:!0}),B=y(h,L);return typeof B=="object"&&B!=null&&"then"in B&&(B=yield B),h.mount(),B})}return(R=globalThis.shopify)===null||R===void 0||R.extend(c,g),g}}var Id=oy();var $d="BlockStack";var ep="Choice";var tp="ChoiceList";var np="Icon";var ap="InlineStack";var rp="Text";var zy=Tn(oa(),1);var _y=Tn(oa(),1);var by=Tn(yy(),1);var Ey=d=>{var c;return(0,by.default)({now:Date.now,scheduleTimeout:setTimeout,cancelTimeout:clearTimeout,noTimeout:!1,supportsMicrotasks:!0,scheduleMicrotask:gy,queueMicrotask:gy,isPrimaryRenderer:(c=d==null?void 0:d.primary)!==null&&c!==void 0?c:!0,supportsMutation:!0,supportsHydration:!1,supportsPersistence:!1,getRootHostContext(){return{}},getChildHostContext(y){return y},createTextInstance(y,R){return R.createText(y)},createInstance(y,R,g){let F=R,{children:M}=F,K=ps(F,["children"]);return g.createComponent(y,K)},commitTextUpdate(y,R,g){y.update(g)},prepareUpdate(y,R,g,M){let K={},F=!1;for(let L in g)!Sy(g,L)||L==="children"||(L in M?g[L]!==M[L]&&(F=!0,K[L]=M[L]):(F=!0,K[L]=void 0));for(let L in M)!Sy(M,L)||L==="children"||L in g||(F=!0,K[L]=M[L]);return F?K:null},commitUpdate(y,R){y.updateProps(R)},appendChildToContainer(y,R){y.append(R)},insertInContainerBefore(y,R,g){y.insertBefore(R,g)},removeChildFromContainer(y,R){y.removeChild(R)},clearContainer(y){for(let R of y.children)y.removeChild(R)},appendInitialChild(y,R){y.append(R)},appendChild(y,R){y.append(R)},insertBefore(y,R,g){y.insertBefore(R,g)},removeChild(y,R){y.removeChild(R)},finalizeInitialChildren(){return!1},shouldSetTextContent(){return!1},getPublicInstance(){},prepareForCommit(){return null},resetAfterCommit(){},commitMount(){},preparePortalMount(){},detachDeletedInstance(){}})};function gy(d){return typeof queueMicrotask=="function"?queueMicrotask:Promise.resolve(null).then(d).catch(xR)}function xR(d){setTimeout(()=>{throw d})}var{hasOwnProperty:TR}={};function Sy(d,c){return TR.call(d,c)}var Cy=Tn(oa(),1),Ss=(0,Cy.createContext)(null);var Oy=Tn(Wi(),1),Ty=new WeakMap,Dy=0,DR=Ey();function ip(d,c,y,R=DR){let g=Ty.get(c);if(!g){var M;let h={container:Number(((M=_y.version.split("."))===null||M===void 0?void 0:M[0])||18)>=18?R.createContainer(c,Dy,null,!1,null,"r-ui",()=>null,null):R.createContainer(c,Dy,!1,null),renderContext:{root:c,reconciler:R}};Ty.set(c,h),g=h}let{container:K,renderContext:F}=g;R.updateContainer(d&&(0,Oy.jsx)(Ss.Provider,{value:F,children:d}),K,null,y)}var Wa=Tn(oa(),1);var My=Tn(Wi(),1);var Ny=Tn(oa(),1);function Uy(){let d=(0,Ny.useContext)(Ss);if(d==null)throw new Error("No remote-ui Render instance found in context");return d}function Xn(d,{fragmentProps:c}={}){if(!c||!c.length)return d;let y=_R(d,c);return y.displayName=d,y}function _R(d,c){let y=d;return(0,Wa.memo)(function(K){var F=K,{children:g=[]}=F,M=ps(F,["children"]);let L=(0,Wa.useRef)({}),{root:h,reconciler:B}=Uy(),{props:Q,children:ve}=(0,Wa.useMemo)(()=>{let tt=[],Qe={};for(let Re of Object.keys(M)){let _e=M[Re];if(c.includes(Re)&&(0,Wa.isValidElement)(_e)){let me=L.current[Re],be=_a(me)?me:h.createFragment();L.current[Re]=be,Object.assign(be,{createText(...bt){return h.createText(...bt)},createComponent(bt,...Hn){return h.createComponent(bt,...Hn)}});let dt=B.createPortal(_e,be,null,null);tt.push(dt),Qe[Re]=be}else Qe[Re]=_e,delete L.current[Re]}return{props:Qe,children:[...Wa.Children.toArray(g),...tt]}},[g,M,h,B,L]);return(0,My.jsx)(y,ds(la({},Q),{children:ve}))})}var Ay=Tn(oa(),1),Es=(0,Ay.createContext)(null);var up=Tn(Wi(),1);function op(d,c){return Id(d,(y,R)=>ki(this,null,function*(){let g=yield c(R);yield new Promise((M,K)=>{try{ip((0,up.jsx)(Es.Provider,{value:R,children:(0,up.jsx)(lp,{children:g})}),y,()=>{M()})}catch(F){console.error(F),K(F)}})}))}var lp=class extends zy.Component{constructor(...c){super(...c),this.state={hasError:!1}}static getDerivedStateFromError(){return{hasError:!0}}componentDidCatch(c,y){reportError(c)}render(){return this.state.hasError?null:this.props.children}};var Ii=Xn($d);var $i=Xn(ep,{fragmentProps:["details","primaryContent","secondaryContent","tertiaryContent"]});var sp=Xn(tp);var eu=Xn(np);var oi=Xn(ap);var Ln=Xn(rp);var Ly=Tn(oa(),1);var Cs=class extends Error{constructor(...c){super(...c),this.name="CheckoutUIExtensionError"}},Rs=class extends Error{constructor(...c){super(...c),this.name="ScopeNotGrantedError"}},hl=class extends Error{constructor(c,y){super(`Cannot call '${c}()' on target '${y}'. The corresponding property was not found on the API.`),this.name="ExtensionHasNoMethodError"}};function Br(d){let c=(0,Ly.useContext)(Es);if(c==null)throw new Cs("You can only call this hook when running as a UI extension.");return c}var xs=Tn(oa(),1);function Ts(d){let[,c]=(0,xs.useState)(d.current);return(0,xs.useEffect)(()=>{let y=!1,R=M=>{y||c(M)},g=d.subscribe(R);return R(d.current),()=>{y=!0,g()}},[d]),d.current}function cp(){let d=Br().shippingAddress;if(!d)throw new Rs("Using shipping address requires having shipping address permissions granted to your app.");return Ts(d)}function fp(){let{lines:d}=Br();return Ts(d)}function dp(){let d=Br();if("applyCartLinesChange"in d)return d.applyCartLinesChange;throw new hl("applyCartLinesChange",d.extension.target)}var Vr=Tn(oa());var qe=Tn(Wi()),qT=op("purchase.checkout.shipping-option-list.render-after",()=>(0,qe.jsx)(OR,{}));function OR(){let d="https://cameron-usual-rachel-precipitation.trycloudflare.com",{query:c}=Br(),y=fp(),R=dp(),{zip:g}=cp(),[M,K]=(0,Vr.useState)(null),[F,L]=(0,Vr.useState)(null),[h,B]=(0,Vr.useState)(!1),[Q,ve]=(0,Vr.useState)("front-door");console.log("update"),(0,Vr.useEffect)(()=>{console.log("changing")},[g]),(0,Vr.useEffect)(()=>{if(!F){let Re=[];y.forEach(_e=>{console.log(_e);let me=c(`#graphql
           query getProductById($id: ID!) {
             product(id: $id) {
@@ -153,3 +184,395 @@ Check the top-level render call using <`+Y+">.")}return O}}function cn(v,O){{if(
               tags
             }
           }`,{variables:{id:_e.merchandise.product.id}}).then(be=>{if(console.log(be),be.data)return be.data});Re.push(ds(la({},me),{lineId:_e.id}))}),L(Re)}},[F]);let tt=Re=>ki(this,null,function*(){let{shippingRules:_e}=yield fetch(`${d}/app/check-rules`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({zip:Re})}).then(me=>me.json()).catch(me=>{console.error("Error:",me)});console.log(_e)}),Qe=Re=>{R({type:"addCartLine",merchandiseId:Re,quantity:1}).then(_e=>{console.log(_e)})};return(0,qe.jsx)(oi,{minInlineSize:"fill",minBlockSize:"fill",children:(0,qe.jsxs)(sp,{name:"shipment",variant:"group",value:Q,onChange:Re=>ve(Re),children:[(0,qe.jsx)($i,{secondaryContent:(0,qe.jsx)(eu,{source:"truck"}),id:"front-door",children:(0,qe.jsxs)(oi,{spacing:"base",children:[(0,qe.jsx)(Ln,{children:"Front Door Delivery - delivered to the outside entrance of your home or building at the ground level"}),(0,qe.jsxs)(Ii,{spacing:"none",children:[(0,qe.jsx)(Ln,{children:"Regular Price: $99"}),(0,qe.jsx)(Ln,{children:"Discounted Price: Free"})]})]})}),(0,qe.jsx)($i,{secondaryContent:(0,qe.jsx)(eu,{source:"delivery"}),id:"enhanced-delivery",children:(0,qe.jsxs)(oi,{spacing:"base",children:[(0,qe.jsx)(Ln,{children:"Enhanced Delivery - delivered to your room of choice on any floor"}),(0,qe.jsxs)(Ii,{spacing:"none",children:[(0,qe.jsx)(Ln,{children:"Regular Price: $179"}),(0,qe.jsx)(Ln,{children:"Discounted Price: $79"})]})]})}),(0,qe.jsx)($i,{secondaryContent:(0,qe.jsx)(eu,{source:"delivered"}),id:"premium-delivery",children:(0,qe.jsxs)(oi,{spacing:"base",children:[(0,qe.jsx)(Ln,{children:"Premium Delivery - includes Enhanced Delivery & item setup"}),(0,qe.jsxs)(Ii,{spacing:"none",children:[(0,qe.jsx)(Ln,{children:"Regular Price: $229"}),(0,qe.jsx)(Ln,{children:"Discounted Price: $129"})]})]})}),(0,qe.jsx)($i,{secondaryContent:(0,qe.jsx)(eu,{source:"return"}),id:"white-glove-delivery",children:(0,qe.jsxs)(oi,{spacing:"base",children:[(0,qe.jsx)(Ln,{children:"White Glove Delivery - includes Premium Delivery & packaging removal"}),(0,qe.jsxs)(Ii,{spacing:"none",children:[(0,qe.jsx)(Ln,{children:"Regular Price: $299"}),(0,qe.jsx)(Ln,{children:"Discounted Price: $199"})]})]})})]})})}})();
+=======
+  // node_modules/.pnpm/@remote-ui+react@5.0.4_react-reconciler@0.29.0_react@18.2.0/node_modules/@remote-ui/react/build/esm/components.mjs
+  function createRemoteReactComponent(componentType, {
+    fragmentProps
+  } = {}) {
+    if (!fragmentProps || !fragmentProps.length) {
+      return componentType;
+    }
+    const wrapper = createComponentWrapper(componentType, fragmentProps);
+    wrapper.displayName = componentType;
+    return wrapper;
+  }
+  function createComponentWrapper(componentType, fragmentProps) {
+    const Component2 = componentType;
+    return /* @__PURE__ */ (0, import_react4.memo)(function ComponentWrapper(_a) {
+      var _b = _a, {
+        children: externalChildren = []
+      } = _b, externalProps = __objRest(_b, [
+        "children"
+      ]);
+      const fragments = (0, import_react4.useRef)({});
+      const {
+        root,
+        reconciler
+      } = useRender();
+      const {
+        props,
+        children
+      } = (0, import_react4.useMemo)(() => {
+        const portals = [];
+        const props2 = {};
+        for (const key of Object.keys(externalProps)) {
+          const element = externalProps[key];
+          if (fragmentProps.includes(key) && /* @__PURE__ */ (0, import_react4.isValidElement)(element)) {
+            const currentFragment = fragments.current[key];
+            const fragment = isRemoteFragment(currentFragment) ? currentFragment : root.createFragment();
+            fragments.current[key] = fragment;
+            Object.assign(fragment, {
+              createText(...args) {
+                return root.createText(...args);
+              },
+              createComponent(type, ...args) {
+                return root.createComponent(type, ...args);
+              }
+            });
+            const portal = reconciler.createPortal(element, fragment, null, null);
+            portals.push(portal);
+            props2[key] = fragment;
+          } else {
+            props2[key] = element;
+            delete fragments.current[key];
+          }
+        }
+        return {
+          props: props2,
+          children: [...import_react4.Children.toArray(externalChildren), ...portals]
+        };
+      }, [externalChildren, externalProps, root, reconciler, fragments]);
+      return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Component2, __spreadProps(__spreadValues({}, props), {
+        children
+      }));
+    });
+  }
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/context.mjs
+  var import_react5 = __toESM(require_react(), 1);
+  var ExtensionApiContext = /* @__PURE__ */ (0, import_react5.createContext)(null);
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/render.mjs
+  var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
+  function reactExtension(target, render3) {
+    return extension(target, (root, api) => __async(this, null, function* () {
+      const element = yield render3(api);
+      yield new Promise((resolve, reject) => {
+        try {
+          render(/* @__PURE__ */ (0, import_jsx_runtime3.jsx)(ExtensionApiContext.Provider, {
+            value: api,
+            children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(ErrorBoundary, {
+              children: element
+            })
+          }), root, () => {
+            resolve();
+          });
+        } catch (error) {
+          console.error(error);
+          reject(error);
+        }
+      });
+    }));
+  }
+  var ErrorBoundary = class extends import_react6.Component {
+    constructor(...args) {
+      super(...args);
+      this.state = {
+        hasError: false
+      };
+    }
+    static getDerivedStateFromError() {
+      return {
+        hasError: true
+      };
+    }
+    componentDidCatch(error, errorInfo) {
+      if (false) {
+        console.error(`The above error occurred in the <${extractComponentName(errorInfo.componentStack)}> component:
+${errorInfo.componentStack}`);
+      }
+      reportError(error);
+    }
+    render() {
+      if (this.state.hasError) {
+        return null;
+      }
+      return this.props.children;
+    }
+  };
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/BlockStack/BlockStack.mjs
+  var BlockStack2 = createRemoteReactComponent(BlockStack);
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/Button/Button.mjs
+  var Button2 = createRemoteReactComponent(Button, {
+    fragmentProps: ["overlay"]
+  });
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/Choice/Choice.mjs
+  var Choice2 = createRemoteReactComponent(Choice, {
+    fragmentProps: ["details", "primaryContent", "secondaryContent", "tertiaryContent"]
+  });
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/ChoiceList/ChoiceList.mjs
+  var ChoiceList2 = createRemoteReactComponent(ChoiceList);
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/Icon/Icon.mjs
+  var Icon2 = createRemoteReactComponent(Icon);
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/InlineLayout/InlineLayout.mjs
+  var InlineLayout2 = createRemoteReactComponent(InlineLayout);
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/InlineStack/InlineStack.mjs
+  var InlineStack2 = createRemoteReactComponent(InlineStack);
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/Text/Text.mjs
+  var Text2 = createRemoteReactComponent(Text);
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/ToggleButton/ToggleButton.mjs
+  var ToggleButton2 = createRemoteReactComponent(ToggleButton);
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/ToggleButtonGroup/ToggleButtonGroup.mjs
+  var ToggleButtonGroup2 = createRemoteReactComponent(ToggleButtonGroup);
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/View/View.mjs
+  var View2 = createRemoteReactComponent(View);
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/api.mjs
+  var import_react19 = __toESM(require_react(), 1);
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/errors.mjs
+  var CheckoutUIExtensionError = class extends Error {
+    constructor(...args) {
+      super(...args);
+      this.name = "CheckoutUIExtensionError";
+    }
+  };
+  var ScopeNotGrantedError = class extends Error {
+    constructor(...args) {
+      super(...args);
+      this.name = "ScopeNotGrantedError";
+    }
+  };
+  var ExtensionHasNoMethodError = class extends Error {
+    constructor(method, target) {
+      super(`Cannot call '${method}()' on target '${target}'. The corresponding property was not found on the API.`);
+      this.name = "ExtensionHasNoMethodError";
+    }
+  };
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/api.mjs
+  function useApi(_target) {
+    const api = (0, import_react19.useContext)(ExtensionApiContext);
+    if (api == null) {
+      throw new CheckoutUIExtensionError("You can only call this hook when running as a UI extension.");
+    }
+    return api;
+  }
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/subscription.mjs
+  var import_react20 = __toESM(require_react(), 1);
+  function useSubscription(subscription) {
+    const [, setValue] = (0, import_react20.useState)(subscription.current);
+    (0, import_react20.useEffect)(() => {
+      let didUnsubscribe = false;
+      const checkForUpdates = (newValue) => {
+        if (didUnsubscribe) {
+          return;
+        }
+        setValue(newValue);
+      };
+      const unsubscribe = subscription.subscribe(checkForUpdates);
+      checkForUpdates(subscription.current);
+      return () => {
+        didUnsubscribe = true;
+        unsubscribe();
+      };
+    }, [subscription]);
+    return subscription.current;
+  }
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/shipping-address.mjs
+  function useShippingAddress() {
+    const shippingAddress = useApi().shippingAddress;
+    if (!shippingAddress) {
+      throw new ScopeNotGrantedError("Using shipping address requires having shipping address permissions granted to your app.");
+    }
+    return useSubscription(shippingAddress);
+  }
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/cart-lines.mjs
+  function useCartLines() {
+    const {
+      lines
+    } = useApi();
+    return useSubscription(lines);
+  }
+  function useApplyCartLinesChange() {
+    const api = useApi();
+    if ("applyCartLinesChange" in api) {
+      return api.applyCartLinesChange;
+    }
+    throw new ExtensionHasNoMethodError("applyCartLinesChange", api.extension.target);
+  }
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/shop.mjs
+  function useShop() {
+    return useApi().shop;
+  }
+
+  // extensions/checkout-ui/src/Checkout.tsx
+  var import_react21 = __toESM(require_react());
+  var import_jsx_runtime4 = __toESM(require_jsx_runtime());
+  var Checkout_default = reactExtension(
+    "purchase.checkout.shipping-option-list.render-after",
+    () => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Extension, {})
+  );
+  function Extension() {
+    const APP_URL = "https://suffered-myself-sin-js.trycloudflare.com";
+    const { query } = useApi();
+    const { myshopifyDomain } = useShop();
+    const lines = useCartLines();
+    const applyCartLinesChange = useApplyCartLinesChange();
+    const { zip } = useShippingAddress();
+    const [shipments, setShipments] = (0, import_react21.useState)([]);
+    const [selectedButton, setSelectedButton] = (0, import_react21.useState)("none");
+    const [shipmentChoice, setShipmentChoice] = (0, import_react21.useState)("front-door");
+    const haveLtl = shipments.some((shipment) => shipment.isLtl);
+    (0, import_react21.useEffect)(() => {
+      if (zip) {
+        getShipmentData(zip);
+      }
+    }, [zip]);
+    (0, import_react21.useEffect)(() => {
+      if (shipments.length) {
+        const shipmentsArray = [...shipments];
+        shipmentsArray.forEach((shipment, index) => {
+          if (shipment.containsFreightItem && !shipment.freightItemAdded) {
+            addProduct(shipment.containsFreightItem);
+            shipmentsArray[index].freightItemAdded = true;
+          }
+        });
+      }
+    }, [shipments]);
+    const getShipmentData = (zip2) => __async(this, null, function* () {
+      const lineItems = lines.map((line) => {
+        return {
+          id: line.merchandise.id,
+          quantity: line.quantity
+        };
+      });
+      const data = yield fetch(`${APP_URL}/app/check-rules?_data=routes/app.check-rules`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ zip: zip2, lineItems, shop: myshopifyDomain })
+      });
+      const { shipments: shipments2 } = yield data.json();
+      console.log(shipments2);
+      setShipments(shipments2);
+    });
+    const addProduct = (productId) => {
+      applyCartLinesChange({
+        type: "addCartLine",
+        merchandiseId: productId,
+        quantity: 1
+      }).then((res) => {
+        console.log(res);
+      });
+    };
+    const handleConfirm = () => {
+    };
+    return !haveLtl && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        ToggleButtonGroup2,
+        {
+          value: selectedButton,
+          onChange: (value) => setSelectedButton(value),
+          children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(InlineLayout2, { spacing: "base", children: shipments.map((shipment, index) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(ToggleButton2, { id: `toggleBtn-${index}`, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+            View2,
+            {
+              blockAlignment: "center",
+              inlineAlignment: "center",
+              minBlockSize: "fill",
+              children: `Shipment ${index + 1} - ${shipment.lineItems.length} items`
+            }
+          ) }, `toggleBtn-${index}`)) })
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(InlineStack2, { minInlineSize: "fill", minBlockSize: "fill", inlineAlignment: "end", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+          ChoiceList2,
+          {
+            name: "shipment",
+            variant: "group",
+            value: shipmentChoice,
+            onChange: (value) => setShipmentChoice(value),
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                Choice2,
+                {
+                  secondaryContent: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Icon2, { source: "truck" }),
+                  id: "front-door",
+                  children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(InlineStack2, { spacing: "base", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "Front Door Delivery - delivered to the outside entrance of your home or building at the ground level" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { spacing: "none", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "Regular Price: $99" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "Discounted Price: Free" })
+                    ] })
+                  ] })
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                Choice2,
+                {
+                  secondaryContent: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Icon2, { source: "delivery" }),
+                  id: "enhanced-delivery",
+                  children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(InlineStack2, { spacing: "base", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "Enhanced Delivery - delivered to your room of choice on any floor" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { spacing: "none", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "Regular Price: $179" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "Discounted Price: $79" })
+                    ] })
+                  ] })
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                Choice2,
+                {
+                  secondaryContent: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Icon2, { source: "delivered" }),
+                  id: "premium-delivery",
+                  children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(InlineStack2, { spacing: "base", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "Premium Delivery - includes Enhanced Delivery & item setup" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { spacing: "none", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "Regular Price: $229" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "Discounted Price: $129" })
+                    ] })
+                  ] })
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                Choice2,
+                {
+                  secondaryContent: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Icon2, { source: "return" }),
+                  id: "white-glove-delivery",
+                  children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(InlineStack2, { spacing: "base", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "White Glove Delivery - includes Premium Delivery & packaging removal" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { spacing: "none", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "Regular Price: $299" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "Discounted Price: $199" })
+                    ] })
+                  ] })
+                }
+              )
+            ]
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Button2, { onPress: () => handleConfirm(), children: "Confirm" })
+      ] })
+    ] });
+  }
+})();
+//# sourceMappingURL=checkout-ui.js.map
+>>>>>>> d6b445f (shipment logic finished, toggle button group for shipments added, extra product adding logic implemented)

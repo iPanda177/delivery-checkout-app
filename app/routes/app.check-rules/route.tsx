@@ -1,11 +1,12 @@
 import {type ActionFunctionArgs, json, type LoaderFunction} from "@remix-run/node";
+// @ts-ignore
 import { cors } from "remix-utils/cors";
 import db from "~/db.server";
 import {unauthenticated} from "~/shopify.server";
-import {getShopLocations, prepareShipmentsArray} from "~/models/Shipping.server";
+import {prepareShipmentsArray} from "~/models/Shipping.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const response = json({ status: "ok" }, { status: 200, headers: { "Access-Control-Allow-Origin": "*" } });
+  const response = json({ status: "ok" }, { status: 200 });
 
   return await cors(request, response, { origin: true });
 }
@@ -13,7 +14,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
   try {
     const body = await request.json();
-    const { zip, productIds, shop } = body;
+    const { zip, lineItems, shop } = body;
     const { admin } = await unauthenticated.admin(shop);
 
     const shippingRules = await db.shippingRules.findMany({
@@ -61,23 +62,24 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         ]
       },
       include: {
-        zipCodeRanges: true
+        zipCodeRanges: true,
+        locations: {
+          include: {
+            location: true
+          }
+        }
       }
     });
 
     if (!shippingRules.length) {
-      return json({ error: "No shipping rules found" }, { status: 404 });
+      return await cors(request, json({ error: "No shipping rules found" }, { status: 404 }), { origin: true });
     }
 
-    const shipmentsArray = await prepareShipmentsArray(shippingRules, productIds, admin.graphql);
+    const shipments = await prepareShipmentsArray(shippingRules as any, lineItems, admin.graphql);
 
-
-
-
-
-    return cors(request, json({ error: "No product found" }, { status: 404 }), { origin: true });
+    return cors(request, json({ shipments }, { status: 200 }), { origin: true });
   } catch (err) {
     console.log(err)
-    return json({ err }, { status: 404 });
+    return cors(request, json({ err }, { status: 404 }), { origin: true });
   }
 }
