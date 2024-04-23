@@ -8,7 +8,13 @@ import {
   Choice,
   BlockStack,
   ChoiceList,
-  Icon, Text, useShop, ToggleButtonGroup, InlineLayout, ToggleButton, View, Button
+  Text,
+  useShop,
+  ToggleButtonGroup,
+  InlineLayout,
+  ToggleButton,
+  View,
+  Button
 } from '@shopify/ui-extensions-react/checkout';
 import {useEffect, useState} from "react";
 
@@ -18,19 +24,62 @@ export default reactExtension(
 );
 
 function Extension() {
-  const APP_URL = 'https://suffered-myself-sin-js.trycloudflare.com';
+  const APP_URL = 'https://steady-harvard-around-manufacturing.trycloudflare.com';
 
   const { query } = useApi();
   const { myshopifyDomain } = useShop();
   const lines = useCartLines();
   const applyCartLinesChange = useApplyCartLinesChange();
   const { zip } = useShippingAddress();
+  console.log(lines)
 
   const [shipments, setShipments] = useState<any[]>([]);
-  const [selectedButton, setSelectedButton] = useState<string>('none');
-  const [shipmentChoice, setShipmentChoice] = useState<string>('front-door');
+  const [deliveryProduct, setDeliveryProduct] = useState<any>(null);
+  const [selectedButton, setSelectedButton] = useState<string>(null);
+  const [shipmentChoice, setShipmentChoice] = useState<string>('none');
 
   const haveLtl = shipments.some((shipment) => shipment.isLtl);
+
+  useEffect(() => {
+    if (!deliveryProduct) {
+      query(`
+        query getProducts($first: Int, $query: String) {
+          products(first: $first, query: $query) {
+            edges {
+              node {
+                id
+                title
+                variants(first: 4) {
+                  edges {
+                    node {
+                      id
+                      title
+                      price {
+                        amount
+                      }
+                      compareAtPrice {
+                        amount
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }` as string,
+        {
+          variables: {
+            first: 1,
+            query: "title:LTL Delivery Type"
+          }
+        }
+      ).then((res) => {
+        console.log(res)
+        const product = res.data.products.edges[0].node;
+        setDeliveryProduct(product);
+      });
+    }
+  }, [deliveryProduct]);
 
   useEffect(() => {
     if (zip) {
@@ -40,15 +89,19 @@ function Extension() {
 
   useEffect(() => {
     if (shipments.length) {
+      const addedProducts = [];
       const shipmentsArray = [...shipments];
       shipmentsArray.forEach((shipment, index) => {
         if (shipment.containsFreightItem && !shipment.freightItemAdded) {
           addProduct(shipment.containsFreightItem);
           shipmentsArray[index].freightItemAdded = true;
+          addedProducts.push(shipment.containsFreightItem);
         }
       });
 
-      // setShipments(shipmentsArray);
+      if (addedProducts.length) {
+        setShipments(shipmentsArray);
+      }
     }
 
   }, [shipments]);
@@ -72,6 +125,27 @@ function Extension() {
     const { shipments } = await data.json();
     console.log(shipments);
 
+    await Promise.all(lines.map(async (line) => {
+      const shipment = shipments.find((shipment) => {
+        return shipment.lineItems.some((item) => item.id === line.merchandise.id);
+      });
+      if (shipment) {
+        const res = await applyCartLinesChange({
+          type: 'updateCartLine',
+          id: line.id,
+          attributes: [{
+            key: 'Parcel',
+            value: `${shipment.etaDaysSmallParcelLow} - ${shipment.etaDaysSmallParcelHigh} days`
+          }, {
+            key: 'LTL',
+            value: `${shipment.etaFreightLow} - ${shipment.etaFreightHigh} days`
+          }]
+        });
+        console.log(res);
+      }
+    }));
+
+
     setShipments(shipments);
   }
 
@@ -86,106 +160,72 @@ function Extension() {
   }
 
   //**TO_DO**//
+  // handle adding product to shipment group in order list (need to decide the approach of task)
   const handleConfirm = () => {
-    // write confirmation function for adding an extra product
-    // Ask Andrew to add this products
+    const shipmentsArray = [...shipments];
+    const index = Number(selectedButton.split('-')[1]);
+    addProduct(shipmentChoice);
+    shipmentsArray[index].ltl_delivery_product_picked = true;
+    setShipments(shipmentsArray);
+    setSelectedButton(null);
   }
 
   return (
     !haveLtl && (
-      <BlockStack>
+      <BlockStack border={"base"} cornerRadius={"base"}>
         <ToggleButtonGroup
           value={selectedButton}
           onChange={(value) => setSelectedButton(value)}
         >
           <InlineLayout spacing="base">
             {shipments.map((shipment, index) => (
-              <ToggleButton id={`toggleBtn-${index}`} key={`toggleBtn-${index}`}>
+              <ToggleButton
+                id={`toggleBtn-${index}`}
+                key={`toggleBtn-${index}`}
+                disabled={shipment.ltl_delivery_product_picked}
+              >
                 <View
                   blockAlignment="center"
                   inlineAlignment="center"
                   minBlockSize="fill"
                 >
-                  {`Shipment ${index + 1} - ${shipment.lineItems.length} items`}
+                  {`Shipment ${index + 1}`}
                 </View>
               </ToggleButton>
             ))}
           </InlineLayout>
         </ToggleButtonGroup>
 
-        <InlineStack minInlineSize={"fill"} minBlockSize={'fill'} inlineAlignment={"end"}>
-          <ChoiceList
-            name="shipment"
-            variant="group"
-            value={shipmentChoice}
-            onChange={(value: string) => setShipmentChoice(value)}
-          >
-            <Choice
-              secondaryContent={
-                <Icon source="truck" />
-              }
-              id="front-door"
-            >
-              <InlineStack spacing={"base"}>
-                <Text>Front Door Delivery - delivered to the outside entrance of your home or building at the ground level</Text>
+        <InlineStack minInlineSize={"fill"} minBlockSize={'fill'}>
+          {shipments.map((shipment, index) => (
+            selectedButton === `toggleBtn-${index}` && (
+              <View key={`toggleBtn-${index}`} inlineAlignment={"end"}>
+                <ChoiceList
+                  name="shipment"
+                  variant="group"
+                  value={shipmentChoice}
+                  onChange={(value: string) => setShipmentChoice(value)}
+                >
+                  {deliveryProduct.variants.edges.map((variant, index) => (
+                    <Choice id={variant.node.id} key={index} disabled={shipment.ltl_delivery_product_picked}>
+                      <InlineStack spacing={"base"}>
+                        <Text>{`${variant.node.title} Delivery - delivered to the outside entrance of your home or building at the ground level`}</Text>
 
-                <BlockStack spacing={"none"}>
-                  <Text>Regular Price: $99</Text>
-                  <Text>Discounted Price: Free</Text>
-                </BlockStack>
-              </InlineStack>
-            </Choice>
+                        <BlockStack spacing={"none"}>
+                          <Text>{`Regular Price: $${variant.node.compareAtPrice.amount}`}</Text>
+                          <Text>{`Discounted Price: $${variant.node.price.amount}`}</Text>
+                        </BlockStack>
+                      </InlineStack>
+                    </Choice>
+                  ))}
+                </ChoiceList>
 
-            <Choice
-              secondaryContent={
-                <Icon source="delivery" />
-              }
-              id="enhanced-delivery"
-            >
-              <InlineStack spacing={"base"}>
-                <Text>Enhanced Delivery - delivered to your room of choice on any floor</Text>
-
-                <BlockStack spacing={"none"}>
-                  <Text>Regular Price: $179</Text>
-                  <Text>Discounted Price: $79</Text>
-                </BlockStack>
-              </InlineStack>
-            </Choice>
-
-            <Choice
-              secondaryContent={
-                <Icon source="delivered" />
-              }
-              id="premium-delivery"
-            >
-              <InlineStack spacing={"base"}>
-                <Text>Premium Delivery - includes Enhanced Delivery & item setup</Text>
-
-                <BlockStack spacing={"none"}>
-                  <Text>Regular Price: $229</Text>
-                  <Text>Discounted Price: $129</Text>
-                </BlockStack>
-              </InlineStack>
-            </Choice>
-
-            <Choice
-              secondaryContent={
-                <Icon source="return" />
-              }
-              id="white-glove-delivery"
-            >
-              <InlineStack spacing={"base"}>
-                <Text>White Glove Delivery - includes Premium Delivery & packaging removal</Text>
-
-                <BlockStack spacing={"none"}>
-                  <Text>Regular Price: $299</Text>
-                  <Text>Discounted Price: $199</Text>
-                </BlockStack>
-              </InlineStack>
-            </Choice>
-          </ChoiceList>
-
-          <Button onPress={() => handleConfirm()}>Confirm</Button>
+                <View padding={"base"}>
+                  <Button onPress={() => handleConfirm()}>Confirm</Button>
+                </View>
+              </View>
+            )
+          ))}
         </InlineStack>
       </BlockStack>
     )
