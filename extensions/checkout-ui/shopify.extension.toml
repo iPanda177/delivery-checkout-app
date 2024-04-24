@@ -22,6 +22,14 @@ handle = "checkout-ui"
 module = "./src/Checkout.tsx"
 target = "purchase.checkout.shipping-option-list.render-after"
 
+[[extensions.targeting]]
+module = "./src/Phone.tsx"
+target = "purchase.checkout.delivery-address.render-after"
+
+[[extensions.targeting]]
+module = "./src/TrustLogos.tsx"
+target = "purchase.checkout.footer.render-after"
+
 [extensions.capabilities]
 # Gives your extension access to directly query Shopify’s storefront API.
 # https://shopify.dev/docs/api/checkout-ui-extensions/unstable/configuration#api-access
@@ -48,9 +56,26 @@ network_access = true
 # your extension. Learn more:
 # https://shopify.dev/docs/api/checkout-ui-extensions/unstable/configuration#settings-definition
 
-# [extensions.settings]
-# [[extensions.settings.fields]]
-# key = "banner_title"
-# type = "single_line_text_field"
-# name = "Banner title"
-# description = "Enter a title for the banner"
+#[extensions.settings]
+#[[extensions.settings.fields]]
+#key = "title"
+#type = "single_line_text_field"
+#name = "Banner title"
+#description = "Enter a title for the banner."
+#[[extensions.settings.fields]]
+#key = "description"
+#type = "single_line_text_field"
+#name = "Banner description"
+#description = "Enter a description for the banner."
+#[[extensions.settings.fields]]
+#key = "status"
+#type = "single_line_text_field"
+#name = "Banner status"
+#[[extensions.settings.fields.validations]]
+#name = "choices"
+#value = "[\"info\", \"success\", \"warning\", \"critical\"]"
+#[[extensions.settings.fields]]
+#key = "collapsible"
+#type = "boolean"
+#name = "Show collapsible description."
+#description = "Display controls to expand or collapse the banner description."
