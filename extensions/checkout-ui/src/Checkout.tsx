@@ -15,7 +15,14 @@ import {
   ToggleButton,
   View,
   Button,
-  Form, BlockSpacer, Grid, GridItem, TextField, Icon, Select, Checkbox, Banner, useApplyAttributeChange
+  Form,
+  BlockSpacer,
+  TextField,
+  Icon,
+  Select,
+  Checkbox,
+  Banner,
+  useApplyAttributeChange
 } from '@shopify/ui-extensions-react/checkout';
 import {useEffect, useState} from "react";
 
@@ -25,7 +32,7 @@ export default reactExtension(
 );
 
 function Extension() {
-  const APP_URL = 'https://fa-favorite-kept-parents.trycloudflare.com';
+  const APP_URL = 'https://prophet-pacific-fitted-bathrooms.trycloudflare.com';
 
   const { query } = useApi();
   const { myshopifyDomain } = useShop();

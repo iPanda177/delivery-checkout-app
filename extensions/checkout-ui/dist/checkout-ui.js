@@ -18401,10 +18401,10 @@
               return jsxWithValidation(type, props, key, false);
             }
           }
-          var jsx7 = jsxWithValidationDynamic;
+          var jsx8 = jsxWithValidationDynamic;
           var jsxs3 = jsxWithValidationStatic;
           exports.Fragment = REACT_FRAGMENT_TYPE;
-          exports.jsx = jsx7;
+          exports.jsx = jsx8;
           exports.jsxs = jsxs3;
         })();
       }
@@ -19643,6 +19643,11 @@ ${errorInfo.componentStack}`);
     return useSubscription(shippingAddress);
   }
 
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/cost.mjs
+  function useTotalAmount() {
+    return useSubscription(useApi().cost.totalAmount);
+  }
+
   // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/cart-lines.mjs
   function useCartLines() {
     const {
@@ -19671,7 +19676,7 @@ ${errorInfo.componentStack}`);
     () => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Extension, {})
   );
   function Extension() {
-    const APP_URL = "https://fa-favorite-kept-parents.trycloudflare.com";
+    const APP_URL = "https://prophet-pacific-fitted-bathrooms.trycloudflare.com";
     const { query } = useApi();
     const { myshopifyDomain } = useShop();
     const lines = useCartLines();
@@ -20071,6 +20076,28 @@ ${errorInfo.componentStack}`);
       /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(PaymentIcon2, { name: "american-express" }),
       /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(PaymentIcon2, { name: "discover" })
     ] });
+  }
+
+  // extensions/checkout-ui/src/ProgressBar.tsx
+  var import_jsx_runtime7 = __toESM(require_jsx_runtime());
+  var ProgressBar_default = reactExtension(
+    "purchase.checkout.cart-line-list.render-after",
+    () => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(ProgressBar, {})
+  );
+  function ProgressBar() {
+    const cost = useTotalAmount();
+    const progress = 80 / 100 * 100;
+    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { style: { width: "100%", backgroundColor: "#ddd", height: "20px" }, children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+      "div",
+      {
+        style: {
+          width: `${progress}%`,
+          backgroundColor: "#007bff",
+          height: "100%",
+          transition: "width 1s ease-in-out"
+        }
+      }
+    ) });
   }
 })();
 //# sourceMappingURL=checkout-ui.js.map

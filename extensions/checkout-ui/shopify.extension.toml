@@ -30,6 +30,10 @@ target = "purchase.checkout.delivery-address.render-after"
 module = "./src/TrustLogos.tsx"
 target = "purchase.checkout.footer.render-after"
 
+[[extensions.targeting]]
+module = "./src/ProgressBar.tsx"
+target = "purchase.checkout.cart-line-list.render-after"
+
 [extensions.capabilities]
 # Gives your extension access to directly query Shopify’s storefront API.
 # https://shopify.dev/docs/api/checkout-ui-extensions/unstable/configuration#api-access

@@ -2,7 +2,7 @@
 
 client_id = "f1115783b0f51ee3fe7c0b50d2bdbfe6"
 name = "Poly & Bark Extensibility(PBE)"
-application_url = "https://fa-favorite-kept-parents.trycloudflare.com"
+application_url = "https://prophet-pacific-fitted-bathrooms.trycloudflare.com"
 embedded = true
 
 [build]
@@ -15,9 +15,9 @@ scopes = "read_cart_transforms,write_cart_transforms,read_assigned_fulfillment_o
 
 [auth]
 redirect_urls = [
-  "https://fa-favorite-kept-parents.trycloudflare.com/auth/callback",
-  "https://fa-favorite-kept-parents.trycloudflare.com/auth/shopify/callback",
-  "https://fa-favorite-kept-parents.trycloudflare.com/api/auth/callback"
+  "https://prophet-pacific-fitted-bathrooms.trycloudflare.com/auth/callback",
+  "https://prophet-pacific-fitted-bathrooms.trycloudflare.com/auth/shopify/callback",
+  "https://prophet-pacific-fitted-bathrooms.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
