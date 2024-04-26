@@ -22,7 +22,8 @@ import {
   Select,
   Checkbox,
   Banner,
-  useApplyAttributeChange
+  useApplyAttributeChange,
+  useAttributeValues
 } from '@shopify/ui-extensions-react/checkout';
 import {useEffect, useState} from "react";
 
@@ -32,7 +33,7 @@ export default reactExtension(
 );
 
 function Extension() {
-  const APP_URL = 'https://prophet-pacific-fitted-bathrooms.trycloudflare.com';
+  const APP_URL = 'https://cameroon-nevada-previous-meaningful.trycloudflare.com';
 
   const { query } = useApi();
   const { myshopifyDomain } = useShop();
@@ -40,13 +41,16 @@ function Extension() {
   const applyCartLinesChange = useApplyCartLinesChange();
   const orderAttributesChange = useApplyAttributeChange();
   const { zip } = useShippingAddress();
+  const zip_code_attr = useAttributeValues(['zip_code'])[0];
   console.log(lines)
+  console.log('ORDER ATTRIBUTES', zip_code_attr)
 
   const [shipments, setShipments] = useState<any[]>([]);
   const [deliveryProduct, setDeliveryProduct] = useState<any>(null);
   const [selectedButton, setSelectedButton] = useState<string>(null);
   const [shipmentChoice, setShipmentChoice] = useState<string>('none');
   const [destinationTypeForm, setDestinationTypeForm] = useState<any>({});
+  const [cachedProducts, setCachedProducts] = useState<any>([]);
 
   const haveLtl = shipments.some((shipment) => shipment.isLtl);
 
@@ -83,7 +87,7 @@ function Extension() {
             query: "title:LTL Delivery Type"
           }
         }
-      ).then((res) => {
+      ).then((res: any) => {
         console.log(res)
         const product = res.data.products.edges[0].node;
         setDeliveryProduct(product);
@@ -93,7 +97,13 @@ function Extension() {
 
   useEffect(() => {
     if (zip) {
-      getShipmentData(zip);
+      if (zip_code_attr && zip_code_attr !== zip) {
+        resetOrderChanges().then(() => {
+          getShipmentData(zip);
+        });
+      } else {
+        getShipmentData(zip);
+      }
     }
   }, [zip])
 
@@ -115,6 +125,33 @@ function Extension() {
     }
 
   }, [shipments]);
+
+  const resetOrderChanges = async () => {
+    await Promise.all(cachedProducts.map((productId) => {
+      return applyCartLinesChange({
+        type: 'removeCartLine',
+        id: productId,
+        quantity: 1
+      });
+    }));
+
+    await Promise.all(lines.map((line) => {
+      return applyCartLinesChange({
+        type: 'updateCartLine',
+        id: line.id,
+        attributes: [{
+          key: 'ETA',
+          value: ``
+        }]
+      })
+    }));
+
+    await orderAttributesChange({
+      key: 'zip_code',
+      type: 'updateAttribute',
+      value: zip
+    });
+  };
 
   const countDeliveryDateFromToday = (shipment) => {
     const etaLow = shipment.isLtl ? shipment.etaFreightLow : shipment.etaSmallParcelLow;
@@ -146,6 +183,10 @@ function Extension() {
     const { shipments } = await data.json();
     console.log(shipments);
 
+    if (!shipments || !shipments.length) {
+      return;
+    }
+
     await Promise.all(lines.map(async (line) => {
       const shipment = shipments.find((shipment) => {
         return shipment.lineItems.some((item) => item.id === line.merchandise.id);
@@ -163,6 +204,11 @@ function Extension() {
       }
     }));
 
+    await orderAttributesChange({
+      key: 'zip_code',
+      type: 'updateAttribute',
+      value: zip
+    });
 
     setShipments(shipments);
   }
@@ -175,6 +221,10 @@ function Extension() {
     }).then((res) => {
       console.log(res);
     })
+
+    const cachedProductsArray = [...cachedProducts];
+    cachedProductsArray.push(productId);
+    setCachedProducts(cachedProductsArray);
   }
 
   //**TO_DO**//

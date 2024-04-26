@@ -60,26 +60,25 @@ network_access = true
 # your extension. Learn more:
 # https://shopify.dev/docs/api/checkout-ui-extensions/unstable/configuration#settings-definition
 
-#[extensions.settings]
-#[[extensions.settings.fields]]
-#key = "title"
-#type = "single_line_text_field"
-#name = "Banner title"
-#description = "Enter a title for the banner."
-#[[extensions.settings.fields]]
-#key = "description"
-#type = "single_line_text_field"
-#name = "Banner description"
-#description = "Enter a description for the banner."
-#[[extensions.settings.fields]]
-#key = "status"
-#type = "single_line_text_field"
-#name = "Banner status"
-#[[extensions.settings.fields.validations]]
-#name = "choices"
-#value = "[\"info\", \"success\", \"warning\", \"critical\"]"
-#[[extensions.settings.fields]]
-#key = "collapsible"
-#type = "boolean"
-#name = "Show collapsible description."
-#description = "Display controls to expand or collapse the banner description."
+[extensions.settings]
+[[extensions.settings.fields]]
+key = "link_1"
+type = "single_line_text_field"
+name = "Logo url 1"
+description = "Enter url to your logo asset"
+[[extensions.settings.fields]]
+key = "link_2"
+type = "single_line_text_field"
+name = "Logo url 2"
+description = "Enter url to your logo asset"
+[[extensions.settings.fields]]
+key = "link_3"
+type = "single_line_text_field"
+name = "Logo url 3"
+description = "Enter url to your logo asset"
+[[extensions.settings.fields]]
+key = "link_4"
+type = "single_line_text_field"
+name = "Logo url 4"
+description = "Enter url to your logo asset"
+

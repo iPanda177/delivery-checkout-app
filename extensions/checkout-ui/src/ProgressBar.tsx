@@ -1,4 +1,4 @@
-import {reactExtension, PaymentIcon, InlineStack, useTotalAmount} from "@shopify/ui-extensions-react/checkout";
+import {reactExtension, useTotalAmount, View} from "@shopify/ui-extensions-react/checkout";
 
 
 export default reactExtension(
@@ -12,15 +12,20 @@ function ProgressBar() {
   const progress = (80 / 100) * 100;
 
   return (
-    <div style={{ width: '100%', backgroundColor: '#ddd', height: '20px' }}>
-      <div
-        style={{
-          width: `${progress}%`,
-          backgroundColor: '#007bff',
-          height: '100%',
-          transition: 'width 1s ease-in-out'
-        }}
-      />
-    </div>
+    <>
+      <View minInlineSize={"100%"} minBlockSize={20} maxBlockSize={20} background={"subdued"}>
+        <View
+          minInlineSize={`${progress}%`}
+          minBlockSize={"100%"}
+          background={"base"}
+          // style={{
+          //   backgroundColor: '#007bff',
+          //   height: '100%',
+          //   transition: 'width 1s ease-in-out'
+          // }}
+        >
+        </View>
+      </View>
+    </>
   );
 };
