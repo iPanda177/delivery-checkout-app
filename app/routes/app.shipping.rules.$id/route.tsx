@@ -161,6 +161,31 @@ export async function action({ request, params }: ActionFunctionArgs) {
           )
         ))
       } else {
+        const shippingRules = await db.shippingRules.findMany({
+          // where zipRangeStart >= ruleData.zipRangeStart AND zipRangeEnd <= ruleData.zipRangeEnd
+          where: {
+            zipRangeStart: {
+              lte: ruleData.zipRangeStart,
+            },
+            zipRangeEnd: {
+              gte: ruleData.zipRangeEnd,
+            },
+            locationToShippingRule: {
+              some: {
+                location: {
+                  locationId: {
+                    in: selectedLocationsArray.map((location: LocationT) => location.locationId),
+                  },
+                },
+              },
+            }
+          },
+        });
+
+        if (shippingRules.length > 0) {
+          return json({ success: false, error: 'Rule already exists' });
+        }
+
         const createdShippingRule  = await db.shippingRules.create({
           data: ruleData,
         });
@@ -273,6 +298,10 @@ export default function ShippingRuleForm() {
       navigate("/app/shipping");
     } else if (actionData && !actionData.success) {
       dispatch({ type: "SET_IS_LOADING", payload: false });
+
+      if (actionData && actionData.error === 'Rule already exists') {
+        shopify.toast.show("Rule for one of the selected zip codes and warehouses already exists", { isError: true });
+      }
 
       shopify.toast.show("Error creating rule", { isError: true });
     }

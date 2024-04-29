@@ -33,7 +33,7 @@ export default reactExtension(
 );
 
 function Extension() {
-  const APP_URL = 'https://cameroon-nevada-previous-meaningful.trycloudflare.com';
+  const APP_URL = 'https://webcast-nearest-touched-exempt.trycloudflare.com';
 
   const { query } = useApi();
   const { myshopifyDomain } = useShop();
@@ -42,8 +42,6 @@ function Extension() {
   const orderAttributesChange = useApplyAttributeChange();
   const { zip } = useShippingAddress();
   const zip_code_attr = useAttributeValues(['zip_code'])[0];
-  console.log(lines)
-  console.log('ORDER ATTRIBUTES', zip_code_attr)
 
   const [shipments, setShipments] = useState<any[]>([]);
   const [deliveryProduct, setDeliveryProduct] = useState<any>(null);
@@ -88,7 +86,6 @@ function Extension() {
           }
         }
       ).then((res: any) => {
-        console.log(res)
         const product = res.data.products.edges[0].node;
         setDeliveryProduct(product);
       });
@@ -98,7 +95,9 @@ function Extension() {
   useEffect(() => {
     if (zip) {
       if (zip_code_attr && zip_code_attr !== zip) {
+        console.log('ZIP CODE CHANGED');
         resetOrderChanges().then(() => {
+          console.log('RESET ORDER CHANGES');
           getShipmentData(zip);
         });
       } else {
@@ -127,15 +126,20 @@ function Extension() {
   }, [shipments]);
 
   const resetOrderChanges = async () => {
-    await Promise.all(cachedProducts.map((productId) => {
+    const cachedLinesIds = cachedProducts.map((productId) => {
+      return lines.find((line) => line.merchandise.id === productId).id;
+    });
+
+    const removeProducts = await Promise.all(cachedLinesIds.map((lineId) => {
       return applyCartLinesChange({
         type: 'removeCartLine',
-        id: productId,
+        id: lineId,
         quantity: 1
       });
     }));
+    console.log(removeProducts);
 
-    await Promise.all(lines.map((line) => {
+    const updatedLines = await Promise.all(lines.map((line) => {
       return applyCartLinesChange({
         type: 'updateCartLine',
         id: line.id,
@@ -145,12 +149,15 @@ function Extension() {
         }]
       })
     }));
+    console.log(updatedLines);
 
     await orderAttributesChange({
       key: 'zip_code',
       type: 'updateAttribute',
       value: zip
     });
+
+    setCachedProducts([]);
   };
 
   const countDeliveryDateFromToday = (shipment) => {
@@ -181,7 +188,6 @@ function Extension() {
       body: JSON.stringify({ zip, lineItems, shop: myshopifyDomain }),
     })
     const { shipments } = await data.json();
-    console.log(shipments);
 
     if (!shipments || !shipments.length) {
       return;
@@ -192,7 +198,7 @@ function Extension() {
         return shipment.lineItems.some((item) => item.id === line.merchandise.id);
       });
       if (shipment) {
-        const res = await applyCartLinesChange({
+        await applyCartLinesChange({
           type: 'updateCartLine',
           id: line.id,
           attributes: [{
@@ -200,7 +206,6 @@ function Extension() {
             value: `${countDeliveryDateFromToday(shipment)}`
           }]
         });
-        console.log(res);
       }
     }));
 
@@ -213,13 +218,11 @@ function Extension() {
     setShipments(shipments);
   }
 
-  const addProduct = (productId: string) => {
-    applyCartLinesChange({
+  const addProduct = async (productId: string) => {
+    const newCartLine = await applyCartLinesChange({
       type: 'addCartLine',
       merchandiseId: productId,
       quantity: 1,
-    }).then((res) => {
-      console.log(res);
     })
 
     const cachedProductsArray = [...cachedProducts];
