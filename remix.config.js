@@ -20,4 +20,9 @@ module.exports = {
   serverDependenciesToBundle: [
     /^remix-utils.*/,
   ],
+  browserNodeBuiltinsPolyfill: {
+    modules: {
+      fs: true,
+    }
+  }
 };

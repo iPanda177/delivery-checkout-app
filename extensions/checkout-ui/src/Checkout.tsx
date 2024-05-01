@@ -33,7 +33,7 @@ export default reactExtension(
 );
 
 function Extension() {
-  const APP_URL = 'https://webcast-nearest-touched-exempt.trycloudflare.com';
+  const APP_URL = 'https://projects-females-worn-deeper.trycloudflare.com';
 
   const { query } = useApi();
   const { myshopifyDomain } = useShop();

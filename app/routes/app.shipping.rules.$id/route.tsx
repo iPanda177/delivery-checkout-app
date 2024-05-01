@@ -30,7 +30,7 @@ import ProductAddonAutocomplete from "./productAddonAutocomplete";
 import db from "../../db.server";
 
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
-import {
+import type {
   LocationT,
   RuleState,
   ShippingRulesActionData,
@@ -131,6 +131,23 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         await Promise.all(selectedLocationsArray.map(
           async (location: LocationT) => {
+            const locationExists = await db.location.findFirst({
+              where: {
+                locationId: location.locationId,
+              },
+            });
+
+            if (locationExists) {
+              await db.locationToShippingRule.create({
+                data: {
+                  locationId: locationExists.id,
+                  shippingRuleId: Number(params.id),
+                },
+              });
+
+              return locationExists;
+            }
+
             const createdLocation = await db.location.create({
               data: {
                 locationId: location.locationId,
@@ -162,7 +179,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
         ))
       } else {
         const shippingRules = await db.shippingRules.findMany({
-          // where zipRangeStart >= ruleData.zipRangeStart AND zipRangeEnd <= ruleData.zipRangeEnd
           where: {
             zipRangeStart: {
               lte: ruleData.zipRangeStart,
@@ -170,7 +186,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             zipRangeEnd: {
               gte: ruleData.zipRangeEnd,
             },
-            locationToShippingRule: {
+            locations: {
               some: {
                 location: {
                   locationId: {
@@ -192,6 +208,23 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         await Promise.all(selectedLocationsArray.map(
           async (location: LocationT) => {
+            const locationExists = await db.location.findFirst({
+              where: {
+                locationId: location.locationId,
+              },
+            });
+
+            if (locationExists) {
+              await db.locationToShippingRule.create({
+                data: {
+                  locationId: locationExists.id,
+                  shippingRuleId: createdShippingRule.id,
+                },
+              });
+
+              return locationExists;
+            }
+
             const createdLocation = await db.location.create({
               data: {
                 locationId: location.locationId,
