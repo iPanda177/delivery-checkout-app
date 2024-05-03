@@ -11,9 +11,9 @@ function PhoneConfirmation() {
   const { phone } = useShippingAddress();
   const [phoneConfirmValue, setPhoneConfirmValue] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  console.log(phone, phoneConfirmValue, phoneConfirmValue !== phone, error);
 
   useEffect(() => {
-    console.log(phoneConfirmValue, phone, phoneConfirmValue === phone);
     if (phoneConfirmValue !== phone) {
       setError("Phone does not match");
     } else if (error) {
@@ -23,7 +23,7 @@ function PhoneConfirmation() {
 
   return <PhoneField
     label="Confirm phone"
-    value={phone}
+    value={phoneConfirmValue}
     onChange={(value) => setPhoneConfirmValue(value)}
     required
     error={error}

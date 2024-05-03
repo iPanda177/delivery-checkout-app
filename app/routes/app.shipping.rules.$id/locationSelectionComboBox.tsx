@@ -95,7 +95,6 @@ export default function LocationSelectCombobox({
       setSelectedTags([...nextSelectedTags]);
       setValue("");
       setSuggestion("");
-      dispatch({ type: "SET_RULE_STATE", payload: { ...ruleState, madeChanges: true } })
     },
     [selectedTags, locations]
   );

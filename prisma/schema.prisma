@@ -46,7 +46,7 @@ model ShippingRules {
   etaDaysFreightLow      Int
   etaDaysFreightHigh     Int
   extendedAreaEligible   Boolean                  @default(true)
-  addOnProductId         String
+  addOnProductId         String?
 
   @@map("Shipping Rules")
 }

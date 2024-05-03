@@ -20,11 +20,10 @@ export default function App() {
   return (
     <AppProvider isEmbeddedApp apiKey={apiKey}>
       <ui-nav-menu>
-        <Link to="/app" rel="home">
+        <Link to="/app/shipping" rel="home">
           Home
         </Link>
-        <Link to="/app/shipping">Shipping & Delivery</Link>
-        <Link to="/app/qrcodes">QR Code Generator</Link>
+        {/*<Link to="/app/shipping">Shipping & Delivery</Link>*/}
       </ui-nav-menu>
       <Outlet />
     </AppProvider>

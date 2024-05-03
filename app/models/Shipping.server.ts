@@ -3,7 +3,6 @@ import db from "../db.server";
 import type {GraphQLClient} from "@shopify/shopify-app-remix/build/ts/server/clients/types";
 import type {AdminOperations} from "@shopify/admin-api-client";
 import type {dbRuleData} from "~/types/types";
-import {ShippingRules} from "@prisma/client";
 
 export async function getShopLocations(graphql: GraphQLClient<AdminOperations>) {
   const response = await graphql(
@@ -75,8 +74,8 @@ export async function getProductVariantData(id: string, graphql: GraphQLClient<A
   return productVariant;
 }
 
-export async function getShippingRule(id: number, graphql: GraphQLClient<AdminOperations>) {
-  const dbRuleData = await db.shippingRules.findFirst({
+export async function getShippingRule(id: number) {
+  const dbRuleData: any = await db.shippingRules.findFirst({
     where: { id },
     include: {
       locations: {
@@ -92,7 +91,7 @@ export async function getShippingRule(id: number, graphql: GraphQLClient<AdminOp
     return null;
   }
 
-  const uniqueLocations = dbRuleData.locations.map(item => item.location);
+  const uniqueLocations = dbRuleData.locations.map((item: any) => item.location);
   dbRuleData.locations = Array.from(new Set(uniqueLocations));
 
   return dbRuleData;
@@ -154,7 +153,7 @@ export async function prepareShipmentsArray(
     let selectedLocation: string | undefined;
 
     shippingRules.forEach((rule) => {
-      rule.locations.forEach((location) => {
+      rule.locations.forEach((location: any) => {
         if (availableLocations.includes(location.location.locationName)) {
           let etaLow: number;
           if (isLtl) {

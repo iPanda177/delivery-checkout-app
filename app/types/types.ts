@@ -3,6 +3,7 @@ import {Dispatch} from "react";
 
 export type ShippingRulesActionData = {
   success: boolean;
+  error?: string;
 }
 
 export type ShippingRulesLoaderData = {
@@ -65,3 +66,7 @@ export type Action =
   | { type: "SET_IS_LOADING"; payload: boolean };
 
 export type DispatchFunction = Dispatch<Action>;
+
+export type groupedShippingRules = {
+  [key: string]: ShippingRules[];
+}

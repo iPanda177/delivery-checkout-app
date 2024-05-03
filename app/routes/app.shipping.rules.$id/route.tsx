@@ -45,7 +45,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const locations = await getShopLocations(admin.graphql);
 
   if (params.id !== 'new') {
-    const ruleState = await getShippingRule(Number(params.id), admin.graphql);
+    const ruleState = await getShippingRule(Number(params.id));
 
     if (!ruleState) {
       return json({ error: { id: "Rule not found" } }, { status: 404 });
@@ -281,7 +281,7 @@ function reducer(state: ShippingRulesReducerState, action: Action) {
     case "SET_RULE_STATE":
       return { ...state, ruleState: action.payload };
     case "SET_SELECTED_LOCATIONS":
-      return { ...state, selectedLocations: action.payload };
+      return { ...state, selectedLocations: action.payload, madeChanges: true };
     case "SET_ZIP_CODE_RANGES":
       return { ...state, zipCodeRanges: action.payload };
     case "SET_ERROR":
@@ -319,6 +319,7 @@ export default function ShippingRuleForm() {
 
       dispatch({ type: "SET_RULE_STATE", payload: editedRuleState });
       dispatch({ type: "SET_ZIP_CODE_RANGES", payload: loaderData.ruleState.zipCodeRanges });
+      // @ts-ignore
       dispatch({ type: "SET_SELECTED_LOCATIONS", payload: loaderData.ruleState.locations });
     }
   }, [loaderData])
@@ -333,10 +334,10 @@ export default function ShippingRuleForm() {
       dispatch({ type: "SET_IS_LOADING", payload: false });
 
       if (actionData && actionData.error === 'Rule already exists') {
-        shopify.toast.show("Rule for one of the selected zip codes and warehouses already exists", { isError: true });
+        shopify.toast.show("Rule for one of the selected zip codes and warehouses already exists", { isError: true, duration: 1000 });
+      } else {
+        shopify.toast.show("Error creating rule", { isError: true });
       }
-
-      shopify.toast.show("Error creating rule", { isError: true });
     }
   }, [actionData])
 
@@ -349,6 +350,7 @@ export default function ShippingRuleForm() {
 
   const handleAddingZipCodeRange = () => {
     dispatch({ type: "SET_ZIP_CODE_RANGES", payload: [...state.zipCodeRanges, { zipRangeStart: '', zipRangeEnd: '' }] });
+    // @ts-ignore
     dispatch({ type: "SET_RULE_STATE", payload: { ...state.ruleState, madeChanges: true } });
   }
 
@@ -382,7 +384,6 @@ export default function ShippingRuleForm() {
     }
 
     if (Object.keys(validationErrors).length > 0) {
-      console.log(validationErrors)
       dispatch({ type: "SET_VALIDATION_ERRORS", payload: validationErrors });
       return;
     }
@@ -450,6 +451,7 @@ export default function ShippingRuleForm() {
                     labelHidden
                     autoComplete="off"
                     value={state.ruleState.ruleName}
+                    // @ts-ignore
                     onChange={(name) => dispatch({ type: "SET_RULE_STATE", payload: { ...state.ruleState, ruleName: name, madeChanges: true }})}
                     error={state.validationErrors.ruleNameEmpty ? 'Rule name cannot be empty' : undefined}
                   />
@@ -457,6 +459,7 @@ export default function ShippingRuleForm() {
                   <Checkbox
                     label="Default Rule"
                     checked={state.ruleState.isDefault}
+                    // @ts-ignore
                     onChange={(value) => dispatch({ type: "SET_RULE_STATE", payload: { ...state.ruleState, isDefault: value, madeChanges: true }})}
                   />
                 </BlockStack>
@@ -531,18 +534,22 @@ export default function ShippingRuleForm() {
                       label="ETA Days Small Parcel Low"
                       type="number"
                       value={String(state.ruleState.etaDaysSmallParcelLow)}
+                      // @ts-ignore
                       onChange={(value) => dispatch({ type: "SET_RULE_STATE", payload: { ...state.ruleState, etaDaysSmallParcelLow: Number(value), madeChanges: true }})}
                       error={state.validationErrors.etaDaysSmallParcelLowEmpty ? 'ETA days small parcel low cannot be empty' : undefined}
                       autoComplete="off"
+                      min={0}
                     />
 
                     <TextField
                       label="ETA Days Small Parcel High"
                       type="number"
                       value={String(state.ruleState.etaDaysSmallParcelHigh)}
+                      // @ts-ignore
                       onChange={(value) => dispatch({ type: "SET_RULE_STATE", payload: { ...state.ruleState, etaDaysSmallParcelHigh: Number(value), madeChanges: true }})}
                       error={state.validationErrors.etaDaysSmallParcelHighEmpty ? 'ETA days small parcel high cannot be empty' : undefined}
                       autoComplete="off"
+                      min={0}
                     />
                   </InlineStack>
 
@@ -555,18 +562,22 @@ export default function ShippingRuleForm() {
                       label="ETA Days Freight Low"
                       type="number"
                       value={String(state.ruleState.etaDaysFreightLow)}
+                      // @ts-ignore
                       onChange={(value) => dispatch({ type: "SET_RULE_STATE", payload: { ...state.ruleState, etaDaysFreightLow: Number(value), madeChanges: true }})}
                       error={state.validationErrors.etaDaysFreightLowEmpty ? 'ETA days freight low cannot be empty' : undefined}
                       autoComplete="off"
+                      min={0}
                     />
 
                     <TextField
                       label="ETA Days Freight High"
                       type="number"
                       value={String(state.ruleState.etaDaysFreightHigh)}
+                      // @ts-ignore
                       onChange={(value) => dispatch({ type: "SET_RULE_STATE", payload: { ...state.ruleState, etaDaysFreightHigh: Number(value), madeChanges: true }})}
                       error={state.validationErrors.etaDaysFreightHighEmpty ? 'ETA days freight high cannot be empty' : undefined}
                       autoComplete="off"
+                      min={0}
                     />
                   </InlineStack>
 
@@ -577,6 +588,7 @@ export default function ShippingRuleForm() {
                   <Checkbox
                     label="Requires Delivery Surcharge / Product Addon"
                     checked={state.ruleState.extendedAreaEligible}
+                    // @ts-ignore
                     onChange={(value) => dispatch({ type: "SET_RULE_STATE", payload: { ...state.ruleState, extendedAreaEligible: value, madeChanges: true }})}
                   />
 

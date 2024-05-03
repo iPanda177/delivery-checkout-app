@@ -1,5 +1,6 @@
-import {type ActionFunctionArgs, json, redirect} from "@remix-run/node";
-import {useLoaderData, Link, useNavigate, useSubmit} from "@remix-run/react";
+import {type ActionFunctionArgs, json} from "@remix-run/node";
+import {useLoaderData, Link, useNavigate, useSubmit, useActionData} from "@remix-run/react";
+// @ts-ignore
 import {Modal, TitleBar} from '@shopify/app-bridge-react';
 import {
   Page,
@@ -10,17 +11,27 @@ import {
   Badge,
   DropZone,
   Banner,
-  List, Box,
+  List,
+  Box,
+  LegacyCard,
 } from "@shopify/polaris";
 
 import db from "../../db.server";
 import type { ShippingRules } from "@prisma/client";
-import {useCallback, useEffect, useState} from "react";
-import type {LocationT, ZipCodeRange} from "~/types/types";
+import {Fragment, useCallback, useEffect, useState} from "react";
+import {groupedShippingRules, LocationT, ZipCodeRange} from "~/types/types";
 
 export async function loader() {
   return json(
     await db.shippingRules.findMany({
+      include: {
+        locations: {
+          include: {
+            location: true,
+          },
+        },
+        zipCodeRanges: true,
+      },
       orderBy: { zipRangeStart: "asc" },
     })
   );
@@ -28,11 +39,12 @@ export async function loader() {
 
 export async function action({ request, params }: ActionFunctionArgs) {
   try {
-    const { data } = {
+    const { data }: {data?: any} = {
       ...Object.fromEntries(await request.formData()),
     };
     const parsedData = JSON.parse(data);
-    console.log('Parsed Data:', parsedData[0])
+    let newRulesCount = 0;
+    let rejectedRulesCount = 0;
 
     for (const row of parsedData) {
       const selectedLocationsArray = JSON.parse(row.selectedLocations as string);
@@ -40,7 +52,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
       const ruleData = {
         ruleName: String(row.ruleName),
-        isDefault: row.isDefault === 'true',
+        isDefault: row.isDefault,
         zipRangeStart: String(row.zipRangeStart),
         zipRangeEnd: String(row.zipRangeEnd),
         etaDaysSmallParcelLow: Number(row.etaDaysSmallParcelLow),
@@ -72,7 +84,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
       });
 
       if (shippingRules.length > 0) {
-        return json({ success: false, error: 'Rule already exists' });
+        console.error('Rule already exists:', ruleData.ruleName);
+        rejectedRulesCount++;
+        continue;
       }
 
       const createdShippingRule  = await db.shippingRules.create({
@@ -80,10 +94,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
       });
 
       await Promise.all(selectedLocationsArray.map(
-        async (location: string) => {
+        async (location: LocationT) => {
           const locationExists = await db.location.findFirst({
             where: {
-              locationName: location,
+              locationId: location.locationId,
             },
           });
 
@@ -98,22 +112,21 @@ export async function action({ request, params }: ActionFunctionArgs) {
             return locationExists;
           }
 
-          // const createdLocation = await db.location.create({
-          //   data: {
-          //     locationId: location.locationId,
-          //     locationName: location.locationName,
-          //   },
-          // });
+          const createdLocation = await db.location.create({
+            data: {
+              locationId: location.locationId,
+              locationName: location.locationName,
+            },
+          });
 
-          // await db.locationToShippingRule.create({
-          //   data: {
-          //     locationId: createdLocation.id,
-          //     shippingRuleId: createdShippingRule.id,
-          //   },
-          // });
+          await db.locationToShippingRule.create({
+            data: {
+              locationId: createdLocation.id,
+              shippingRuleId: createdShippingRule.id,
+            },
+          });
 
-          // return createdLocation;
-          return null
+          return createdLocation;
         },
       ));
 
@@ -128,9 +141,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
           })
         )
       ));
+
+      newRulesCount++;
     }
 
-    return json({ success: true });
+    return json({ success: true, created: newRulesCount, rejected: rejectedRulesCount });
   } catch (err) {
     console.error(err);
     return json({ success: false });
@@ -140,14 +155,39 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function Index() {
   const navigate = useNavigate();
   const submit = useSubmit();
+  const shippingRules = useLoaderData<typeof loader>();
+  const actionData: { success: boolean, created?: number, rejected?: number} | undefined = useActionData<typeof action>();
 
+  const [groupedShippingRules, setGroupedShippingRules] = useState<groupedShippingRules>({});
   const [file, setFile] = useState<File>();
   const [rejectedFile, setRejectedFile] = useState<File>();
-  console.log(file)
+
+  useEffect(() => {
+    if (shippingRules) {
+      const locationRules: { [key: string]: any[] } = {};
+
+      shippingRules.forEach(rule => {
+        rule.locations.forEach(locationInfo => {
+          const locationName = locationInfo.location.locationName;
+          if (!locationRules[locationName]) {
+            locationRules[locationName] = [];
+          }
+          locationRules[locationName].push(rule);
+        });
+      });
+
+      setGroupedShippingRules(locationRules);
+    }
+  }, [shippingRules]);
+
+  useEffect(() => {
+    if (actionData && actionData.success) {
+      shopify.toast.show(`${actionData.created} rules created successfully, ${actionData.rejected} rules was rejected. Reason: Rule for picked zip code already exists.`);
+    }
+  }, [actionData])
 
   useEffect(() => {
     if (file) {
-      console.log(file)
       handleFileChange(file);
     }
   }, [file]);
@@ -160,7 +200,6 @@ export default function Index() {
 
   const handleDropZoneDrop = useCallback(
     (_dropFiles: File[], acceptedFiles: File[], _rejectedFiles: File[]) => {
-      console.log('Accepted Files', acceptedFiles)
       if (_rejectedFiles.length > 0) {
         setRejectedFile(_rejectedFiles[0]);
         return;
@@ -189,7 +228,6 @@ export default function Index() {
           data.push(values);
         });
 
-        console.log('CSV DATA', data);
         resolve(data);
       };
 
@@ -204,7 +242,6 @@ export default function Index() {
   const handleFileChange = async (file: any) => {
     try {
       const csvData = await readCSVFile(file);
-      console.log('CSV данные:', csvData);
 
       const parsedData = [];
 
@@ -212,7 +249,7 @@ export default function Index() {
         const values = row.map(value => value.trim());
         const ruleName = values[0];
         const isDefault = values[1] === 'true';
-        const locations = values[2].split(',').map(location => location.trim());
+        const locations = JSON.parse(values[2]) as LocationT[];
         const zipCodeRanges = values[3].split(',').map(range => {
           const [startStr, endStr] = range.trim().split('-');
           const start = parseInt(startStr);
@@ -224,7 +261,6 @@ export default function Index() {
             return null;
           }
         }).filter(Boolean);
-        console.log(locations, zipCodeRanges)
         const smallParcelLow = parseInt(values[4]);
         const smallParcelHigh = parseInt(values[5]);
         const freightLow = parseInt(values[6]);
@@ -244,22 +280,22 @@ export default function Index() {
           etaDaysFreightHigh: String(freightHigh),
           selectedLocations: JSON.stringify(locations),
           zipCodeRanges: JSON.stringify(zipCodeRanges),
+          extendedAreaEligible: false,
+          addOnProductId: '',
         };
 
         parsedData.push(ruleObject);
       }
 
-      console.log('Parsed Data:', parsedData);
-
       await submit({ data: JSON.stringify(parsedData) }, { method: 'POST' })
 
       shopify.modal.hide('my-modal');
     } catch (error) {
-      console.error('Ошибка при чтении CSV файла:', error);
+      console.error('Error in reading file:', error);
     }
   };
 
-  const fileUpload = !file && <DropZone.FileUpload />;
+  const fileUpload = !file && <DropZone.FileUpload actionHint="Accepts .csv" />;
 
   const errorMessage = rejectedFile && (
     <Banner title="The following file couldn’t be uploaded:" tone="critical">
@@ -272,8 +308,6 @@ export default function Index() {
   );
 
   const ZipCodeTable = () => {
-    const shippingRules = useLoaderData<typeof loader>();
-
     return (
       <IndexTable
         resourceName={{
@@ -295,9 +329,34 @@ export default function Index() {
         sortable={[false, true, true]}
         selectable={false}
       >
-        {shippingRules.map((shippingRule: ShippingRules) => (
-          <ZipCodeTableRow key={shippingRule.id} shippingRule={shippingRule} />
-        ))}
+        {
+          Object.keys(groupedShippingRules).map((locationName: string, index: number) => {
+            const shippingRules = groupedShippingRules[locationName as keyof typeof groupedShippingRules];
+
+            return (
+              <Fragment key={`${index}-fragment`}>
+                <IndexTable.Row
+                  rowType="subheader"
+                  id={`${index}-subheader`}
+                  key={`${index}-subheader`}
+                  position={index}
+                >
+                  <IndexTable.Cell
+                    colSpan={4}
+                    scope="colgroup"
+                    as="th"
+                  >
+                    {`${locationName}`}
+                  </IndexTable.Cell>
+                </IndexTable.Row>
+
+                {shippingRules.map((shippingRule: ShippingRules) => (
+                  <ZipCodeTableRow key={shippingRule.id} shippingRule={shippingRule} />
+                ))}
+              </Fragment>
+            );
+          })
+        }
       </IndexTable>
     );
   };
@@ -368,17 +427,16 @@ export default function Index() {
       </ui-title-bar>
 
       <Modal id="my-modal">
-        <Box as={"div"} minHeight={"400"}>
-          {errorMessage}
-          <DropZone accept=".csv" type="file" onDrop={handleDropZoneDrop} allowMultiple={false}>
-            {fileUpload}
-          </DropZone>
-        </Box>
+        <TitleBar title={"Upload rules file"} />
 
-        <TitleBar title="Title">
-          <button variant="primary">Label</button>
-          <button onClick={() => shopify.modal.hide('my-modal')}>Cancel</button>
-        </TitleBar>
+        <Box as={"div"} minWidth={"600"} minHeight={"600"}>
+          <LegacyCard>
+            {errorMessage}
+            <DropZone accept=".csv" type="file" onDrop={handleDropZoneDrop} allowMultiple={false} variableHeight>
+              {fileUpload}
+            </DropZone>
+          </LegacyCard>
+        </Box>
       </Modal>
 
       <Layout>

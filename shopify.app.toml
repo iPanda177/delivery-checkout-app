@@ -2,12 +2,13 @@
 
 client_id = "f1115783b0f51ee3fe7c0b50d2bdbfe6"
 name = "Poly & Bark Extensibility(PBE)"
-application_url = "https://bacteria-pride-istanbul-neil.trycloudflare.com"
+application_url = "https://breast-december-appointed-bet.trycloudflare.com"
 embedded = true
 
 [build]
 automatically_update_urls_on_dev = true
 dev_store_url = "poly-bark-dev-plus.myshopify.com"
+include_config_on_deploy = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
@@ -15,9 +16,9 @@ scopes = "read_cart_transforms,write_cart_transforms,read_assigned_fulfillment_o
 
 [auth]
 redirect_urls = [
-  "https://bacteria-pride-istanbul-neil.trycloudflare.com/auth/callback",
-  "https://bacteria-pride-istanbul-neil.trycloudflare.com/auth/shopify/callback",
-  "https://bacteria-pride-istanbul-neil.trycloudflare.com/api/auth/callback"
+  "https://breast-december-appointed-bet.trycloudflare.com/auth/callback",
+  "https://breast-december-appointed-bet.trycloudflare.com/auth/shopify/callback",
+  "https://breast-december-appointed-bet.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

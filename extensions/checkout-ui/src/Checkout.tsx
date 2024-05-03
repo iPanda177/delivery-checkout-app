@@ -33,7 +33,7 @@ export default reactExtension(
 );
 
 function Extension() {
-  const APP_URL = 'https://projects-females-worn-deeper.trycloudflare.com';
+  const APP_URL = 'https://breast-december-appointed-bet.trycloudflare.com';
 
   const { query } = useApi();
   const { myshopifyDomain } = useShop();
@@ -49,6 +49,7 @@ function Extension() {
   const [shipmentChoice, setShipmentChoice] = useState<string>('none');
   const [destinationTypeForm, setDestinationTypeForm] = useState<any>({});
   const [cachedProducts, setCachedProducts] = useState<any>([]);
+  const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
 
   const haveLtl = shipments.some((shipment) => shipment.isLtl);
 
@@ -101,22 +102,26 @@ function Extension() {
           getShipmentData(zip);
         });
       } else {
+        console.log('ZIP CODE DID NOT CHANGE')
         getShipmentData(zip);
       }
     }
   }, [zip])
 
   useEffect(() => {
+    console.log('SHIPMENTS USE EFFECT WORKS')
     if (shipments.length) {
       const addedProducts = [];
       const shipmentsArray = [...shipments];
       shipmentsArray.forEach((shipment, index) => {
+        console.log('SHIPMENT IN USE EFFECT', shipment)
         if (shipment.containsFreightItem && !shipment.freightItemAdded) {
           addProduct(shipment.containsFreightItem);
           shipmentsArray[index].freightItemAdded = true;
           addedProducts.push(shipment.containsFreightItem);
         }
       });
+      console.log('ADDED PRODUCTS', addedProducts);
 
       if (addedProducts.length) {
         setShipments(shipmentsArray);
@@ -129,17 +134,48 @@ function Extension() {
     const cachedLinesIds = cachedProducts.map((productId) => {
       return lines.find((line) => line.merchandise.id === productId).id;
     });
+    console.log('CACHED PRODUCT IDS', cachedProducts)
+    console.log('CACHED LINES IDS', cachedLinesIds)
 
-    const removeProducts = await Promise.all(cachedLinesIds.map((lineId) => {
+    const removeProducts = await Promise.all(cachedLinesIds.map( async (lineId) => {
+      await new Promise(resolve => setTimeout(resolve, 500));
       return applyCartLinesChange({
         type: 'removeCartLine',
         id: lineId,
         quantity: 1
       });
     }));
-    console.log(removeProducts);
 
-    const updatedLines = await Promise.all(lines.map((line) => {
+    console.log('REMOVE PRODUCTS',removeProducts);
+
+    if (removeProducts.some((product) => product.type === 'error')) {
+      let tries = 0;
+
+      while (tries < 3) {
+        const retryRemoveProducts = await Promise.all(removeProducts.map( async (product, index) => {
+          if (product.type === 'error') {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            return applyCartLinesChange({
+              type: 'removeCartLine',
+              id: cachedLinesIds[index],
+              quantity: 1
+            });
+          }
+          return product;
+        }));
+
+        console.log('RETRY REMOVE PRODUCTS', retryRemoveProducts);
+
+        if (!retryRemoveProducts.some((product) => product.type === 'error')) {
+          break;
+        }
+
+        tries++;
+      }
+    }
+
+    const updatedLines = await Promise.all(lines.map( async (line) => {
+      await new Promise(resolve => setTimeout(resolve, 500));
       return applyCartLinesChange({
         type: 'updateCartLine',
         id: line.id,
@@ -178,6 +214,7 @@ function Extension() {
         quantity: line.quantity
       }
     });
+    console.log('LINE ITEMS', lineItems)
 
     const data = await fetch(`${APP_URL}/app/check-rules?_data=routes/app.check-rules`, {
       method: "POST",
@@ -188,6 +225,7 @@ function Extension() {
       body: JSON.stringify({ zip, lineItems, shop: myshopifyDomain }),
     })
     const { shipments } = await data.json();
+    console.log('SHIPMENTS', shipments)
 
     if (!shipments || !shipments.length) {
       return;
@@ -219,7 +257,7 @@ function Extension() {
   }
 
   const addProduct = async (productId: string) => {
-    const newCartLine = await applyCartLinesChange({
+    await applyCartLinesChange({
       type: 'addCartLine',
       merchandiseId: productId,
       quantity: 1,
@@ -227,6 +265,7 @@ function Extension() {
 
     const cachedProductsArray = [...cachedProducts];
     cachedProductsArray.push(productId);
+    console.log('CACHED PRODUCTS WHEN PRODUCT ADDED', cachedProductsArray)
     setCachedProducts(cachedProductsArray);
   }
 
@@ -256,162 +295,167 @@ function Extension() {
         value: destinationTypeForm[key]
       });
     }
+    setFormSubmitted(true);
   };
 
   return (
     !haveLtl && (
       <BlockStack>
-        <Form
-          onSubmit={() =>
-            console.log('onSubmit event')
-          }
-        >
-          <ToggleButtonGroup
-            value={destinationTypeForm.destinationType || 'none'}
-            onChange={(value) => handleFormChange('destinationType', value)}
+        {!formSubmitted && (
+          <Form
+            onSubmit={() =>
+              console.log('onSubmit event')
+            }
           >
-            <InlineLayout spacing="base">
-              <ToggleButton
-                id={`house`}
-              >
-                <BlockStack inlineAlignment={"center"}>
-                  <Icon size={"large"} source={"delivered"} />
-                  <Text>House</Text>
-                </BlockStack>
-              </ToggleButton>
+            <ToggleButtonGroup
+              value={destinationTypeForm.destinationType || 'none'}
+              onChange={(value) => handleFormChange('destinationType', value)}
+            >
+              <InlineLayout spacing="base" >
+                <ToggleButton
+                  id={`house`}
+                >
+                  <BlockStack inlineAlignment={"center"}>
+                    <Icon size={"large"} source={"delivered"} />
+                    <Text>House</Text>
+                  </BlockStack>
+                </ToggleButton>
 
-              <ToggleButton
-                id={`apartment`}
-              >
-                <BlockStack inlineAlignment={"center"}>
-                  <Icon size={"large"} source={"store"} />
-                  <Text>Apartment</Text>
-                </BlockStack>
-              </ToggleButton>
+                <ToggleButton
+                  id={`apartment`}
+                >
+                  <BlockStack inlineAlignment={"center"}>
+                    <Icon size={"large"} source={"store"} />
+                    <Text>Apartment</Text>
+                  </BlockStack>
+                </ToggleButton>
 
-              <ToggleButton
-                id={`office`}
-              >
-                <BlockStack inlineAlignment={"center"}>
-                  <Icon size={"large"} source={"store"} />
-                  <Text>Commercial/Office</Text>
-                </BlockStack>
-              </ToggleButton>
-            </InlineLayout>
-          </ToggleButtonGroup>
+                <ToggleButton
+                  id={`office`}
+                >
+                  <BlockStack inlineAlignment={"center"}>
+                    <Icon size={"large"} source={"store"} />
+                    <Text>Commercial/Office</Text>
+                  </BlockStack>
+                </ToggleButton>
+              </InlineLayout>
+            </ToggleButtonGroup>
 
-          <BlockSpacer spacing="base" />
+            <BlockSpacer spacing="base" />
 
-          {destinationTypeForm.destinationType === 'house' && (
-            <BlockStack>
-              <Select
-                label={"Will delivery require the use of stairs?"}
-                value={destinationTypeForm.houseStairs || 'none'}
-                options={[
-                  {label: "Yes", value: "yes"},
-                  {label: "No", value: "no"},
-                ]}
-                onChange={(value) => handleFormChange('houseStairs', value)}
-              />
-
-              {destinationTypeForm.stairsOrElevator === 'yes' && (
+            {destinationTypeForm.destinationType === 'house' && (
+              <BlockStack>
                 <Select
-                  label={"Would the delivery involve carrying the item more than 21 stairs from the ground floor?"}
-                  value={destinationTypeForm.moreThanTwentyOneStairs || 'none'}
+                  label={"Will delivery require the use of stairs?"}
+                  value={destinationTypeForm.houseStairs || 'none'}
                   options={[
                     {label: "Yes", value: "yes"},
                     {label: "No", value: "no"},
                   ]}
-                  onChange={(value) => handleFormChange('moreThanTwentyOneStairs', value)}
+                  onChange={(value) => handleFormChange('houseStairs', value)}
                 />
-              )}
 
-              {destinationTypeForm.moreThanTwentyOneStairs === 'yes' && (
-                <TextField
-                  label={"What is the total number of individual stair steps that will need to be traversed?"}
-                  value={destinationTypeForm.numberOfStairs || ''}
-                  onChange={(value) => handleFormChange('numberOfStairs', value)}
+                {destinationTypeForm.stairsOrElevator === 'yes' && (
+                  <Select
+                    label={"Would the delivery involve carrying the item more than 21 stairs from the ground floor?"}
+                    value={destinationTypeForm.moreThanTwentyOneStairs || 'none'}
+                    options={[
+                      {label: "Yes", value: "yes"},
+                      {label: "No", value: "no"},
+                    ]}
+                    onChange={(value) => handleFormChange('moreThanTwentyOneStairs', value)}
+                  />
+                )}
+
+                {destinationTypeForm.moreThanTwentyOneStairs === 'yes' && (
+                  <TextField
+                    label={"What is the total number of individual stair steps that will need to be traversed?"}
+                    value={destinationTypeForm.numberOfStairs || ''}
+                    onChange={(value) => handleFormChange('numberOfStairs', value)}
+                  />
+                )}
+
+                <Checkbox
+                  id={"confirm"}
+                  name={"confirm"}
+                  onChange={(value) => handleFormChange('confirm', String(value))}
+                >
+                  Please confirm that you have measured the entrance and all elevator/doorways for adequate fit
+                </Checkbox>
+              </BlockStack>
+            )}
+
+            {(destinationTypeForm.destinationType === 'apartment' || destinationTypeForm.destinationType === 'office') && (
+              <BlockStack>
+                <Banner
+                  status={"warning"}
+                  title={"For Apartment and Office Deliveries that are not on the ground floor, we suggest upgrading to Enhanced Delivery to ensure there are no restrictions imposed by the Freight Courier on your delivery"}
                 />
-              )}
 
-              <Checkbox
-                id={"confirm"}
-                name={"confirm"}
-                onChange={(value) => handleFormChange('confirm', String(value))}
-              >
-                Please confirm that you have measured the entrance and all elevator/doorways for adequate fit
-              </Checkbox>
-            </BlockStack>
-          )}
-
-          {(destinationTypeForm.destinationType === 'apartment' || destinationTypeForm.destinationType === 'office') && (
-            <BlockStack>
-              <Banner
-                status={"warning"}
-                title={"For Apartment and Office Deliveries that are not on the ground floor, we suggest upgrading to Enhanced Delivery to ensure there are no restrictions imposed by the Freight Courier on your delivery"}
-              />
-
-              <Select
-                label={"Will delivery require the use of stairs or elevator?"}
-                value={destinationTypeForm.stairsOrElevator || 'none'}
-                options={[
-                  {label: "Requires use of Stairs", value: "stairs"},
-                  {label: "Requires use of Elevator", value: "elevator"},
-                  {label: "None Needed (Ground Level)", value: "none"}
-                ]}
-                onChange={(value) => handleFormChange('stairsOrElevator', value)}
-              />
-
-              {destinationTypeForm.stairsOrElevator === 'stairs' && (
-                <TextField
-                  label={"What is the total number of individual stair steps that will need to be traversed?"}
-                  value={destinationTypeForm.numberOfStairs || ''}
-                  onChange={(value) => handleFormChange('numberOfStairs', value)}
-                />
-              )}
-
-              {destinationTypeForm.stairsOrElevator === 'elevator' && (
                 <Select
-                  label={
-                    destinationTypeForm.destinationType === 'apartment'
-                      ? "Is the elevator large enough to accommodate the delivery (i.e. Freight Elevator)?"
-                      :  "Does the building / location have a delivery dock and/or freight elevator for Deliveries?"
-                }
-                  value={destinationTypeForm.elevatorAccommodate || 'none'}
+                  label={"Will delivery require the use of stairs or elevator?"}
+                  value={destinationTypeForm.stairsOrElevator || 'none'}
+                  options={[
+                    {label: "Requires use of Stairs", value: "stairs"},
+                    {label: "Requires use of Elevator", value: "elevator"},
+                    {label: "None Needed (Ground Level)", value: "none"}
+                  ]}
+                  onChange={(value) => handleFormChange('stairsOrElevator', value)}
+                />
+
+                {destinationTypeForm.stairsOrElevator === 'stairs' && (
+                  <TextField
+                    label={"What is the total number of individual stair steps that will need to be traversed?"}
+                    value={destinationTypeForm.numberOfStairs || ''}
+                    onChange={(value) => handleFormChange('numberOfStairs', value)}
+                  />
+                )}
+
+                {destinationTypeForm.stairsOrElevator === 'elevator' && (
+                  <Select
+                    label={
+                      destinationTypeForm.destinationType === 'apartment'
+                        ? "Is the elevator large enough to accommodate the delivery (i.e. Freight Elevator)?"
+                        :  "Does the building / location have a delivery dock and/or freight elevator for Deliveries?"
+                    }
+                    value={destinationTypeForm.elevatorAccommodate || 'none'}
+                    options={[
+                      {label: "Yes", value: "yes"},
+                      {label: "No", value: "no"}
+                    ]}
+                    onChange={(value) => handleFormChange('elevatorAccommodate', value)}
+                  />
+                )}
+
+                <Select
+                  label={"Does your building or unit require a Certificate of Insurance (COI) for delivery?"}
+                  value={destinationTypeForm.certificateInsurance || 'none'}
                   options={[
                     {label: "Yes", value: "yes"},
                     {label: "No", value: "no"}
                   ]}
-                  onChange={(value) => handleFormChange('elevatorAccommodate', value)}
+                  onChange={(value) => handleFormChange('certificateInsurance', value)}
                 />
-              )}
 
-              <Select
-                label={"Does your building or unit require a Certificate of Insurance (COI) for delivery?"}
-                value={destinationTypeForm.certificateInsurance || 'none'}
-                options={[
-                  {label: "Yes", value: "yes"},
-                  {label: "No", value: "no"}
-                ]}
-                onChange={(value) => handleFormChange('certificateInsurance', value)}
-              />
+                <Checkbox
+                  id={"confirm"}
+                  name={"confirm"}
+                  onChange={(value) => handleFormChange('confirm', String(value))}
+                >
+                  Please confirm that you have measured the entrance and all elevator/doorways for adequate fit
+                </Checkbox>
+              </BlockStack>
+            )}
 
-              <Checkbox
-                id={"confirm"}
-                name={"confirm"}
-                onChange={(value) => handleFormChange('confirm', String(value))}
-              >
-                Please confirm that you have measured the entrance and all elevator/doorways for adequate fit
-              </Checkbox>
-            </BlockStack>
-          )}
+            <BlockSpacer spacing="base" />
 
-          <BlockSpacer spacing="base" />
-
-          <Button accessibilityRole="submit" onPress={() => submitForm()}>
-            Submit
-          </Button>
-        </Form>
+            <InlineStack inlineAlignment={"end"}>
+              <Button accessibilityRole="submit" onPress={() => submitForm()}>
+                Submit
+              </Button>
+            </InlineStack>
+          </Form>
+        )}
 
         <BlockStack border={"base"} cornerRadius={"base"}>
           <ToggleButtonGroup
