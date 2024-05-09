@@ -32,13 +32,18 @@ target = "purchase.checkout.footer.render-after"
 
 [[extensions.targeting]]
 module = "./src/ProgressBar.tsx"
-target = "purchase.checkout.cart-line-list.render-after"
+target = "purchase.checkout.block.render"
+#
+#[[extensions.targeting]]
+#module = "./src/TrustBlock.tsx"
+#target = "purchase.checkout.block.render"
 
 [extensions.capabilities]
 # Gives your extension access to directly query Shopify’s storefront API.
 # https://shopify.dev/docs/api/checkout-ui-extensions/unstable/configuration#api-access
 api_access = true
 network_access = true
+block_progress = true
 
 # Gives your extension access to make external network calls, using the
 # JavaScript `fetch()` API. Learn more:
@@ -80,5 +85,20 @@ description = "Enter url to your logo asset"
 key = "link_4"
 type = "single_line_text_field"
 name = "Logo url 4"
+description = "Enter url to your logo asset"
+[[extensions.settings.fields]]
+key = "trust_href_1"
+type = "single_line_text_field"
+name = "Trust logo url 1"
+description = "Enter url to your logo asset"
+[[extensions.settings.fields]]
+key = "trust_href_2"
+type = "single_line_text_field"
+name = "Trust logo url 2"
+description = "Enter url to your logo asset"
+[[extensions.settings.fields]]
+key = "trust_href_3"
+type = "single_line_text_field"
+name = "Trust logo url 3"
 description = "Enter url to your logo asset"
 

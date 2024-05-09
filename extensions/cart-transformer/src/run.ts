@@ -12,23 +12,21 @@ export function run(input: RunInput): FunctionRunResult {
     operations: [],
   };
 
-  const productId = input.cart.lines[0].extra_product_id || null;
+ const ltlProduct = input.cart.lines.find((line) => line.free_delivery?.value === 'free');
 
-  if (productId) {
+  if (ltlProduct) {
     CHANGES.operations.push(
       {
-        merge: {
-          cartLines: input.cart.lines.map((line) => ({
-            cartLineId: line.id,
-            quantity: line.quantity
-          }))
-        },
-        parentVariantId: productId,
-        // check later for custom title and image grabbing
-        // title: "Meal Kit",
-        // image: {
-        //   url: "https://cdn.shopify.com/[...]/custom-image.png"
-        // }
+        update: {
+          cartLineId: ltlProduct.id,
+          price: {
+            adjustment: {
+              fixedPricePerUnit: {
+                amount: 0,
+              }
+            }
+          }
+        }
       }
     )
   }

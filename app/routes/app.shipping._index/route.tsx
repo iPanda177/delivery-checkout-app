@@ -399,7 +399,7 @@ export default function Index() {
 
       <IndexTable.Cell>
         <Text as="span">
-          <Badge size={"large"} tone={shippingRule.extendedAreaEligible ? "success" : undefined}>{shippingRule.extendedAreaEligible ? "true" : "false"}</Badge>
+          <Badge size={"large"} tone={shippingRule.ineligibleForLtl ? "success" : undefined}>{shippingRule.ineligibleForLtl ? "true" : "false"}</Badge>
           </Text>
       </IndexTable.Cell>
 

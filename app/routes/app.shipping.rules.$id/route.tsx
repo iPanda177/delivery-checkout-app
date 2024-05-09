@@ -43,6 +43,7 @@ import type {
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { admin } = await authenticate.admin(request);
   const locations = await getShopLocations(admin.graphql);
+  console.log('locations', locations);
 
   if (params.id !== 'new') {
     const ruleState = await getShippingRule(Number(params.id));
@@ -72,6 +73,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     etaDaysSmallParcelHigh: 0,
     etaDaysFreightLow: 0,
     etaDaysFreightHigh: 0,
+    ineligibleForLtl: false,
     extendedAreaEligible: false,
     addOnProductId: '',
   };
@@ -112,6 +114,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         etaDaysFreightLow: Number(data.etaDaysFreightLow),
         etaDaysFreightHigh: Number(data.etaDaysFreightHigh),
         extendedAreaEligible: data.extendedAreaEligible === 'true',
+        ineligibleForLtl: data.ineligibleForLtl === 'true',
         addOnProductId: String(data.addOnProductId),
       };
 
@@ -275,6 +278,7 @@ const initialState: ShippingRulesReducerState = {
 };
 
 function reducer(state: ShippingRulesReducerState, action: Action) {
+  console.log('reducer', action)
   switch (action.type) {
     case "SET_LOCATIONS":
       return { ...state, locations: action.payload };
@@ -298,8 +302,10 @@ function reducer(state: ShippingRulesReducerState, action: Action) {
 export default function ShippingRuleForm() {
   const loaderData = useLoaderData<ShippingRulesLoaderData>();
   const actionData = useActionData<ShippingRulesActionData>();
+  console.log('loaderData', loaderData);
 
   const [state, dispatch] = useReducer(reducer, initialState);
+  console.log(state)
 
   const navigate = useNavigate();
   const submit = useSubmit();
@@ -334,7 +340,7 @@ export default function ShippingRuleForm() {
       dispatch({ type: "SET_IS_LOADING", payload: false });
 
       if (actionData && actionData.error === 'Rule already exists') {
-        shopify.toast.show("Rule for one of the selected zip codes and warehouses already exists", { isError: true, duration: 1000 });
+        shopify.toast.show("Rule for one of the selected zip codes and warehouses already exists", { isError: true, duration: 5000 });
       } else {
         shopify.toast.show("Error creating rule", { isError: true });
       }
@@ -580,6 +586,13 @@ export default function ShippingRuleForm() {
                       min={0}
                     />
                   </InlineStack>
+
+                  <Checkbox
+                    label="Ineligible for LTL"
+                    checked={state.ruleState.ineligibleForLtl}
+                    // @ts-ignore
+                    onChange={(value) => dispatch({ type: "SET_RULE_STATE", payload: { ...state.ruleState, ineligibleForLtl: value, madeChanges: true }})}
+                  />
 
                   <Bleed marginInlineStart="200" marginInlineEnd="200">
                     <Divider/>

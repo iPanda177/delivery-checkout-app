@@ -1133,7 +1133,7 @@
             }
             return dispatcher.useContext(Context);
           }
-          function useState4(initialState) {
+          function useState5(initialState) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useState(initialState);
           }
@@ -1141,11 +1141,11 @@
             var dispatcher = resolveDispatcher();
             return dispatcher.useReducer(reducer, initialArg, init);
           }
-          function useRef2(initialValue) {
+          function useRef3(initialValue) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useRef(initialValue);
           }
-          function useEffect4(create, deps) {
+          function useEffect6(create, deps) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useEffect(create, deps);
           }
@@ -1927,15 +1927,15 @@
           exports.useContext = useContext3;
           exports.useDebugValue = useDebugValue;
           exports.useDeferredValue = useDeferredValue;
-          exports.useEffect = useEffect4;
+          exports.useEffect = useEffect6;
           exports.useId = useId;
           exports.useImperativeHandle = useImperativeHandle;
           exports.useInsertionEffect = useInsertionEffect;
           exports.useLayoutEffect = useLayoutEffect;
           exports.useMemo = useMemo2;
           exports.useReducer = useReducer;
-          exports.useRef = useRef2;
-          exports.useState = useState4;
+          exports.useRef = useRef3;
+          exports.useState = useState5;
           exports.useSyncExternalStore = useSyncExternalStore;
           exports.useTransition = useTransition;
           exports.version = ReactVersion;
@@ -19631,6 +19631,32 @@ ${errorInfo.componentStack}`);
     return subscription.current;
   }
 
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/capabilities.mjs
+  function useExtensionCapabilities() {
+    return useSubscription(useApi().extension.capabilities);
+  }
+  function useExtensionCapability(capability) {
+    return useExtensionCapabilities().includes(capability);
+  }
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/buyer-journey.mjs
+  var import_react30 = __toESM(require_react(), 1);
+  function useBuyerJourneyIntercept(interceptor) {
+    const api = useApi();
+    if (!("buyerJourney" in api)) {
+      throw new ExtensionHasNoMethodError("buyerJourney", api.extension.target);
+    }
+    const interceptorRef = (0, import_react30.useRef)(interceptor);
+    interceptorRef.current = interceptor;
+    return (0, import_react30.useEffect)(() => {
+      const teardownPromise = api.buyerJourney.intercept((interceptorProps) => interceptorRef.current(interceptorProps));
+      return () => {
+        teardownPromise.then((teardown) => teardown()).catch(() => {
+        });
+      };
+    }, [api.buyerJourney]);
+  }
+
   // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/attributes.mjs
   function useAttributes() {
     return useSubscription(useApi().attributes);
@@ -19694,14 +19720,14 @@ ${errorInfo.componentStack}`);
   }
 
   // extensions/checkout-ui/src/Checkout.tsx
-  var import_react30 = __toESM(require_react());
+  var import_react31 = __toESM(require_react());
   var import_jsx_runtime4 = __toESM(require_jsx_runtime());
   var Checkout_default = reactExtension(
     "purchase.checkout.shipping-option-list.render-after",
     () => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Extension, {})
   );
   function Extension() {
-    const APP_URL = "https://breast-december-appointed-bet.trycloudflare.com";
+    const APP_URL = "https://lost-issn-national-dried.trycloudflare.com";
     const { query } = useApi();
     const { myshopifyDomain } = useShop();
     const lines = useCartLines();
@@ -19709,15 +19735,67 @@ ${errorInfo.componentStack}`);
     const orderAttributesChange = useApplyAttributeChange();
     const { zip } = useShippingAddress();
     const zip_code_attr = useAttributeValues(["zip_code"])[0];
-    const [shipments, setShipments] = (0, import_react30.useState)([]);
-    const [deliveryProduct, setDeliveryProduct] = (0, import_react30.useState)(null);
-    const [selectedButton, setSelectedButton] = (0, import_react30.useState)(null);
-    const [shipmentChoice, setShipmentChoice] = (0, import_react30.useState)("none");
-    const [destinationTypeForm, setDestinationTypeForm] = (0, import_react30.useState)({});
-    const [cachedProducts, setCachedProducts] = (0, import_react30.useState)([]);
-    const [formSubmitted, setFormSubmitted] = (0, import_react30.useState)(false);
+    const canBlockProgress = useExtensionCapability("block_progress");
+    console.log("CAN BLOCK PROGRESS", canBlockProgress);
+    const [shipments, setShipments] = (0, import_react31.useState)([]);
+    const [deliveryProduct, setDeliveryProduct] = (0, import_react31.useState)(null);
+    const [selectedButton, setSelectedButton] = (0, import_react31.useState)(null);
+    const [shipmentChoice, setShipmentChoice] = (0, import_react31.useState)("none");
+    const [destinationTypeForm, setDestinationTypeForm] = (0, import_react31.useState)({});
+    const [cachedProducts, setCachedProducts] = (0, import_react31.useState)([]);
+    const [formSubmitted, setFormSubmitted] = (0, import_react31.useState)(false);
+    const [ltlDeliveryProductPicked, setLTLDeliveryProductPicked] = (0, import_react31.useState)(false);
+    const [validationErrors, setValidationErrors] = (0, import_react31.useState)({});
     const haveLtl = shipments.some((shipment) => shipment.isLtl);
-    (0, import_react30.useEffect)(() => {
+    const ineligibleForLtl = shipments.some((shipment) => shipment.ineligibleForLtl);
+    useBuyerJourneyIntercept(({ canBlockProgress: canBlockProgress2 }) => {
+      if (canBlockProgress2 && haveLtl && ineligibleForLtl) {
+        return {
+          behavior: "block",
+          reason: "Ineligible for LTL delivery",
+          perform: (result) => {
+            if (result.behavior === "block") {
+              const errors = __spreadValues({}, validationErrors);
+              errors.ineligibleForLtl = true;
+              setValidationErrors(errors);
+            }
+          }
+        };
+      }
+      if (canBlockProgress2 && haveLtl && !formSubmitted) {
+        return {
+          behavior: "block",
+          reason: "Please fill out the form",
+          perform: (result) => {
+            if (result.behavior === "block") {
+              const errors = __spreadValues({}, validationErrors);
+              errors.formNotSubmitted = true;
+              setValidationErrors(errors);
+            }
+          }
+        };
+      }
+      if (canBlockProgress2 && haveLtl && !ltlDeliveryProductPicked) {
+        return {
+          behavior: "block",
+          reason: "Please choose a delivery type",
+          perform: (result) => {
+            if (result.behavior === "block") {
+              const errors = __spreadValues({}, validationErrors);
+              errors.ltlDeliveryProductNotPicked = true;
+              setValidationErrors(errors);
+            }
+          }
+        };
+      }
+      return {
+        behavior: "allow",
+        perform: () => {
+          setValidationErrors({});
+        }
+      };
+    });
+    (0, import_react31.useEffect)(() => {
       if (!deliveryProduct) {
         query(
           `
@@ -19757,7 +19835,7 @@ ${errorInfo.componentStack}`);
         });
       }
     }, [deliveryProduct]);
-    (0, import_react30.useEffect)(() => {
+    (0, import_react31.useEffect)(() => {
       if (zip) {
         if (zip_code_attr && zip_code_attr !== zip) {
           console.log("ZIP CODE CHANGED");
@@ -19771,7 +19849,7 @@ ${errorInfo.componentStack}`);
         }
       }
     }, [zip]);
-    (0, import_react30.useEffect)(() => {
+    (0, import_react31.useEffect)(() => {
       console.log("SHIPMENTS USE EFFECT WORKS");
       if (shipments.length) {
         const addedProducts = [];
@@ -19826,23 +19904,6 @@ ${errorInfo.componentStack}`);
           tries++;
         }
       }
-      const updatedLines = yield Promise.all(lines.map((line) => __async(this, null, function* () {
-        yield new Promise((resolve) => setTimeout(resolve, 500));
-        return applyCartLinesChange({
-          type: "updateCartLine",
-          id: line.id,
-          attributes: [{
-            key: "ETA",
-            value: ``
-          }]
-        });
-      })));
-      console.log(updatedLines);
-      yield orderAttributesChange({
-        key: "zip_code",
-        type: "updateAttribute",
-        value: zip
-      });
       setCachedProducts([]);
     });
     const countDeliveryDateFromToday = (shipment) => {
@@ -19880,6 +19941,7 @@ ${errorInfo.componentStack}`);
           return shipment2.lineItems.some((item) => item.id === line.merchandise.id);
         });
         if (shipment) {
+          yield new Promise((resolve) => setTimeout(resolve, 500));
           yield applyCartLinesChange({
             type: "updateCartLine",
             id: line.id,
@@ -19898,6 +19960,7 @@ ${errorInfo.componentStack}`);
       setShipments(shipments2);
     });
     const addProduct = (productId) => __async(this, null, function* () {
+      yield new Promise((resolve) => setTimeout(resolve, 500));
       yield applyCartLinesChange({
         type: "addCartLine",
         merchandiseId: productId,
@@ -19915,6 +19978,7 @@ ${errorInfo.componentStack}`);
       shipmentsArray[index].ltl_delivery_product_picked = true;
       setShipments(shipmentsArray);
       setSelectedButton(null);
+      setLTLDeliveryProductPicked(true);
     };
     const handleFormChange = (type, value) => {
       setDestinationTypeForm(__spreadProps(__spreadValues({}, destinationTypeForm), {
@@ -19931,8 +19995,15 @@ ${errorInfo.componentStack}`);
       }
       setFormSubmitted(true);
     };
-    return !haveLtl && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { children: [
-      !formSubmitted && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+    return haveLtl && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { border: "base", borderWidth: "medium", cornerRadius: "base", padding: "base", children: [
+      validationErrors && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        Banner2,
+        {
+          status: "critical",
+          title: "Oops! It looks like you are not eligible for LTL delivery."
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
         Form2,
         {
           onSubmit: () => console.log("onSubmit event"),
@@ -19942,6 +20013,7 @@ ${errorInfo.componentStack}`);
               {
                 value: destinationTypeForm.destinationType || "none",
                 onChange: (value) => handleFormChange("destinationType", value),
+                disabled: formSubmitted,
                 children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(InlineLayout2, { spacing: "base", children: [
                   /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
                     ToggleButton2,
@@ -19976,6 +20048,13 @@ ${errorInfo.componentStack}`);
                 ] })
               }
             ),
+            validationErrors.formNotSubmitted && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              Banner2,
+              {
+                status: "critical",
+                title: "Please fill out the form before proceeding"
+              }
+            ),
             /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(BlockSpacer2, { spacing: "base" }),
             destinationTypeForm.destinationType === "house" && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { children: [
               /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
@@ -19987,7 +20066,9 @@ ${errorInfo.componentStack}`);
                     { label: "Yes", value: "yes" },
                     { label: "No", value: "no" }
                   ],
-                  onChange: (value) => handleFormChange("houseStairs", value)
+                  onChange: (value) => handleFormChange("houseStairs", value),
+                  required: true,
+                  disabled: formSubmitted
                 }
               ),
               destinationTypeForm.stairsOrElevator === "yes" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
@@ -19999,7 +20080,9 @@ ${errorInfo.componentStack}`);
                     { label: "Yes", value: "yes" },
                     { label: "No", value: "no" }
                   ],
-                  onChange: (value) => handleFormChange("moreThanTwentyOneStairs", value)
+                  onChange: (value) => handleFormChange("moreThanTwentyOneStairs", value),
+                  required: true,
+                  disabled: formSubmitted
                 }
               ),
               destinationTypeForm.moreThanTwentyOneStairs === "yes" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
@@ -20007,7 +20090,9 @@ ${errorInfo.componentStack}`);
                 {
                   label: "What is the total number of individual stair steps that will need to be traversed?",
                   value: destinationTypeForm.numberOfStairs || "",
-                  onChange: (value) => handleFormChange("numberOfStairs", value)
+                  onChange: (value) => handleFormChange("numberOfStairs", value),
+                  required: true,
+                  disabled: formSubmitted
                 }
               ),
               /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
@@ -20016,6 +20101,7 @@ ${errorInfo.componentStack}`);
                   id: "confirm",
                   name: "confirm",
                   onChange: (value) => handleFormChange("confirm", String(value)),
+                  disabled: formSubmitted,
                   children: "Please confirm that you have measured the entrance and all elevator/doorways for adequate fit"
                 }
               )
@@ -20038,7 +20124,9 @@ ${errorInfo.componentStack}`);
                     { label: "Requires use of Elevator", value: "elevator" },
                     { label: "None Needed (Ground Level)", value: "none" }
                   ],
-                  onChange: (value) => handleFormChange("stairsOrElevator", value)
+                  onChange: (value) => handleFormChange("stairsOrElevator", value),
+                  required: true,
+                  disabled: formSubmitted
                 }
               ),
               destinationTypeForm.stairsOrElevator === "stairs" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
@@ -20046,7 +20134,9 @@ ${errorInfo.componentStack}`);
                 {
                   label: "What is the total number of individual stair steps that will need to be traversed?",
                   value: destinationTypeForm.numberOfStairs || "",
-                  onChange: (value) => handleFormChange("numberOfStairs", value)
+                  onChange: (value) => handleFormChange("numberOfStairs", value),
+                  required: true,
+                  disabled: formSubmitted
                 }
               ),
               destinationTypeForm.stairsOrElevator === "elevator" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
@@ -20058,7 +20148,9 @@ ${errorInfo.componentStack}`);
                     { label: "Yes", value: "yes" },
                     { label: "No", value: "no" }
                   ],
-                  onChange: (value) => handleFormChange("elevatorAccommodate", value)
+                  onChange: (value) => handleFormChange("elevatorAccommodate", value),
+                  required: true,
+                  disabled: formSubmitted
                 }
               ),
               /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
@@ -20070,7 +20162,9 @@ ${errorInfo.componentStack}`);
                     { label: "Yes", value: "yes" },
                     { label: "No", value: "no" }
                   ],
-                  onChange: (value) => handleFormChange("certificateInsurance", value)
+                  onChange: (value) => handleFormChange("certificateInsurance", value),
+                  required: true,
+                  disabled: formSubmitted
                 }
               ),
               /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
@@ -20079,16 +20173,24 @@ ${errorInfo.componentStack}`);
                   id: "confirm",
                   name: "confirm",
                   onChange: (value) => handleFormChange("confirm", String(value)),
+                  disabled: formSubmitted,
                   children: "Please confirm that you have measured the entrance and all elevator/doorways for adequate fit"
                 }
               )
             ] }),
             /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(BlockSpacer2, { spacing: "base" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(InlineStack2, { inlineAlignment: "end", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Button2, { accessibilityRole: "submit", onPress: () => submitForm(), children: "Submit" }) })
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(InlineStack2, { inlineAlignment: "end", children: !formSubmitted ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Button2, { accessibilityRole: "submit", onPress: () => submitForm(), children: "Submit" }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Button2, { kind: "secondary", accessibilityRole: "submit", onPress: () => setFormSubmitted(false), children: "Edit" }) })
           ]
         }
       ),
       /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { border: "base", cornerRadius: "base", children: [
+        validationErrors.ltlDeliveryProductNotPicked && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+          Banner2,
+          {
+            status: "critical",
+            title: "Please choose a delivery type before proceeding"
+          }
+        ),
         /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
           ToggleButtonGroup2,
           {
@@ -20124,8 +20226,8 @@ ${errorInfo.componentStack}`);
               children: deliveryProduct.variants.edges.map((variant, index2) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Choice2, { id: variant.node.id, disabled: shipment.ltl_delivery_product_picked, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(InlineStack2, { spacing: "base", children: [
                 /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: `${variant.node.title} Delivery - delivered to the outside entrance of your home or building at the ground level` }),
                 /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { spacing: "none", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: `Regular Price: $${variant.node.compareAtPrice.amount}` }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: `Discounted Price: $${variant.node.price.amount}` })
+                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: `Regular Price: $${Number(variant.node.compareAtPrice.amount).toFixed()}` }),
+                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: `Discounted Price: $${Number(variant.node.price.amount).toFixed()}` })
                 ] })
               ] }) }, index2))
             }
@@ -20137,7 +20239,7 @@ ${errorInfo.componentStack}`);
   }
 
   // extensions/checkout-ui/src/Phone.tsx
-  var import_react31 = __toESM(require_react());
+  var import_react32 = __toESM(require_react());
   var import_jsx_runtime5 = __toESM(require_jsx_runtime());
   var Phone_default = reactExtension(
     "purchase.checkout.delivery-address.render-after",
@@ -20145,23 +20247,42 @@ ${errorInfo.componentStack}`);
   );
   function PhoneConfirmation() {
     const { phone } = useShippingAddress();
-    const [phoneConfirmValue, setPhoneConfirmValue] = (0, import_react31.useState)("");
-    const [error, setError] = (0, import_react31.useState)(null);
-    console.log(phone, phoneConfirmValue, phoneConfirmValue !== phone, error);
-    (0, import_react31.useEffect)(() => {
+    const canBlockProgress = useExtensionCapability("block_progress");
+    const [phoneConfirmValue, setPhoneConfirmValue] = (0, import_react32.useState)("");
+    const [error, setError] = (0, import_react32.useState)(null);
+    (0, import_react32.useEffect)(() => {
       if (phoneConfirmValue !== phone) {
         setError("Phone does not match");
       } else if (error) {
         setError(null);
       }
     }, [phoneConfirmValue, phone]);
+    useBuyerJourneyIntercept(({ canBlockProgress: canBlockProgress2 }) => {
+      if (canBlockProgress2 && !phone) {
+        return {
+          behavior: "block",
+          reason: "Phone is required",
+          perform: (result) => {
+            if (result.behavior === "block") {
+              setError("Phone is required");
+            }
+          }
+        };
+      }
+      return {
+        behavior: "allow",
+        perform: () => {
+          setError(null);
+        }
+      };
+    });
     return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
       PhoneField2,
       {
         label: "Confirm phone",
         value: phoneConfirmValue,
         onChange: (value) => setPhoneConfirmValue(value),
-        required: true,
+        required: canBlockProgress,
         error
       }
     );
@@ -20193,15 +20314,70 @@ ${errorInfo.componentStack}`);
   }
 
   // extensions/checkout-ui/src/ProgressBar.tsx
+  var import_react33 = __toESM(require_react());
   var import_jsx_runtime7 = __toESM(require_jsx_runtime());
   var ProgressBar_default = reactExtension(
-    "purchase.checkout.cart-line-list.render-after",
+    "purchase.checkout.block.render",
     () => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(ProgressBar, {})
   );
   function ProgressBar() {
-    const cost = useTotalAmount();
-    const progress = 80 / 100 * 100;
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(import_jsx_runtime7.Fragment, {});
+    const { amount } = useTotalAmount();
+    const applyCartLinesChange = useApplyCartLinesChange();
+    const deliveryProduct = useCartLines().find((line) => line.merchandise.title.includes("LTL Delivery"));
+    const [title, setTitle] = (0, import_react33.useState)(null);
+    (0, import_react33.useEffect)(() => {
+      if (deliveryProduct) {
+        console.log("deliveryProduct", deliveryProduct, amount);
+        const cost = deliveryProduct.cost.totalAmount.amount;
+        if (cost === 0) {
+          return;
+        }
+        console.log("COOOOOOOOOST", cost);
+        switch (true) {
+          case (amount >= 3e3 && deliveryProduct.merchandise.subtitle.includes("Enhanced")):
+          case (amount >= 5e3 && deliveryProduct.merchandise.subtitle.includes("Premium")):
+          case (amount >= 7e3 && deliveryProduct.merchandise.subtitle.includes("White Glove")):
+            console.log("STATEMENT WORKS");
+            addFreeAttribute(deliveryProduct);
+            break;
+          default:
+            break;
+        }
+        if (cost > 0) {
+          setTitle(prepareTitle(amount));
+        }
+      }
+      setTitle(prepareTitle(amount));
+    }, [amount]);
+    const addFreeAttribute = (line) => __async(this, null, function* () {
+      console.log("Adding free attribute to line", line.id);
+      const updateAttr = yield applyCartLinesChange({
+        type: "updateCartLine",
+        id: line.id,
+        attributes: [{
+          key: "_free_delivery",
+          value: "free"
+        }]
+      });
+      console.log("updateAttr", updateAttr);
+    });
+    const prepareTitle = (amount2) => {
+      switch (true) {
+        case amount2 < 3e3:
+          return `Spend $${(3e3 - amount2).toFixed(2)} more to get free enhanced delivery on your order!`;
+        case amount2 < 5e3:
+          return `Spend $${(5e3 - amount2).toFixed(2)} more to get free premium delivery on your order!`;
+        case amount2 < 7e3:
+          return `Spend $${(7e3 - amount2).toFixed(2)} more to get free white-glove delivery on your order!`;
+      }
+    };
+    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(import_jsx_runtime7.Fragment, { children: title && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+      Banner2,
+      {
+        status: "info",
+        title
+      }
+    ) });
   }
 })();
 //# sourceMappingURL=checkout-ui.js.map

@@ -30,6 +30,7 @@ export async function getShopLocations(graphql: GraphQLClient<AdminOperations>) 
 }
 
 export async function getProductVariantData(id: string, graphql: GraphQLClient<AdminOperations>) {
+  console.log(id)
   const response = await graphql(
     `
       query getProductVariant($id: ID!) {
@@ -38,20 +39,6 @@ export async function getProductVariantData(id: string, graphql: GraphQLClient<A
           image {
             url
             altText
-          }
-          inventoryItem {
-            id
-            inventoryLevel(locationId: $locationId) {
-              edges {
-                node {
-                  available
-                  location {
-                    id
-                  }
-                }
-              }
-
-            }
           }
         }
       }
@@ -75,6 +62,7 @@ export async function getProductVariantData(id: string, graphql: GraphQLClient<A
 }
 
 export async function getShippingRule(id: number) {
+  console.log(id)
   const dbRuleData: any = await db.shippingRules.findFirst({
     where: { id },
     include: {
@@ -189,6 +177,7 @@ export async function prepareShipmentsArray(
         etaSmallParcelHigh: selectedRule.etaDaysSmallParcelHigh,
         etaFreightLow: selectedRule.etaDaysFreightLow,
         etaFreightHigh: selectedRule.etaDaysFreightHigh,
+        ineligibleForLtl: selectedRule.ineligibleForLtl,
         containsFreightItem: selectedRule.addOnProductId,
         isLtl: isLtl,
       });
