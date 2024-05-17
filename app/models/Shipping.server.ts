@@ -91,6 +91,7 @@ export async function prepareShipmentsArray(
   graphql: GraphQLClient<AdminOperations>
 ) {
   const shipments: any[] = [];
+  let rulesList: any[] = [...shippingRules];
 
   const variantsDataPromises = variants.map(async (variant) => {
     const variantQuery = await graphql(`
@@ -130,6 +131,48 @@ export async function prepareShipmentsArray(
     return variantData.data.productVariant;
   });
 
+  if (rulesList.length === 0) {
+    const locations = Array.from(
+      new Set(variantsData.map((variant: any) => variant.inventoryItem.inventoryLevels.edges.map((edge: any) => edge.node.location.name)).flat())
+    );
+    console.log('locations', locations)
+    if (locations.length === 0) {
+      return false;
+    }
+
+    const defaultShippingRules = await db.shippingRules.findMany({
+      where: {
+        isDefault: true,
+        locations: {
+          some: {
+            location: {
+              locationName: {
+                in: locations,
+              }
+            }
+          },
+        }
+      },
+      include: {
+        locations: {
+          include: {
+            location: true
+          }
+        },
+        zipCodeRanges: true,
+      }
+    });
+
+    console.log('defaultShippingRules', defaultShippingRules)
+
+    if (defaultShippingRules.length === 0) {
+      return false;
+    }
+
+    rulesList = [...defaultShippingRules];
+  }
+
+
   variantsData.forEach((variant: any) => {
     const isLtl = variant.product.tags.includes("ltl");
     const isSmallParcel = variant.product.tags.includes("small-parcel");
@@ -140,7 +183,7 @@ export async function prepareShipmentsArray(
     let selectedRule: dbRuleData | undefined;
     let selectedLocation: string | undefined;
 
-    shippingRules.forEach((rule) => {
+    rulesList.forEach((rule) => {
       rule.locations.forEach((location: any) => {
         if (availableLocations.includes(location.location.locationName)) {
           let etaLow: number;
@@ -186,3 +229,30 @@ export async function prepareShipmentsArray(
 
   return shipments;
 }
+
+export const getLocationData = async (locationId: string, graphql: GraphQLClient<AdminOperations>) => {
+  console.log('locationId', locationId)
+  const gid = `gid://shopify/Location/${locationId}`;
+  const response = await graphql(
+    `
+      query getLocation($gid: ID!) {
+        location(id: $gid) {
+          id
+          name
+        }
+      }
+    ` as string,
+    {
+      variables: {
+        gid,
+      },
+    }
+  );
+
+  const {
+    data: { location },
+  } = await response.json();
+  console.log(location)
+
+  return { locationId: location.id, locationName: location.name };
+};

@@ -70,12 +70,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         }
       }
     });
+    console.log('SHIPPING RULES', shippingRules)
 
-    if (!shippingRules.length) {
-      return await cors(request, json({ error: "No shipping rules found" }, { status: 404 }), { origin: true });
-    }
-
-    const shipments = await prepareShipmentsArray(shippingRules as any, lineItems, admin.graphql);
+    const shipments = await prepareShipmentsArray(shippingRules as any[], lineItems, admin.graphql);
 
     return cors(request, json({ shipments }, { status: 200 }), { origin: true });
   } catch (err) {

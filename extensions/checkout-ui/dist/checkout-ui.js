@@ -2495,7 +2495,7 @@
           var HostPortal = 4;
           var HostComponent = 5;
           var HostText = 6;
-          var Fragment2 = 7;
+          var Fragment3 = 7;
           var Mode = 8;
           var ContextConsumer = 9;
           var ContextProvider = 10;
@@ -2635,7 +2635,7 @@
                 return "DehydratedFragment";
               case ForwardRef:
                 return getWrappedName$1(type, type.render, "ForwardRef");
-              case Fragment2:
+              case Fragment3:
                 return "Fragment";
               case HostComponent:
                 return type;
@@ -7053,7 +7053,7 @@
               }
             }
             function updateFragment2(returnFiber, current2, fragment, lanes, key) {
-              if (current2 === null || current2.tag !== Fragment2) {
+              if (current2 === null || current2.tag !== Fragment3) {
                 var created = createFiberFromFragment(fragment, returnFiber.mode, lanes, key);
                 created.return = returnFiber;
                 return created;
@@ -7456,7 +7456,7 @@
                 if (child.key === key) {
                   var elementType = element.type;
                   if (elementType === REACT_FRAGMENT_TYPE) {
-                    if (child.tag === Fragment2) {
+                    if (child.tag === Fragment3) {
                       deleteRemainingChildren(returnFiber, child.sibling);
                       var existing = useFiber(child, element.props.children);
                       existing.return = returnFiber;
@@ -11633,7 +11633,7 @@
                 var _resolvedProps2 = workInProgress2.elementType === type ? _unresolvedProps2 : resolveDefaultProps(type, _unresolvedProps2);
                 return updateForwardRef(current2, workInProgress2, type, _resolvedProps2, renderLanes2);
               }
-              case Fragment2:
+              case Fragment3:
                 return updateFragment(current2, workInProgress2, renderLanes2);
               case Mode:
                 return updateMode(current2, workInProgress2, renderLanes2);
@@ -12074,7 +12074,7 @@
               case SimpleMemoComponent:
               case FunctionComponent:
               case ForwardRef:
-              case Fragment2:
+              case Fragment3:
               case Mode:
               case Profiler:
               case ContextConsumer:
@@ -16840,7 +16840,7 @@
             return fiber;
           }
           function createFiberFromFragment(elements, mode, lanes, key) {
-            var fiber = createFiber(Fragment2, elements, key, mode);
+            var fiber = createFiber(Fragment3, elements, key, mode);
             fiber.lanes = lanes;
             return fiber;
           }
@@ -19136,12 +19136,6 @@
   // node_modules/.pnpm/@shopify+ui-extensions@2024.4.1/node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/Checkbox/Checkbox.mjs
   var Checkbox = createRemoteComponent("Checkbox");
 
-  // node_modules/.pnpm/@shopify+ui-extensions@2024.4.1/node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/Choice/Choice.mjs
-  var Choice = createRemoteComponent("Choice");
-
-  // node_modules/.pnpm/@shopify+ui-extensions@2024.4.1/node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/ChoiceList/ChoiceList.mjs
-  var ChoiceList = createRemoteComponent("ChoiceList");
-
   // node_modules/.pnpm/@shopify+ui-extensions@2024.4.1/node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/Form/Form.mjs
   var Form = createRemoteComponent("Form");
 
@@ -19177,9 +19171,6 @@
 
   // node_modules/.pnpm/@shopify+ui-extensions@2024.4.1/node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/ToggleButtonGroup/ToggleButtonGroup.mjs
   var ToggleButtonGroup = createRemoteComponent("ToggleButtonGroup");
-
-  // node_modules/.pnpm/@shopify+ui-extensions@2024.4.1/node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/View/View.mjs
-  var View = createRemoteComponent("View");
 
   // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/render.mjs
   var import_react6 = __toESM(require_react(), 1);
@@ -19526,14 +19517,6 @@ ${errorInfo.componentStack}`);
   // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/Checkbox/Checkbox.mjs
   var Checkbox2 = createRemoteReactComponent(Checkbox);
 
-  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/Choice/Choice.mjs
-  var Choice2 = createRemoteReactComponent(Choice, {
-    fragmentProps: ["details", "primaryContent", "secondaryContent", "tertiaryContent"]
-  });
-
-  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/ChoiceList/ChoiceList.mjs
-  var ChoiceList2 = createRemoteReactComponent(ChoiceList);
-
   // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/Form/Form.mjs
   var Form2 = createRemoteReactComponent(Form);
 
@@ -19574,11 +19557,8 @@ ${errorInfo.componentStack}`);
   // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/ToggleButtonGroup/ToggleButtonGroup.mjs
   var ToggleButtonGroup2 = createRemoteReactComponent(ToggleButtonGroup);
 
-  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/View/View.mjs
-  var View2 = createRemoteReactComponent(View);
-
   // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/api.mjs
-  var import_react28 = __toESM(require_react(), 1);
+  var import_react25 = __toESM(require_react(), 1);
 
   // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/errors.mjs
   var CheckoutUIExtensionError = class extends Error {
@@ -19602,7 +19582,7 @@ ${errorInfo.componentStack}`);
 
   // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/api.mjs
   function useApi(_target) {
-    const api = (0, import_react28.useContext)(ExtensionApiContext);
+    const api = (0, import_react25.useContext)(ExtensionApiContext);
     if (api == null) {
       throw new CheckoutUIExtensionError("You can only call this hook when running as a UI extension.");
     }
@@ -19610,10 +19590,10 @@ ${errorInfo.componentStack}`);
   }
 
   // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/subscription.mjs
-  var import_react29 = __toESM(require_react(), 1);
+  var import_react26 = __toESM(require_react(), 1);
   function useSubscription(subscription) {
-    const [, setValue] = (0, import_react29.useState)(subscription.current);
-    (0, import_react29.useEffect)(() => {
+    const [, setValue] = (0, import_react26.useState)(subscription.current);
+    (0, import_react26.useEffect)(() => {
       let didUnsubscribe = false;
       const checkForUpdates = (newValue) => {
         if (didUnsubscribe) {
@@ -19640,15 +19620,15 @@ ${errorInfo.componentStack}`);
   }
 
   // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/buyer-journey.mjs
-  var import_react30 = __toESM(require_react(), 1);
+  var import_react27 = __toESM(require_react(), 1);
   function useBuyerJourneyIntercept(interceptor) {
     const api = useApi();
     if (!("buyerJourney" in api)) {
       throw new ExtensionHasNoMethodError("buyerJourney", api.extension.target);
     }
-    const interceptorRef = (0, import_react30.useRef)(interceptor);
+    const interceptorRef = (0, import_react27.useRef)(interceptor);
     interceptorRef.current = interceptor;
-    return (0, import_react30.useEffect)(() => {
+    return (0, import_react27.useEffect)(() => {
       const teardownPromise = api.buyerJourney.intercept((interceptorProps) => interceptorRef.current(interceptorProps));
       return () => {
         teardownPromise.then((teardown) => teardown()).catch(() => {
@@ -19719,35 +19699,71 @@ ${errorInfo.componentStack}`);
     return settings;
   }
 
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/delivery-groups.mjs
+  function useDeliveryGroups() {
+    const api = useApi();
+    if (!("deliveryGroups" in api)) {
+      throw new ExtensionHasNoMethodError("deliveryGroups", api.extension.target);
+    }
+    return useSubscription(api.deliveryGroups);
+  }
+
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2024.4.1_@shopify+ui-extensions@2024.4.1_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/checkout-token.mjs
+  function useCheckoutToken() {
+    return useSubscription(useApi().checkoutToken);
+  }
+
   // extensions/checkout-ui/src/Checkout.tsx
-  var import_react31 = __toESM(require_react());
+  var import_react28 = __toESM(require_react());
   var import_jsx_runtime4 = __toESM(require_jsx_runtime());
   var Checkout_default = reactExtension(
     "purchase.checkout.shipping-option-list.render-after",
     () => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Extension, {})
   );
   function Extension() {
-    const APP_URL = "https://lost-issn-national-dried.trycloudflare.com";
+    const APP_URL = "https://circle-marvel-superintendent-head.trycloudflare.com";
     const { query } = useApi();
     const { myshopifyDomain } = useShop();
     const lines = useCartLines();
+    console.log("LINES", lines);
     const applyCartLinesChange = useApplyCartLinesChange();
     const orderAttributesChange = useApplyAttributeChange();
     const { zip } = useShippingAddress();
     const zip_code_attr = useAttributeValues(["zip_code"])[0];
     const canBlockProgress = useExtensionCapability("block_progress");
     console.log("CAN BLOCK PROGRESS", canBlockProgress);
-    const [shipments, setShipments] = (0, import_react31.useState)([]);
-    const [deliveryProduct, setDeliveryProduct] = (0, import_react31.useState)(null);
-    const [selectedButton, setSelectedButton] = (0, import_react31.useState)(null);
-    const [shipmentChoice, setShipmentChoice] = (0, import_react31.useState)("none");
-    const [destinationTypeForm, setDestinationTypeForm] = (0, import_react31.useState)({});
-    const [cachedProducts, setCachedProducts] = (0, import_react31.useState)([]);
-    const [formSubmitted, setFormSubmitted] = (0, import_react31.useState)(false);
-    const [ltlDeliveryProductPicked, setLTLDeliveryProductPicked] = (0, import_react31.useState)(false);
-    const [validationErrors, setValidationErrors] = (0, import_react31.useState)({});
-    const haveLtl = shipments.some((shipment) => shipment.isLtl);
-    const ineligibleForLtl = shipments.some((shipment) => shipment.ineligibleForLtl);
+    const [shipments, setShipments] = (0, import_react28.useState)([]);
+    const [ineligibleForLtl, setIneligibleForLtl] = (0, import_react28.useState)(true);
+    const [deliveryProduct, setDeliveryProduct] = (0, import_react28.useState)(null);
+    const [destinationTypeForm, setDestinationTypeForm] = (0, import_react28.useState)({});
+    const [cachedProducts, setCachedProducts] = (0, import_react28.useState)([]);
+    const [formSubmitted, setFormSubmitted] = (0, import_react28.useState)(false);
+    const [validationErrors, setValidationErrors] = (0, import_react28.useState)({});
+    const checkForLtl = (lines2) => __async(this, null, function* () {
+      const products = yield query(
+        `#graphql
+      query getProductsByIds($ids: [ID!]!) {
+        nodes(ids: $ids) {
+          ... on Product {
+            title
+            tags
+          }
+        }
+      }`,
+        {
+          variables: {
+            ids: lines2.map((line) => line.merchandise.product.id)
+          }
+        }
+      );
+      console.log(lines2.map((line) => line.merchandise.product.id));
+      if (!products.data || !products.data.nodes.length) {
+        return false;
+      }
+      return products.data.nodes.some((product) => product.tags.includes("ltl"));
+    });
+    const haveLtl = checkForLtl(lines);
+    console.log("ineligibleForLtl", ineligibleForLtl);
     useBuyerJourneyIntercept(({ canBlockProgress: canBlockProgress2 }) => {
       if (canBlockProgress2 && haveLtl && ineligibleForLtl) {
         return {
@@ -19775,19 +19791,6 @@ ${errorInfo.componentStack}`);
           }
         };
       }
-      if (canBlockProgress2 && haveLtl && !ltlDeliveryProductPicked) {
-        return {
-          behavior: "block",
-          reason: "Please choose a delivery type",
-          perform: (result) => {
-            if (result.behavior === "block") {
-              const errors = __spreadValues({}, validationErrors);
-              errors.ltlDeliveryProductNotPicked = true;
-              setValidationErrors(errors);
-            }
-          }
-        };
-      }
       return {
         behavior: "allow",
         perform: () => {
@@ -19795,7 +19798,7 @@ ${errorInfo.componentStack}`);
         }
       };
     });
-    (0, import_react31.useEffect)(() => {
+    (0, import_react28.useEffect)(() => {
       if (!deliveryProduct) {
         query(
           `
@@ -19835,7 +19838,7 @@ ${errorInfo.componentStack}`);
         });
       }
     }, [deliveryProduct]);
-    (0, import_react31.useEffect)(() => {
+    (0, import_react28.useEffect)(() => {
       if (zip) {
         if (zip_code_attr && zip_code_attr !== zip) {
           console.log("ZIP CODE CHANGED");
@@ -19849,9 +19852,10 @@ ${errorInfo.componentStack}`);
         }
       }
     }, [zip]);
-    (0, import_react31.useEffect)(() => {
+    (0, import_react28.useEffect)(() => {
       console.log("SHIPMENTS USE EFFECT WORKS");
       if (shipments.length) {
+        setIneligibleForLtl(shipments.some((shipment) => shipment.ineligibleForLtl));
         const addedProducts = [];
         const shipmentsArray = [...shipments];
         shipmentsArray.forEach((shipment, index) => {
@@ -19933,6 +19937,11 @@ ${errorInfo.componentStack}`);
       });
       const { shipments: shipments2 } = yield data.json();
       console.log("SHIPMENTS", shipments2);
+      yield orderAttributesChange({
+        key: "zip_code",
+        type: "updateAttribute",
+        value: zip2
+      });
       if (!shipments2 || !shipments2.length) {
         return;
       }
@@ -19952,11 +19961,6 @@ ${errorInfo.componentStack}`);
           });
         }
       })));
-      yield orderAttributesChange({
-        key: "zip_code",
-        type: "updateAttribute",
-        value: zip2
-      });
       setShipments(shipments2);
     });
     const addProduct = (productId) => __async(this, null, function* () {
@@ -19971,15 +19975,6 @@ ${errorInfo.componentStack}`);
       console.log("CACHED PRODUCTS WHEN PRODUCT ADDED", cachedProductsArray);
       setCachedProducts(cachedProductsArray);
     });
-    const handleConfirm = () => {
-      const shipmentsArray = [...shipments];
-      const index = Number(selectedButton.split("-")[1]);
-      addProduct(shipmentChoice);
-      shipmentsArray[index].ltl_delivery_product_picked = true;
-      setShipments(shipmentsArray);
-      setSelectedButton(null);
-      setLTLDeliveryProductPicked(true);
-    };
     const handleFormChange = (type, value) => {
       setDestinationTypeForm(__spreadProps(__spreadValues({}, destinationTypeForm), {
         [type]: value
@@ -19995,251 +19990,196 @@ ${errorInfo.componentStack}`);
       }
       setFormSubmitted(true);
     };
-    return haveLtl && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { border: "base", borderWidth: "medium", cornerRadius: "base", padding: "base", children: [
-      validationErrors && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-        Banner2,
-        {
-          status: "critical",
-          title: "Oops! It looks like you are not eligible for LTL delivery."
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
-        Form2,
-        {
-          onSubmit: () => console.log("onSubmit event"),
-          children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-              ToggleButtonGroup2,
-              {
-                value: destinationTypeForm.destinationType || "none",
-                onChange: (value) => handleFormChange("destinationType", value),
-                disabled: formSubmitted,
-                children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(InlineLayout2, { spacing: "base", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-                    ToggleButton2,
-                    {
-                      id: `house`,
-                      children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { inlineAlignment: "center", children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Icon2, { size: "large", source: "delivered" }),
-                        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "House" })
-                      ] })
-                    }
-                  ),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-                    ToggleButton2,
-                    {
-                      id: `apartment`,
-                      children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { inlineAlignment: "center", children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Icon2, { size: "large", source: "store" }),
-                        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "Apartment" })
-                      ] })
-                    }
-                  ),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-                    ToggleButton2,
-                    {
-                      id: `office`,
-                      children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { inlineAlignment: "center", children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Icon2, { size: "large", source: "store" }),
-                        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "Commercial/Office" })
-                      ] })
-                    }
-                  )
-                ] })
-              }
-            ),
-            validationErrors.formNotSubmitted && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-              Banner2,
-              {
-                status: "critical",
-                title: "Please fill out the form before proceeding"
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(BlockSpacer2, { spacing: "base" }),
-            destinationTypeForm.destinationType === "house" && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-                Select2,
-                {
-                  label: "Will delivery require the use of stairs?",
-                  value: destinationTypeForm.houseStairs || "none",
-                  options: [
-                    { label: "Yes", value: "yes" },
-                    { label: "No", value: "no" }
-                  ],
-                  onChange: (value) => handleFormChange("houseStairs", value),
-                  required: true,
-                  disabled: formSubmitted
-                }
-              ),
-              destinationTypeForm.stairsOrElevator === "yes" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-                Select2,
-                {
-                  label: "Would the delivery involve carrying the item more than 21 stairs from the ground floor?",
-                  value: destinationTypeForm.moreThanTwentyOneStairs || "none",
-                  options: [
-                    { label: "Yes", value: "yes" },
-                    { label: "No", value: "no" }
-                  ],
-                  onChange: (value) => handleFormChange("moreThanTwentyOneStairs", value),
-                  required: true,
-                  disabled: formSubmitted
-                }
-              ),
-              destinationTypeForm.moreThanTwentyOneStairs === "yes" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-                TextField2,
-                {
-                  label: "What is the total number of individual stair steps that will need to be traversed?",
-                  value: destinationTypeForm.numberOfStairs || "",
-                  onChange: (value) => handleFormChange("numberOfStairs", value),
-                  required: true,
-                  disabled: formSubmitted
-                }
-              ),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-                Checkbox2,
-                {
-                  id: "confirm",
-                  name: "confirm",
-                  onChange: (value) => handleFormChange("confirm", String(value)),
-                  disabled: formSubmitted,
-                  children: "Please confirm that you have measured the entrance and all elevator/doorways for adequate fit"
-                }
-              )
-            ] }),
-            (destinationTypeForm.destinationType === "apartment" || destinationTypeForm.destinationType === "office") && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-                Banner2,
-                {
-                  status: "warning",
-                  title: "For Apartment and Office Deliveries that are not on the ground floor, we suggest upgrading to Enhanced Delivery to ensure there are no restrictions imposed by the Freight Courier on your delivery"
-                }
-              ),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-                Select2,
-                {
-                  label: "Will delivery require the use of stairs or elevator?",
-                  value: destinationTypeForm.stairsOrElevator || "none",
-                  options: [
-                    { label: "Requires use of Stairs", value: "stairs" },
-                    { label: "Requires use of Elevator", value: "elevator" },
-                    { label: "None Needed (Ground Level)", value: "none" }
-                  ],
-                  onChange: (value) => handleFormChange("stairsOrElevator", value),
-                  required: true,
-                  disabled: formSubmitted
-                }
-              ),
-              destinationTypeForm.stairsOrElevator === "stairs" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-                TextField2,
-                {
-                  label: "What is the total number of individual stair steps that will need to be traversed?",
-                  value: destinationTypeForm.numberOfStairs || "",
-                  onChange: (value) => handleFormChange("numberOfStairs", value),
-                  required: true,
-                  disabled: formSubmitted
-                }
-              ),
-              destinationTypeForm.stairsOrElevator === "elevator" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-                Select2,
-                {
-                  label: destinationTypeForm.destinationType === "apartment" ? "Is the elevator large enough to accommodate the delivery (i.e. Freight Elevator)?" : "Does the building / location have a delivery dock and/or freight elevator for Deliveries?",
-                  value: destinationTypeForm.elevatorAccommodate || "none",
-                  options: [
-                    { label: "Yes", value: "yes" },
-                    { label: "No", value: "no" }
-                  ],
-                  onChange: (value) => handleFormChange("elevatorAccommodate", value),
-                  required: true,
-                  disabled: formSubmitted
-                }
-              ),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-                Select2,
-                {
-                  label: "Does your building or unit require a Certificate of Insurance (COI) for delivery?",
-                  value: destinationTypeForm.certificateInsurance || "none",
-                  options: [
-                    { label: "Yes", value: "yes" },
-                    { label: "No", value: "no" }
-                  ],
-                  onChange: (value) => handleFormChange("certificateInsurance", value),
-                  required: true,
-                  disabled: formSubmitted
-                }
-              ),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-                Checkbox2,
-                {
-                  id: "confirm",
-                  name: "confirm",
-                  onChange: (value) => handleFormChange("confirm", String(value)),
-                  disabled: formSubmitted,
-                  children: "Please confirm that you have measured the entrance and all elevator/doorways for adequate fit"
-                }
-              )
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(BlockSpacer2, { spacing: "base" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(InlineStack2, { inlineAlignment: "end", children: !formSubmitted ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Button2, { accessibilityRole: "submit", onPress: () => submitForm(), children: "Submit" }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Button2, { kind: "secondary", accessibilityRole: "submit", onPress: () => setFormSubmitted(false), children: "Edit" }) })
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { border: "base", cornerRadius: "base", children: [
-        validationErrors.ltlDeliveryProductNotPicked && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-          Banner2,
-          {
-            status: "critical",
-            title: "Please choose a delivery type before proceeding"
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-          ToggleButtonGroup2,
-          {
-            value: selectedButton,
-            onChange: (value) => setSelectedButton(value),
-            children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(InlineLayout2, { spacing: "base", children: shipments.map((shipment, index) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-              ToggleButton2,
-              {
-                id: `toggleBtn-${index}`,
-                disabled: shipment.ltl_delivery_product_picked,
-                children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-                  View2,
+    return haveLtl && !ineligibleForLtl && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(BlockStack2, { border: "base", borderWidth: "medium", cornerRadius: "base", padding: "base", children: Object.keys(validationErrors).length ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+      Banner2,
+      {
+        status: "critical",
+        title: "Oops! It looks like you are not eligible for LTL delivery."
+      }
+    ) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_jsx_runtime4.Fragment, { children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+      Form2,
+      {
+        onSubmit: () => console.log("onSubmit event"),
+        children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+            ToggleButtonGroup2,
+            {
+              value: destinationTypeForm.destinationType || "none",
+              onChange: (value) => handleFormChange("destinationType", value),
+              disabled: formSubmitted,
+              children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(InlineLayout2, { spacing: "base", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                  ToggleButton2,
                   {
-                    blockAlignment: "center",
-                    inlineAlignment: "center",
-                    minBlockSize: "fill",
-                    children: `Shipment ${index + 1}`
+                    id: `house`,
+                    children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { inlineAlignment: "center", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Icon2, { size: "large", source: "delivered" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "House" })
+                    ] })
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                  ToggleButton2,
+                  {
+                    id: `apartment`,
+                    children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { inlineAlignment: "center", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Icon2, { size: "large", source: "store" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "Apartment" })
+                    ] })
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                  ToggleButton2,
+                  {
+                    id: `office`,
+                    children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { inlineAlignment: "center", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Icon2, { size: "large", source: "store" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "Commercial/Office" })
+                    ] })
                   }
                 )
-              },
-              `toggleBtn-${index}`
-            )) })
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(InlineStack2, { minInlineSize: "fill", minBlockSize: "fill", children: shipments.map((shipment, index) => selectedButton === `toggleBtn-${index}` && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(View2, { inlineAlignment: "end", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-            ChoiceList2,
-            {
-              name: "shipment",
-              variant: "group",
-              value: shipmentChoice,
-              onChange: (value) => setShipmentChoice(value),
-              children: deliveryProduct.variants.edges.map((variant, index2) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Choice2, { id: variant.node.id, disabled: shipment.ltl_delivery_product_picked, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(InlineStack2, { spacing: "base", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: `${variant.node.title} Delivery - delivered to the outside entrance of your home or building at the ground level` }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { spacing: "none", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: `Regular Price: $${Number(variant.node.compareAtPrice.amount).toFixed()}` }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: `Discounted Price: $${Number(variant.node.price.amount).toFixed()}` })
-                ] })
-              ] }) }, index2))
+              ] })
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(View2, { padding: "base", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Button2, { onPress: () => handleConfirm(), children: "Confirm" }) })
-        ] }, `toggleBtn-${index}`)) })
-      ] })
-    ] });
+          validationErrors.formNotSubmitted && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+            Banner2,
+            {
+              status: "critical",
+              title: "Please fill out the form before proceeding"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(BlockSpacer2, { spacing: "base" }),
+          destinationTypeForm.destinationType === "house" && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              Select2,
+              {
+                label: "Will delivery require the use of stairs?",
+                value: destinationTypeForm.houseStairs || "none",
+                options: [
+                  { label: "Yes", value: "yes" },
+                  { label: "No", value: "no" }
+                ],
+                onChange: (value) => handleFormChange("houseStairs", value),
+                required: true,
+                disabled: formSubmitted
+              }
+            ),
+            destinationTypeForm.stairsOrElevator === "yes" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              Select2,
+              {
+                label: "Would the delivery involve carrying the item more than 21 stairs from the ground floor?",
+                value: destinationTypeForm.moreThanTwentyOneStairs || "none",
+                options: [
+                  { label: "Yes", value: "yes" },
+                  { label: "No", value: "no" }
+                ],
+                onChange: (value) => handleFormChange("moreThanTwentyOneStairs", value),
+                required: true,
+                disabled: formSubmitted
+              }
+            ),
+            destinationTypeForm.moreThanTwentyOneStairs === "yes" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              TextField2,
+              {
+                label: "What is the total number of individual stair steps that will need to be traversed?",
+                value: destinationTypeForm.numberOfStairs || "",
+                onChange: (value) => handleFormChange("numberOfStairs", value),
+                required: true,
+                disabled: formSubmitted
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              Checkbox2,
+              {
+                id: "confirm",
+                name: "confirm",
+                onChange: (value) => handleFormChange("confirm", String(value)),
+                disabled: formSubmitted,
+                children: "Please confirm that you have measured the entrance and all elevator/doorways for adequate fit"
+              }
+            )
+          ] }),
+          (destinationTypeForm.destinationType === "apartment" || destinationTypeForm.destinationType === "office") && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              Banner2,
+              {
+                status: "warning",
+                title: "For Apartment and Office Deliveries that are not on the ground floor, we suggest upgrading to Enhanced Delivery to ensure there are no restrictions imposed by the Freight Courier on your delivery"
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              Select2,
+              {
+                label: "Will delivery require the use of stairs or elevator?",
+                value: destinationTypeForm.stairsOrElevator || "none",
+                options: [
+                  { label: "Requires use of Stairs", value: "stairs" },
+                  { label: "Requires use of Elevator", value: "elevator" },
+                  { label: "None Needed (Ground Level)", value: "none" }
+                ],
+                onChange: (value) => handleFormChange("stairsOrElevator", value),
+                required: true,
+                disabled: formSubmitted
+              }
+            ),
+            destinationTypeForm.stairsOrElevator === "stairs" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              TextField2,
+              {
+                label: "What is the total number of individual stair steps that will need to be traversed?",
+                value: destinationTypeForm.numberOfStairs || "",
+                onChange: (value) => handleFormChange("numberOfStairs", value),
+                required: true,
+                disabled: formSubmitted
+              }
+            ),
+            destinationTypeForm.stairsOrElevator === "elevator" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              Select2,
+              {
+                label: destinationTypeForm.destinationType === "apartment" ? "Is the elevator large enough to accommodate the delivery (i.e. Freight Elevator)?" : "Does the building / location have a delivery dock and/or freight elevator for Deliveries?",
+                value: destinationTypeForm.elevatorAccommodate || "none",
+                options: [
+                  { label: "Yes", value: "yes" },
+                  { label: "No", value: "no" }
+                ],
+                onChange: (value) => handleFormChange("elevatorAccommodate", value),
+                required: true,
+                disabled: formSubmitted
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              Select2,
+              {
+                label: "Does your building or unit require a Certificate of Insurance (COI) for delivery?",
+                value: destinationTypeForm.certificateInsurance || "none",
+                options: [
+                  { label: "Yes", value: "yes" },
+                  { label: "No", value: "no" }
+                ],
+                onChange: (value) => handleFormChange("certificateInsurance", value),
+                required: true,
+                disabled: formSubmitted
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              Checkbox2,
+              {
+                id: "confirm",
+                name: "confirm",
+                onChange: (value) => handleFormChange("confirm", String(value)),
+                disabled: formSubmitted,
+                children: "Please confirm that you have measured the entrance and all elevator/doorways for adequate fit"
+              }
+            )
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(BlockSpacer2, { spacing: "base" }),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(InlineStack2, { inlineAlignment: "end", children: !formSubmitted ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Button2, { accessibilityRole: "submit", onPress: () => submitForm(), children: "Submit" }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Button2, { kind: "secondary", accessibilityRole: "submit", onPress: () => setFormSubmitted(false), children: "Edit" }) })
+        ]
+      }
+    ) }) });
   }
 
   // extensions/checkout-ui/src/Phone.tsx
-  var import_react32 = __toESM(require_react());
+  var import_react29 = __toESM(require_react());
   var import_jsx_runtime5 = __toESM(require_jsx_runtime());
   var Phone_default = reactExtension(
     "purchase.checkout.delivery-address.render-after",
@@ -20248,9 +20188,9 @@ ${errorInfo.componentStack}`);
   function PhoneConfirmation() {
     const { phone } = useShippingAddress();
     const canBlockProgress = useExtensionCapability("block_progress");
-    const [phoneConfirmValue, setPhoneConfirmValue] = (0, import_react32.useState)("");
-    const [error, setError] = (0, import_react32.useState)(null);
-    (0, import_react32.useEffect)(() => {
+    const [phoneConfirmValue, setPhoneConfirmValue] = (0, import_react29.useState)("");
+    const [error, setError] = (0, import_react29.useState)(null);
+    (0, import_react29.useEffect)(() => {
       if (phoneConfirmValue !== phone) {
         setError("Phone does not match");
       } else if (error) {
@@ -20314,53 +20254,48 @@ ${errorInfo.componentStack}`);
   }
 
   // extensions/checkout-ui/src/ProgressBar.tsx
-  var import_react33 = __toESM(require_react());
+  var import_react30 = __toESM(require_react());
   var import_jsx_runtime7 = __toESM(require_jsx_runtime());
   var ProgressBar_default = reactExtension(
-    "purchase.checkout.block.render",
+    "purchase.checkout.shipping-option-list.render-before",
     () => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(ProgressBar, {})
   );
   function ProgressBar() {
     const { amount } = useTotalAmount();
+    const { query, checkoutToken: { current } } = useApi();
+    const checkoutToken = useCheckoutToken();
+    console.log("CHECKoUT TOKEN", checkoutToken);
     const applyCartLinesChange = useApplyCartLinesChange();
-    const deliveryProduct = useCartLines().find((line) => line.merchandise.title.includes("LTL Delivery"));
-    const [title, setTitle] = (0, import_react33.useState)(null);
-    (0, import_react33.useEffect)(() => {
-      if (deliveryProduct) {
-        console.log("deliveryProduct", deliveryProduct, amount);
-        const cost = deliveryProduct.cost.totalAmount.amount;
-        if (cost === 0) {
-          return;
-        }
-        console.log("COOOOOOOOOST", cost);
-        switch (true) {
-          case (amount >= 3e3 && deliveryProduct.merchandise.subtitle.includes("Enhanced")):
-          case (amount >= 5e3 && deliveryProduct.merchandise.subtitle.includes("Premium")):
-          case (amount >= 7e3 && deliveryProduct.merchandise.subtitle.includes("White Glove")):
-            console.log("STATEMENT WORKS");
-            addFreeAttribute(deliveryProduct);
-            break;
-          default:
-            break;
-        }
-        if (cost > 0) {
-          setTitle(prepareTitle(amount));
+    const deliveryGroup = useDeliveryGroups();
+    const [title, setTitle] = (0, import_react30.useState)(null);
+    console.log("DELIVERY GROUP", deliveryGroup);
+    (0, import_react30.useEffect)(() => {
+      const changeDeliveryMethod = query(`
+      mutation cartSelectedDeliveryOptionsUpdate($cartId: ID!, $selectedDeliveryOptions: [CartSelectedDeliveryOptionInput!]!) {
+        cartSelectedDeliveryOptionsUpdate(cartId: $cartId, selectedDeliveryOptions: $selectedDeliveryOptions) {
+          cart {
+            id
+          }
+          userErrors {
+            field
+            message
+          }
         }
       }
-      setTitle(prepareTitle(amount));
-    }, [amount]);
-    const addFreeAttribute = (line) => __async(this, null, function* () {
-      console.log("Adding free attribute to line", line.id);
-      const updateAttr = yield applyCartLinesChange({
-        type: "updateCartLine",
-        id: line.id,
-        attributes: [{
-          key: "_free_delivery",
-          value: "free"
-        }]
+    `, {
+        variables: {
+          cartId: `gid://shopify/Cart/${current}`,
+          selectedDeliveryOptions: [
+            {
+              deliveryGroupId: deliveryGroup[0].id,
+              deliveryOptionHandle: "c52493197cc01998e2a40acc6fde2a46-1f420b03014c5a6655a23d85f9b4c9ac"
+            }
+          ]
+        }
+      }).then((data) => {
+        console.log("------ DATA ------", data);
       });
-      console.log("updateAttr", updateAttr);
-    });
+    }, [amount]);
     const prepareTitle = (amount2) => {
       switch (true) {
         case amount2 < 3e3:

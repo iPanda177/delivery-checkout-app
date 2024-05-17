@@ -4,12 +4,13 @@ import {
   EmptySearchResult,
   Combobox,
   Text,
-  AutoSelection, InlineStack,
+  AutoSelection,
+  InlineStack,
 } from "@shopify/polaris";
 import {useState, useCallback, useMemo, useEffect} from "react";
 import type {LocationT, LocationGraphQLResponse, RuleState, DispatchFunction} from "~/types/types";
 
-export default function LocationSelectCombobox({
+export default function DeliverySelectCombobox({
   locations,
   selectedLocations,
   dispatch,
@@ -165,19 +166,19 @@ export default function LocationSelectCombobox({
   const optionMarkup =
     options.length > 0
       ? options.map((option) => {
-          return (
-            <Listbox.Option
-              key={option}
-              value={option}
-              selected={selectedTags.includes(option)}
-              accessibilityLabel={option}
-            >
-              <Listbox.TextOption selected={selectedTags.includes(option)}>
-                {formatOptionText(option)}
-              </Listbox.TextOption>
-            </Listbox.Option>
-          );
-        })
+        return (
+          <Listbox.Option
+            key={option}
+            value={option}
+            selected={selectedTags.includes(option)}
+            accessibilityLabel={option}
+          >
+            <Listbox.TextOption selected={selectedTags.includes(option)}>
+              {formatOptionText(option)}
+            </Listbox.TextOption>
+          </Listbox.Option>
+        );
+      })
       : null;
 
   const noResults = value && !getAllWarehouses().includes(value);

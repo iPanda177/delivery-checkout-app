@@ -48,13 +48,14 @@ model ShippingRules {
   ineligibleForLtl       Boolean                  @default(false)
   extendedAreaEligible   Boolean                  @default(true)
   addOnProductId         String?
+  deliveryTypes          DeliveryToShippingRule[]
 
   @@map("Shipping Rules")
 }
 
 model Location {
   id            Int                      @id @default(autoincrement())
-  locationId    String
+  locationId    String                   @unique
   locationName  String
   shippingRules LocationToShippingRule[]
 }
@@ -75,4 +76,18 @@ model ZipCodeRanges {
   zipRangeEnd     String
   ShippingRules   ShippingRules? @relation(fields: [shippingRulesId], references: [id])
   shippingRulesId Int
+}
+
+model DeliveryType {
+  id            Int                      @id @default(autoincrement())
+  name          String
+  shippingRules DeliveryToShippingRule[]
+}
+
+model DeliveryToShippingRule {
+  id             Int           @id @default(autoincrement())
+  shippingRuleId Int
+  deliveryTypeId Int
+  shippingRule   ShippingRules @relation(fields: [shippingRuleId], references: [id])
+  deliveryType   DeliveryType  @relation(fields: [deliveryTypeId], references: [id])
 }

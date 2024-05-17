@@ -2,7 +2,6 @@
   "name": "poly-bark-extensibility-pbe",
   "private": true,
   "scripts": {
-    "build": "tsc && remix build",
     "predev": "prisma generate && prisma migrate deploy",
     "dev": "shopify app dev",
     "config:link": "shopify app config link",

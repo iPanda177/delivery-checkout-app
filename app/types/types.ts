@@ -54,6 +54,7 @@ export type ShippingRulesReducerState = {
   error: String | null;
   validationErrors: ValidationErrors;
   isLoading: boolean,
+  deliveryTypes: any[]
 };
 
 export type Action =
@@ -61,6 +62,7 @@ export type Action =
   | { type: "SET_RULE_STATE"; payload: RuleState | null }
   | { type: "SET_SELECTED_LOCATIONS"; payload: LocationT[] }
   | { type: "SET_ZIP_CODE_RANGES"; payload: ZipCodeRange[] }
+  | { type: "SET_DELIVERY_TYPES"; payload: any[]}
   | { type: "SET_ERROR"; payload: string | null }
   | { type: "SET_VALIDATION_ERRORS"; payload: ValidationErrors }
   | { type: "SET_IS_LOADING"; payload: boolean };

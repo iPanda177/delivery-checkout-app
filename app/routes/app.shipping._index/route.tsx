@@ -20,6 +20,8 @@ import db from "../../db.server";
 import type { ShippingRules } from "@prisma/client";
 import {Fragment, useCallback, useEffect, useState} from "react";
 import {groupedShippingRules, LocationT, ZipCodeRange} from "~/types/types";
+import {authenticate} from "~/shopify.server";
+import {getLocationData} from "~/models/Shipping.server";
 
 export async function loader() {
   return json(
@@ -39,6 +41,7 @@ export async function loader() {
 
 export async function action({ request, params }: ActionFunctionArgs) {
   try {
+    const { admin } = await authenticate.admin(request);
     const { data }: {data?: any} = {
       ...Object.fromEntries(await request.formData()),
     };
@@ -47,7 +50,25 @@ export async function action({ request, params }: ActionFunctionArgs) {
     let rejectedRulesCount = 0;
 
     for (const row of parsedData) {
-      const selectedLocationsArray = JSON.parse(row.selectedLocations as string);
+      const selectedLocations = JSON.parse(row.selectedLocations as string);
+      console.log('SELECTED LOCATIONS', selectedLocations)
+
+      const selectedLocationsArray = await Promise.all(selectedLocations.map(async (locationId: string) => {
+        const location = await db.location.findFirst({
+          where: {
+            locationId: `gid://shopify/Location/${locationId}`,
+          },
+        });
+
+        if (location) {
+          return { locationId: location.locationId, locationName: location.locationName };
+        }
+
+        return await getLocationData(locationId, admin.graphql);
+      }));
+
+      console.log('SELECTED LOCATIONS ARRAY', selectedLocationsArray);
+
       const zipCodeRangesData = JSON.parse(row.zipCodeRanges as string);
 
       const ruleData = {
@@ -156,6 +177,7 @@ export default function Index() {
   const navigate = useNavigate();
   const submit = useSubmit();
   const shippingRules = useLoaderData<typeof loader>();
+  console.log(shippingRules)
   const actionData: { success: boolean, created?: number, rejected?: number} | undefined = useActionData<typeof action>();
 
   const [groupedShippingRules, setGroupedShippingRules] = useState<groupedShippingRules>({});
@@ -239,6 +261,44 @@ export default function Index() {
     });
   };
 
+  const exportCSV = async () => {
+    const csvData = shippingRules.map((rule: ShippingRules | any) => {
+      const locations = rule.locations.map((location: any) => location.location.locationId.split('/').pop()).join(', ');
+
+      const zipCodeRanges = rule.zipCodeRanges.map((range: any) => `${range.zipRangeStart}-${range.zipRangeEnd}`).join(', ');
+
+      return [
+        rule.ruleName,
+        rule.isDefault,
+        JSON.stringify(locations),
+        zipCodeRanges,
+        rule.etaDaysSmallParcelLow,
+        rule.etaDaysSmallParcelHigh,
+        rule.etaDaysFreightLow,
+        rule.etaDaysFreightHigh,
+      ];
+    });
+
+    console.log(csvData);
+
+    const csvContent = 'RuleName;IsDefault;Locations;ZipCodeRanges;SmallParcelLow;SmallParcelHigh;FreightLow;FreightHigh;\n'
+      + csvData.map(e => e.join(';') + ';').join('\n');
+
+    console.log(csvContent);
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'shipping_rules.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   const handleFileChange = async (file: any) => {
     try {
       const csvData = await readCSVFile(file);
@@ -249,7 +309,7 @@ export default function Index() {
         const values = row.map(value => value.trim());
         const ruleName = values[0];
         const isDefault = values[1] === 'true';
-        const locations = JSON.parse(values[2]) as LocationT[];
+        const locations = values[2].split(', ')
         const zipCodeRanges = values[3].split(',').map(range => {
           const [startStr, endStr] = range.trim().split('-');
           const start = parseInt(startStr);
@@ -286,6 +346,8 @@ export default function Index() {
 
         parsedData.push(ruleObject);
       }
+
+      console.log(parsedData);
 
       await submit({ data: JSON.stringify(parsedData) }, { method: 'POST' })
 
@@ -342,7 +404,7 @@ export default function Index() {
                   position={index}
                 >
                   <IndexTable.Cell
-                    colSpan={4}
+                    colSpan={9}
                     scope="colgroup"
                     as="th"
                   >
@@ -374,11 +436,11 @@ export default function Index() {
       </IndexTable.Cell>
 
       <IndexTable.Cell>
-        <Text as="span">{shippingRule.zipRangeStart}</Text>
+        <Text as="span">{shippingRule.zipRangeStart.includes('Infinity') ? '--/--' : shippingRule.zipRangeStart}</Text>
       </IndexTable.Cell>
 
       <IndexTable.Cell>
-        <Text as="span">{shippingRule.zipRangeEnd}</Text>
+        <Text as="span">{shippingRule.zipRangeEnd.includes('Infinity') ? '--/--' : shippingRule.zipRangeEnd}</Text>
       </IndexTable.Cell>
 
       <IndexTable.Cell>
@@ -422,12 +484,18 @@ export default function Index() {
         <button
           onClick={() => shopify.modal.show('my-modal')}
         >
-          Import
+          Import CSV file
+        </button>
+
+        <button
+          onClick={() => exportCSV()}
+        >
+          Export as CSV
         </button>
       </ui-title-bar>
 
       <Modal id="my-modal">
-        <TitleBar title={"Upload rules file"} />
+        <TitleBar title={"Upload rules file"}/>
 
         <Box as={"div"} minWidth={"600"} minHeight={"600"}>
           <LegacyCard>

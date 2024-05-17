@@ -3,7 +3,7 @@ import { authenticate } from "../shopify.server";
 import db from "../db.server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { topic, shop, session, admin, payload } = await authenticate.webhook(
+  const { topic, shop, session, admin, payload }: any = await authenticate.webhook(
     request
   );
 
@@ -19,6 +19,24 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       }
 
       break;
+
+    case "LOCATIONS_CREATE":
+      await db.location.create({
+        data: {
+          locationId: `gid://shopify/Location/${payload.id}`,
+          locationName: payload.name,
+        }
+      });
+
+    case "LOCATIONS_UPDATE":
+      await db.location.update({
+        where: { locationId: `gid://shopify/Location/${payload.id}` },
+        data: {
+          locationName: payload.name,
+        }
+      });
+
+
     case "CUSTOMERS_DATA_REQUEST":
     case "CUSTOMERS_REDACT":
     case "SHOP_REDACT":
