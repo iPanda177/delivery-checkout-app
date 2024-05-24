@@ -3,7 +3,7 @@ query RunInput {
     lines {
       id
       quantity
-      free_delivery: attribute(key: "_free_delivery") {
+      shipping_group: attribute(key: "_shipping_group") {
         value
       }
     }

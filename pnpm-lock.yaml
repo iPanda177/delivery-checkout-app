@@ -157,6 +157,32 @@ importers:
         specifier: 0.29.0
         version: 0.29.0(react@18.2.0)
 
+  extensions/delivery-customization:
+    dependencies:
+      '@shopify/shopify_function':
+        specifier: 0.1.0
+        version: 0.1.0(@babel/core@7.23.7)(@types/node@18.19.31)(javy@0.1.1)
+      javy:
+        specifier: 0.1.1
+        version: 0.1.1
+    devDependencies:
+      vitest:
+        specifier: ^0.29.8
+        version: 0.29.8
+
+  extensions/shipping-discount:
+    dependencies:
+      '@shopify/shopify_function':
+        specifier: 0.1.0
+        version: 0.1.0(@babel/core@7.23.7)(@types/node@18.19.31)(javy@0.1.1)
+      javy:
+        specifier: 0.1.1
+        version: 0.1.1
+    devDependencies:
+      vitest:
+        specifier: ^0.29.8
+        version: 0.29.8
+
 packages:
 
   /@aashutoshrathi/word-wrap@1.2.6:

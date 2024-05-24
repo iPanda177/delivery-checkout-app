@@ -24,6 +24,21 @@ import {authenticate} from "~/shopify.server";
 import {getLocationData} from "~/models/Shipping.server";
 
 export async function loader() {
+  const deliveryTypes = await db.deliveryType.findMany();
+
+  if (deliveryTypes.length === 0) {
+    const deliveryTypesNames = ['Standard', 'Enhanced', 'Premium', 'White-glove'];
+
+
+    for (const deliveryTypeName of deliveryTypesNames) {
+      await db.deliveryType.create({
+        data: {
+          name: deliveryTypeName,
+        },
+      });
+    }
+  }
+
   return json(
     await db.shippingRules.findMany({
       include: {
@@ -264,6 +279,7 @@ export default function Index() {
   const exportCSV = async () => {
     const csvData = shippingRules.map((rule: ShippingRules | any) => {
       const locations = rule.locations.map((location: any) => location.location.locationId.split('/').pop()).join(', ');
+      console.log('----LOCATIONS----', locations, JSON.stringify(locations))
 
       const zipCodeRanges = rule.zipCodeRanges.map((range: any) => `${range.zipRangeStart}-${range.zipRangeEnd}`).join(', ');
 
@@ -309,7 +325,8 @@ export default function Index() {
         const values = row.map(value => value.trim());
         const ruleName = values[0];
         const isDefault = values[1] === 'true';
-        const locations = values[2].split(', ')
+        const locations = JSON.parse(values[2]).split(', ')
+        console.log('PARSED LOCATIONS', locations)
         const zipCodeRanges = values[3].split(',').map(range => {
           const [startStr, endStr] = range.trim().split('-');
           const start = parseInt(startStr);
@@ -384,7 +401,7 @@ export default function Index() {
           { title: "ETA Small Parcel High" },
           { title: "ETA Days Freight Low" },
           { title: "ETA Days Freight High" },
-          { title: "Extended Area Delivery Eligible" },
+          { title: "No EAD" },
           { title: "Required Addon Product or Surcharge" },
         ]}
         itemCount={shippingRules.length}

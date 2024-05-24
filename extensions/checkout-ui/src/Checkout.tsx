@@ -5,15 +5,12 @@ import {
   useApplyCartLinesChange,
   useApi,
   InlineStack,
-  Choice,
   BlockStack,
-  ChoiceList,
   Text,
   useShop,
   ToggleButtonGroup,
   InlineLayout,
   ToggleButton,
-  View,
   Button,
   Form,
   BlockSpacer,
@@ -35,7 +32,7 @@ export default reactExtension(
 );
 
 function Extension() {
-  const APP_URL = 'https://circle-marvel-superintendent-head.trycloudflare.com';
+  const APP_URL = 'https://freebsd-contacted-ongoing-note.trycloudflare.com';
 
   const { query } = useApi();
   const { myshopifyDomain } = useShop();
@@ -58,33 +55,8 @@ function Extension() {
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   // const [ltlDeliveryProductPicked, setLTLDeliveryProductPicked] = useState<boolean>(false);
   const [validationErrors, setValidationErrors] = useState<any>({});
+  const [haveLtl, setHaveLtl] = useState(null);
 
-  const checkForLtl = async (lines) => {
-    const products: any = await query(
-      `#graphql
-      query getProductsByIds($ids: [ID!]!) {
-        nodes(ids: $ids) {
-          ... on Product {
-            title
-            tags
-          }
-        }
-      }`, {
-        variables: {
-          ids: lines.map((line) => line.merchandise.product.id)
-        }
-      }
-    );
-    console.log(lines.map((line) => line.merchandise.product.id))
-
-    if (!products.data || !products.data.nodes.length) {
-      return false;
-    }
-
-    return products.data.nodes.some((product) => product.tags.includes('ltl'));
-  };
-
-  const haveLtl = checkForLtl(lines);
   console.log('ineligibleForLtl', ineligibleForLtl)
 
   useBuyerJourneyIntercept(({ canBlockProgress }) => {
@@ -137,6 +109,47 @@ function Extension() {
       },
     };
   });
+
+  useEffect(() => {
+    const checkForLtl = async (lines) => {
+      const products = await query(
+        `
+        query getProductsByIds($ids: [ID!]!) {
+          nodes(ids: $ids) {
+            ... on Product {
+              title
+              tags
+            }
+          }
+        }`,
+        {
+          variables: {
+            ids: lines.map((line) => line.merchandise.product.id)
+          }
+        }
+      );
+
+      console.log(lines.map((line) => line.merchandise.product.id));
+
+      if (!products.data || !products.data.nodes.length) {
+        return false;
+      }
+
+      return products.data.nodes.some((product) => product.tags.includes('ltl'));
+    };
+
+    const fetchData = async () => {
+      try {
+        const result = await checkForLtl(lines);
+        setHaveLtl(result);
+      } catch (error) {
+        console.error('Error fetching LTL data:', error);
+        setHaveLtl(false);
+      }
+    };
+
+    fetchData();
+  }, [lines]);
 
   useEffect(() => {
     if (!deliveryProduct) {
@@ -193,31 +206,197 @@ function Extension() {
     }
   }, [zip])
 
+  // useEffect(() => {
+  //   console.log('SHIPMENTS USE EFFECT WORKS')
+  //   if (shipments.length) {
+  //     setIneligibleForLtl(shipments.some((shipment) => shipment.ineligibleForLtl));
+  //     const addedProducts = [];
+  //     const shipmentsArray = [...shipments];
+  //     const deliveryTypes = [];
+  //
+  //     const processShipments = async () => {
+  //       for (let index = 0; index < shipmentsArray.length; index++) {
+  //         const shipment = shipmentsArray[index];
+  //         console.log('SHIPMENT IN USE EFFECT', shipment);
+  //
+  //         if (shipment.containsFreightItem && !shipment.freightItemAdded) {
+  //           await addProduct(shipment.containsFreightItem, index);
+  //           shipmentsArray[index].freightItemAdded = true;
+  //           addedProducts.push(shipment.containsFreightItem);
+  //         }
+  //
+  //         console.log('SHIPMENT DELIVERY TYPES', shipment.deliveryTypes, shipment);
+  //         deliveryTypes.push(...shipment.deliveryTypes);
+  //         console.log('DELIVERY TYPES', deliveryTypes);
+  //       }
+  //
+  //       console.log('ADDED PRODUCTS', addedProducts);
+  //
+  //       const uniqueDeliveryTypes = Array.from(new Set(deliveryTypes));
+  //       console.log('UNIQUE DELIVERY TYPES', uniqueDeliveryTypes);
+  //
+  //       const availableDeliveryMethods = {
+  //         'Standard': false,
+  //         'Premium': false,
+  //         'Enhanced': false,
+  //         'White-glove': false
+  //       };
+  //
+  //       for (const method of uniqueDeliveryTypes) {
+  //         console.log('METHOD', deliveryTypes, availableDeliveryMethods);
+  //         if (availableDeliveryMethods.hasOwnProperty(method)) {
+  //           availableDeliveryMethods[method] = true;
+  //         }
+  //       }
+  //
+  //       console.log('AVAILABLE DELIVERY METHODS', availableDeliveryMethods);
+  //
+  //       if (Object.values(availableDeliveryMethods).some(value => value === false)) {
+  //         await addDisableDeliveryMethodsAttribute(availableDeliveryMethods);
+  //       }
+  //
+  //       if (addedProducts.length) {
+  //         setShipments(shipmentsArray);
+  //       }
+  //
+  //     };
+  //
+  //     processShipments();
+  //   }
+  // }, [shipments]);
+
   useEffect(() => {
     console.log('SHIPMENTS USE EFFECT WORKS')
-    if (shipments.length) {
-      setIneligibleForLtl(shipments.some((shipment) => shipment.ineligibleForLtl));
-      const addedProducts = [];
-      const shipmentsArray = [...shipments];
 
-      shipmentsArray.forEach((shipment, index) => {
-        console.log('SHIPMENT IN USE EFFECT', shipment)
+    const processShipments = async () => {
+      if (shipments.length) {
+        setIneligibleForLtl(shipments.some((shipment) => shipment.ineligibleForLtl));
+        const addedProducts = [];
+        const shipmentsArray = [...shipments];
+        const deliveryTypes = [];
 
-        if (shipment.containsFreightItem && !shipment.freightItemAdded) {
-          addProduct(shipment.containsFreightItem);
-          shipmentsArray[index].freightItemAdded = true;
-          addedProducts.push(shipment.containsFreightItem);
+        await Promise.all(lines.map(async (line) => {
+          let shippingGroup = 0;
+
+          const shipment = shipments.find((shipment, index) => {
+            if (shipment.lineItems.some((item) => item.id === line.merchandise.id)) {
+              shippingGroup = index;
+              return true;
+            }
+            return false;
+          });
+
+          console.log('---SHIPMENT', shipment);
+
+          if (shipment) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await retryApplyCartLinesChange(line, shipment, shippingGroup);
+          }
+        }));
+
+
+        for (let index = 0; index < shipmentsArray.length; index++) {
+          const shipment = shipmentsArray[index];
+          console.log('SHIPMENT IN USE EFFECT', shipment);
+
+          if (shipment.containsFreightItem && !shipment.freightItemAdded) {
+            await addProduct(shipment.containsFreightItem, index);
+            shipmentsArray[index].freightItemAdded = true;
+            addedProducts.push(shipment.containsFreightItem);
+          }
+
+          console.log('SHIPMENT DELIVERY TYPES', shipment.deliveryTypes, shipment);
+          deliveryTypes.push(...shipment.deliveryTypes);
+          console.log('DELIVERY TYPES', deliveryTypes);
         }
-      });
-      console.log('ADDED PRODUCTS', addedProducts);
 
-      if (addedProducts.length) {
-        setShipments(shipmentsArray);
+        console.log('ADDED PRODUCTS', addedProducts);
+
+        const uniqueDeliveryTypes = Array.from(new Set(deliveryTypes));
+        console.log('UNIQUE DELIVERY TYPES', uniqueDeliveryTypes);
+
+        const availableDeliveryMethods = {
+          'Standard': false,
+          'Premium': false,
+          'Enhanced': false,
+          'White-glove': false
+        };
+
+        for (const method of uniqueDeliveryTypes) {
+          console.log('METHOD', deliveryTypes, availableDeliveryMethods);
+          if (availableDeliveryMethods.hasOwnProperty(method)) {
+            availableDeliveryMethods[method] = true;
+          }
+        }
+
+        console.log('AVAILABLE DELIVERY METHODS', availableDeliveryMethods);
+
+        if (Object.values(availableDeliveryMethods).some(value => value === false)) {
+          await addDisableDeliveryMethodsAttribute(availableDeliveryMethods);
+        }
+
+        if (addedProducts.length) {
+          setShipments(shipmentsArray);
+        }
       }
     }
+
+    processShipments();
   }, [shipments]);
 
+  const retryApplyCartLinesChange = async (line, shipment, shippingGroup, retries = 3) => {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        await applyCartLinesChange({
+          type: 'updateCartLine',
+          id: line.id,
+          attributes: [
+            {
+              key: 'ETA',
+              value: `${countDeliveryDateFromToday(shipment)}`
+            },
+            {
+              key: '_shipping_group',
+              value: `${shippingGroup + 1}`
+            }
+          ]
+        });
+
+        console.log("Applied cart line change")
+        return;
+      } catch (error) {
+        console.log("Error applying cart line change", error.message);
+        if (error.message.includes("Negotiation was stale") && attempt < retries) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } else {
+          throw error;
+        }
+      }
+    }
+  };
+
+  const addDisableDeliveryMethodsAttribute = async (methods) => {
+    console.log('METHODS', methods)
+    await applyCartLinesChange({
+      type: 'updateCartLine',
+      id: lines[0].id,
+      attributes: [
+        ...lines[0].attributes,
+        {
+          key: '_disable_methods',
+          value: `${Object.keys(methods).filter((method) => !methods[method]).join(', ')}`
+        }
+      ]
+    });
+  };
+
   const resetOrderChanges = async () => {
+    if (!cachedProducts.length) {
+      return;
+    }
+
+    console.log('CACHED PRODUCTS', cachedProducts)
+
     const cachedLinesIds = cachedProducts.map((productId) => {
       return lines.find((line) => line.merchandise.id === productId).id;
     });
@@ -225,7 +404,7 @@ function Extension() {
     console.log('CACHED LINES IDS', cachedLinesIds)
 
     const removeProducts = await Promise.all(cachedLinesIds.map( async (lineId) => {
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 1000));
       return applyCartLinesChange({
         type: 'removeCartLine',
         id: lineId,
@@ -241,7 +420,7 @@ function Extension() {
       while (tries < 3) {
         const retryRemoveProducts = await Promise.all(removeProducts.map( async (product, index) => {
           if (product.type === 'error') {
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 1000));
             return applyCartLinesChange({
               type: 'removeCartLine',
               id: cachedLinesIds[index],
@@ -282,7 +461,7 @@ function Extension() {
         quantity: line.quantity
       }
     });
-    console.log('LINE ITEMS', lineItems)
+    console.log('LINE ITEMS', lineItems);
 
     const data = await fetch(`${APP_URL}/app/check-rules?_data=routes/app.check-rules`, {
       method: "POST",
@@ -290,9 +469,9 @@ function Extension() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ zip, lineItems, shop: myshopifyDomain }),
-    })
+    });
     const { shipments } = await data.json();
-    console.log('SHIPMENTS', shipments)
+    console.log('SHIPMENTS', shipments);
 
     await orderAttributesChange({
       key: 'zip_code',
@@ -304,32 +483,71 @@ function Extension() {
       return;
     }
 
-    await Promise.all(lines.map(async (line) => {
-      const shipment = shipments.find((shipment) => {
-        return shipment.lineItems.some((item) => item.id === line.merchandise.id);
-      });
-      if (shipment) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        await applyCartLinesChange({
-          type: 'updateCartLine',
-          id: line.id,
-          attributes: [{
-            key: 'ETA',
-            value: `${countDeliveryDateFromToday(shipment)}`
-          }]
-        });
-      }
-    }));
+    // const retryApplyCartLinesChange = async (line, shipment, shippingGroup, retries = 3) => {
+    //   for (let attempt = 1; attempt <= retries; attempt++) {
+    //     try {
+    //       await applyCartLinesChange({
+    //         type: 'updateCartLine',
+    //         id: line.id,
+    //         attributes: [
+    //           {
+    //             key: 'ETA',
+    //             value: `${countDeliveryDateFromToday(shipment)}`
+    //           },
+    //           {
+    //             key: '_shipping_group',
+    //             value: `${shippingGroup + 1}`
+    //           }
+    //         ]
+    //       });
+    //
+    //       console.log("Applied cart line change")
+    //       return;
+    //     } catch (error) {
+    //       console.log("Error applying cart line change", error.message);
+    //       if (error.message.includes("Negotiation was stale") && attempt < retries) {
+    //         await new Promise(resolve => setTimeout(resolve, 500));
+    //       } else {
+    //         throw error;
+    //       }
+    //     }
+    //   }
+    // };
+    //
+    // await Promise.all(lines.map(async (line) => {
+    //   let shippingGroup = 0;
+    //
+    //   const shipment = shipments.find((shipment, index) => {
+    //     if (shipment.lineItems.some((item) => item.id === line.merchandise.id)) {
+    //       shippingGroup = index;
+    //       return true;
+    //     }
+    //     return false;
+    //   });
+    //
+    //   console.log('---SHIPMENT', shipment);
+    //
+    //   if (shipment) {
+    //     await new Promise(resolve => setTimeout(resolve, 500));
+    //     await retryApplyCartLinesChange(line, shipment, shippingGroup);
+    //   }
+    // }));
 
     setShipments(shipments);
   }
 
-  const addProduct = async (productId: string) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
+  const addProduct = async (productId: string, index: number) => {
+    await new Promise(resolve => setTimeout(resolve, 1000));
     await applyCartLinesChange({
       type: 'addCartLine',
       merchandiseId: productId,
       quantity: 1,
+      attributes: [
+        {
+          key: '_shipping_group',
+          value: `${index + 1}`
+        }
+      ]
     })
 
     const cachedProductsArray = [...cachedProducts];
@@ -351,11 +569,42 @@ function Extension() {
   // }
 
   const handleFormChange = (type: string, value: string) => {
+    if (type === 'destinationType') {
+      setDestinationTypeForm({
+        [type]: value
+      });
+    }
     setDestinationTypeForm({
       ...destinationTypeForm,
       [type]: value
     });
   };
+
+  const disableSubmitButton = () => {
+    console.log('destinationTypeForm', destinationTypeForm)
+    if (destinationTypeForm.destinationType === 'house') {
+      return !destinationTypeForm.confirm
+        || destinationTypeForm.confirm === 'false'
+        || (destinationTypeForm.houseStairs === 'yes'
+          && !destinationTypeForm.moreThanTwentyOneStairs)
+        || (destinationTypeForm.moreThanTwentyOneStairs === 'yes'
+          && !destinationTypeForm.numberOfStairs);
+    }
+
+    if (destinationTypeForm.destinationType === 'apartment' || destinationTypeForm.destinationType === 'office') {
+      return !destinationTypeForm.confirm === true
+        || destinationTypeForm.confirm === 'false'
+        || (destinationTypeForm.stairsOrElevator === 'stairs'
+          && !destinationTypeForm.numberOfStairs)
+        || (destinationTypeForm.stairsOrElevator === 'elevator'
+          && !destinationTypeForm.elevatorAccommodate)
+        || !destinationTypeForm.certificateInsurance;
+    }
+
+    return !destinationTypeForm.destinationType;
+  }
+
+  console.log('disableSubmitButton', disableSubmitButton())
 
   const submitForm = () => {
     for (const key in destinationTypeForm) {
@@ -367,6 +616,8 @@ function Extension() {
     }
     setFormSubmitted(true);
   };
+
+  console.log('haveLtl && !ineligibleForLtl', haveLtl, ineligibleForLtl)
 
   return (
     haveLtl && !ineligibleForLtl && (
@@ -382,40 +633,43 @@ function Extension() {
                 console.log('onSubmit event')
               }
             >
-              <ToggleButtonGroup
-                value={destinationTypeForm.destinationType || 'none'}
-                onChange={(value) => handleFormChange('destinationType', value)}
-                disabled={formSubmitted}
-              >
-                <InlineLayout spacing="base" >
-                  <ToggleButton
-                    id={`house`}
-                  >
-                    <BlockStack inlineAlignment={"center"}>
-                      <Icon size={"large"} source={"delivered"} />
-                      <Text>House</Text>
-                    </BlockStack>
-                  </ToggleButton>
+              <BlockStack spacing={"base"}>
+                <Text size={"large"}>Choose a destination type</Text>
+                <ToggleButtonGroup
+                  value={destinationTypeForm.destinationType || 'none'}
+                  onChange={(value) => handleFormChange('destinationType', value)}
+                  disabled={formSubmitted}
+                >
+                  <InlineLayout spacing="base" >
+                    <ToggleButton
+                      id={`house`}
+                    >
+                      <BlockStack inlineAlignment={"center"}>
+                        <Icon size={"large"} source={"delivered"} />
+                        <Text>House</Text>
+                      </BlockStack>
+                    </ToggleButton>
 
-                  <ToggleButton
-                    id={`apartment`}
-                  >
-                    <BlockStack inlineAlignment={"center"}>
-                      <Icon size={"large"} source={"store"} />
-                      <Text>Apartment</Text>
-                    </BlockStack>
-                  </ToggleButton>
+                    <ToggleButton
+                      id={`apartment`}
+                    >
+                      <BlockStack inlineAlignment={"center"}>
+                        <Icon size={"large"} source={"store"} />
+                        <Text>Apartment</Text>
+                      </BlockStack>
+                    </ToggleButton>
 
-                  <ToggleButton
-                    id={`office`}
-                  >
-                    <BlockStack inlineAlignment={"center"}>
-                      <Icon size={"large"} source={"store"} />
-                      <Text>Commercial/Office</Text>
-                    </BlockStack>
-                  </ToggleButton>
-                </InlineLayout>
-              </ToggleButtonGroup>
+                    <ToggleButton
+                      id={`office`}
+                    >
+                      <BlockStack inlineAlignment={"center"}>
+                        <Icon size={"large"} source={"store"} />
+                        <Text>Commercial/Office</Text>
+                      </BlockStack>
+                    </ToggleButton>
+                  </InlineLayout>
+                </ToggleButtonGroup>
+              </BlockStack>
 
               {validationErrors.formNotSubmitted && (
                 <Banner
@@ -430,7 +684,7 @@ function Extension() {
                 <BlockStack>
                   <Select
                     label={"Will delivery require the use of stairs?"}
-                    value={destinationTypeForm.houseStairs || 'none'}
+                    value={destinationTypeForm.houseStairs || 'no'}
                     options={[
                       {label: "Yes", value: "yes"},
                       {label: "No", value: "no"},
@@ -440,10 +694,10 @@ function Extension() {
                     disabled={formSubmitted}
                   />
 
-                  {destinationTypeForm.stairsOrElevator === 'yes' && (
+                  {destinationTypeForm.houseStairs === 'yes' && (
                     <Select
                       label={"Would the delivery involve carrying the item more than 21 stairs from the ground floor?"}
-                      value={destinationTypeForm.moreThanTwentyOneStairs || 'none'}
+                      value={destinationTypeForm.moreThanTwentyOneStairs || 'no'}
                       options={[
                         {label: "Yes", value: "yes"},
                         {label: "No", value: "no"},
@@ -551,7 +805,7 @@ function Extension() {
               <InlineStack inlineAlignment={"end"}>
                 {!formSubmitted
                   ? (
-                    <Button accessibilityRole="submit" onPress={() => submitForm()}>
+                    <Button accessibilityRole="submit" onPress={() => submitForm()} disabled={disableSubmitButton()}>
                       Submit
                     </Button>
                   )

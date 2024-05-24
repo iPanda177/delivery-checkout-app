@@ -8,15 +8,16 @@ import {
   InlineStack,
 } from "@shopify/polaris";
 import {useState, useCallback, useMemo, useEffect} from "react";
-import type {LocationT, LocationGraphQLResponse, RuleState, DispatchFunction} from "~/types/types";
+import type {DispatchFunction} from "~/types/types";
+import type { DeliveryType } from "@prisma/client";
 
 export default function DeliverySelectCombobox({
-  locations,
-  selectedLocations,
+  deliveryTypes,
+  selectedDeliveryTypes,
   dispatch,
 }: {
-  locations: LocationGraphQLResponse[];
-  selectedLocations: LocationT[];
+  deliveryTypes: DeliveryType[];
+  selectedDeliveryTypes: DeliveryType[];
   dispatch: DispatchFunction;
 }) {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -24,14 +25,16 @@ export default function DeliverySelectCombobox({
   const [suggestion, setSuggestion] = useState<string | undefined>("");
 
   useEffect(() => {
-    const selectedLocationsNames = selectedLocations.map((location) => location.locationName);
+    if (!selectedDeliveryTypes || selectedDeliveryTypes.length === 0) return;
+    console.log('SELECTED DELIVERY TYPES',selectedDeliveryTypes)
+    const selectedDeliveryTypesNames = selectedDeliveryTypes.map((deliveryType: any) => deliveryType.name);
 
-    setSelectedTags(selectedLocationsNames);
-  }, [locations, selectedLocations]);
+    setSelectedTags(selectedDeliveryTypesNames);
+  }, [selectedDeliveryTypes]);
 
   const suggestions = useMemo(
-    () => locations.map((location) => location.name),
-    [locations],
+    () => deliveryTypes.map((deliveryType) => deliveryType.name),
+    [deliveryTypes],
   );
 
   const handleChange = useCallback(
@@ -84,18 +87,18 @@ export default function DeliverySelectCombobox({
         nextSelectedTags.add(selected);
       }
 
-      const selectedLocations = locations
-        .filter((location) => nextSelectedTags.has(location.name))
-        .map((location) => {
-          return { locationId: location.id, locationName: location.name }
-        })
+      const selectedDeliveryTypes = deliveryTypes
+        .filter((deliveryTypes) => nextSelectedTags.has(deliveryTypes.name))
+        // .map((deliveryTypes) => {
+        //   return { locationId: deliveryTypes.id, locationName: deliveryTypes.name }
+        // })
 
-      dispatch({ type: "SET_SELECTED_LOCATIONS", payload: selectedLocations })
+      dispatch({ type: "SET_SELECTED_DELIVERY_TYPES", payload: selectedDeliveryTypes })
       setSelectedTags([...nextSelectedTags]);
       setValue("");
       setSuggestion("");
     },
-    [selectedTags, locations]
+    [selectedTags, deliveryTypes]
   );
 
   const removeTag = useCallback(
@@ -105,12 +108,13 @@ export default function DeliverySelectCombobox({
     [updateSelection]
   );
 
-  const getAllWarehouses = useCallback(() => {
+  const getAllDeliveryTypes = useCallback(() => {
     return [...new Set([...suggestions, ...selectedTags].sort())];
   }, [selectedTags, suggestions]);
 
   const formatOptionText = useCallback(
     (option: string) => {
+      console.log('OPTION',option)
       const trimValue = value.trim().toLocaleLowerCase();
       const matchIndex = option.toLocaleLowerCase().indexOf(trimValue);
 
@@ -140,7 +144,7 @@ export default function DeliverySelectCombobox({
 
   const options = useMemo(() => {
     let list;
-    const allTags = getAllWarehouses();
+    const allTags = getAllDeliveryTypes();
     const filterRegex = new RegExp(escapeSpecialRegExCharacters(value), "i");
 
     if (value) {
@@ -149,14 +153,15 @@ export default function DeliverySelectCombobox({
       list = allTags;
     }
 
-    return [...list];
-  }, [value, getAllWarehouses, escapeSpecialRegExCharacters]);
+    return [...list.filter((tag) => !!tag)];
+  }, [value, getAllDeliveryTypes, escapeSpecialRegExCharacters]);
+  console.log('OPTIONS',options)
 
   const verticalContentMarkup =
     selectedTags.length > 0 ? (
       <InlineStack gap={"100"} align="start">
         {selectedTags.map((tag) => (
-          <Tag key={`option-${tag}`} onRemove={removeTag(tag)}>
+          <Tag key={`delivery-option-${tag}`} onRemove={removeTag(tag)}>
             {tag}
           </Tag>
         ))}
@@ -181,7 +186,7 @@ export default function DeliverySelectCombobox({
       })
       : null;
 
-  const noResults = value && !getAllWarehouses().includes(value);
+  const noResults = value && !getAllDeliveryTypes().includes(value);
 
   const actionMarkup = noResults ? (
     <Listbox.Action value={value}>{`Add "${value}"`}</Listbox.Action>
@@ -213,11 +218,11 @@ export default function DeliverySelectCombobox({
         <div onKeyDown={handleKeyDown}>
           <Combobox.TextField
             autoComplete="off"
-            label="Search locations "
+            label="Pick delivery types"
             labelHidden
             value={value}
             suggestion={suggestion}
-            placeholder="Search locations"
+            placeholder="Pick delivery types"
             verticalContent={verticalContentMarkup}
             onChange={handleChange}
           />

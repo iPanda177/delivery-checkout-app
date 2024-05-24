@@ -1,5 +1,5 @@
-import type { ShippingRules, Location, ZipCodeRanges } from "@prisma/client";
-import {Dispatch} from "react";
+import type {ShippingRules, Location, ZipCodeRanges, DeliveryType} from "@prisma/client";
+import type {Dispatch} from "react";
 
 export type ShippingRulesActionData = {
   success: boolean;
@@ -8,8 +8,9 @@ export type ShippingRulesActionData = {
 
 export type ShippingRulesLoaderData = {
   locations?: LocationGraphQLResponse[];
-  ruleState?: ShippingRules & { zipCodeRanges: ZipCodeRanges[], locations: Location };
+  ruleState?: ShippingRules & { zipCodeRanges: ZipCodeRanges[], locations: Location, deliveryTypes: DeliveryType[] };
   variantData?: { displayName: string; image?: { url?: string; altText?: string } };
+  deliveryTypes?: any[];
   error?: { id: string };
 };
 
@@ -31,7 +32,6 @@ export type RuleState = ShippingRules & { madeChanges?: boolean };
 export type ZipCodeRange = {
   zipRangeStart: string;
   zipRangeEnd: string;
-
 }
 
 export type ValidationErrors = {
@@ -44,17 +44,18 @@ export type ValidationErrors = {
   etaDaysFreightHighEmpty?: boolean;
 };
 
-export type dbRuleData = ShippingRules & { zipCodeRanges: ZipCodeRanges[], locations: Location[] };
+export type dbRuleData = ShippingRules & { zipCodeRanges: ZipCodeRanges[], locations: Location[], deliveryTypes: DeliveryType[] };
 
 export type ShippingRulesReducerState = {
   locations: LocationGraphQLResponse[] | null;
   ruleState: RuleState | null;
-  selectedLocations: LocationT[],
+  selectedLocations: LocationT[];
   zipCodeRanges: ZipCodeRange[];
-  error: String | null;
+  deliveryTypes: any[];
+  selectedDeliveryTypes: any[];
+  error: string | null;
   validationErrors: ValidationErrors;
-  isLoading: boolean,
-  deliveryTypes: any[]
+  isLoading: boolean;
 };
 
 export type Action =
@@ -62,7 +63,8 @@ export type Action =
   | { type: "SET_RULE_STATE"; payload: RuleState | null }
   | { type: "SET_SELECTED_LOCATIONS"; payload: LocationT[] }
   | { type: "SET_ZIP_CODE_RANGES"; payload: ZipCodeRange[] }
-  | { type: "SET_DELIVERY_TYPES"; payload: any[]}
+  | { type: "SET_DELIVERY_TYPES"; payload: any[] }
+  | { type: "SET_SELECTED_DELIVERY_TYPES"; payload: any[] }
   | { type: "SET_ERROR"; payload: string | null }
   | { type: "SET_VALIDATION_ERRORS"; payload: ValidationErrors }
   | { type: "SET_IS_LOADING"; payload: boolean };

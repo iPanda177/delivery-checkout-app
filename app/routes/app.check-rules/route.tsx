@@ -67,6 +67,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           include: {
             location: true
           }
+        },
+        deliveryTypes: {
+          include: {
+            deliveryType: true
+          }
         }
       }
     });

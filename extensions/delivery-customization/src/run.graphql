@@ -1,0 +1,15 @@
+query RunInput {
+  cart {
+    lines {
+      disable_methods: attribute(key: "_disable_methods") {
+        value
+      }
+    }
+    deliveryGroups {
+      deliveryOptions {
+        title
+        handle
+      }
+    }
+  }
+}

@@ -54,31 +54,43 @@ description = "Enter main title text for the trust logos"
 key = "trust_href_1"
 type = "single_line_text_field"
 name = "Trust image url 1"
-description = "Enter url to your image asset (image must be 70x70 for correct work)."
+description = "Enter url to your image asset (image must be 80x80 for correct work)."
 [[extensions.settings.fields]]
 key = "image_title_1"
 type = "single_line_text_field"
 name = "First image text"
 description = "Enter text for the first image"
+[[extensions.settings.fields]]
+key = "image_title_1_centered"
+type = "boolean"
+name = "Center first image text"
 
 [[extensions.settings.fields]]
 key = "trust_href_2"
 type = "single_line_text_field"
 name = "Trust image url 2"
-description = "Enter url to your image asset (image must be 70x70 for correct work)."
+description = "Enter url to your image asset (image must be 80x80 for correct work)."
 [[extensions.settings.fields]]
 key = "image_title_2"
 type = "single_line_text_field"
 name = "Second image text"
 description = "Enter text for the second image"
+[[extensions.settings.fields]]
+key = "image_title_2_centered"
+type = "boolean"
+name = "Center second image text"
 
 [[extensions.settings.fields]]
 key = "trust_href_3"
 type = "single_line_text_field"
 name = "Trust image url 3"
-description = "Enter url to your image asset (image must be 70x70 for correct work)."
+description = "Enter url to your image asset (image must be 80x80 for correct work)."
 [[extensions.settings.fields]]
 key = "image_title_3"
 type = "single_line_text_field"
 name = "Third image text"
 description = "Enter text for the third image"
+[[extensions.settings.fields]]
+key = "image_title_3_centered"
+type = "boolean"
+name = "Center third image text"

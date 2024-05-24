@@ -40,10 +40,13 @@ import type {
   Action, ValidationErrors
 } from "~/types/types";
 import DeliverySelectCombobox from "~/routes/app.shipping.rules.$id/deliverySelectionCombobox";
+import type {DeliveryType} from "@prisma/client";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { admin } = await authenticate.admin(request);
+
   const locations = await getShopLocations(admin.graphql);
+  const deliveryTypes = await db.deliveryType.findMany();
   console.log('locations', locations);
 
   if (params.id !== 'new') {
@@ -59,7 +62,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       variantData = await getProductVariantData(ruleState.addOnProductId, admin.graphql);
     }
 
-    return json({ ...{ locations }, ruleState, variantData });
+    return json({ ...{ locations }, ruleState, variantData, deliveryTypes });
   }
 
   const ruleState = {
@@ -77,10 +80,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     ineligibleForLtl: false,
     extendedAreaEligible: false,
     addOnProductId: '',
-    deliveryTypes: []
+    deliveryTypes: [...deliveryTypes]
   };
 
-  return json({ ...{ locations }, ruleState });
+  return json({ ...{ locations }, ruleState, deliveryTypes });
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
@@ -91,6 +94,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
     const selectedLocationsArray = JSON.parse(data.selectedLocations as string);
     const zipCodeRangesData = JSON.parse(data.zipCodeRanges as string);
+    const selectedDeliveryTypes = JSON.parse(data.selectedDeliveryTypes as string);
 
     if (data.action === "delete") {
       await db.locationToShippingRule.deleteMany({
@@ -99,6 +103,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
       await db.zipCodeRanges.deleteMany({
         where: { shippingRulesId: Number(params.id) }
+      });
+
+      await db.deliveryToShippingRule.deleteMany({
+        where: { shippingRuleId: Number(params.id) }
       });
 
       await db.shippingRules.delete({ where: { id: Number(params.id) } });
@@ -120,47 +128,47 @@ export async function action({ request, params }: ActionFunctionArgs) {
         addOnProductId: String(data.addOnProductId),
       };
 
-      const shippingRules = await db.shippingRules.findMany({
-        where: {
-          NOT: {
-            id: Number(params.id),
-          },
-          isDefault: ruleData.isDefault,
-          OR: [
-            {
-              zipRangeStart: {
+      if (params.id !== 'new') {
+        const shippingRules = await db.shippingRules.findMany({
+          where: {
+            NOT: {
+              id: Number(params.id),
+            },
+            isDefault: ruleData.isDefault,
+            zipRangeStart: {
+              lte: ruleData.zipRangeEnd,
+            },
+            ...(ruleData.zipRangeEnd && {
+              zipRangeEnd: {
                 gte: ruleData.zipRangeStart,
               },
-            },
-            {
-              zipRangeEnd: {
-                lte: ruleData.zipRangeEnd,
-              },
-            },
-          ],
-          locations: {
-            some: {
-              location: {
-                locationId: {
-                  in: selectedLocationsArray.map((location: LocationT) => location.locationId),
+            }),
+            locations: {
+              some: {
+                location: {
+                  locationId: {
+                    in: selectedLocationsArray.map((location: LocationT) => location.locationId),
+                  },
                 },
               },
-            },
-          }
-        },
-      });
+            }
+          },
+        });
 
-      if (shippingRules.length > 0) {
-        return json({ success: false, error: 'Rule already exists' });
-      }
+        if (shippingRules.length > 0) {
+          return json({ success: false, error: 'Rule already exists' });
+        }
 
-      if (params.id !== 'new') {
         await db.locationToShippingRule.deleteMany({
           where: { shippingRuleId: Number(params.id) }
         });
 
         await db.zipCodeRanges.deleteMany({
           where: { shippingRulesId: Number(params.id) }
+        });
+
+        await db.deliveryToShippingRule.deleteMany({
+          where: { shippingRuleId: Number(params.id) }
         });
 
         await db.shippingRules.update({
@@ -216,7 +224,46 @@ export async function action({ request, params }: ActionFunctionArgs) {
             })
           )
         ))
+
+        await Promise.all(selectedDeliveryTypes.map(async (deliveryType: DeliveryType) =>
+          await db.deliveryToShippingRule.create({
+            data: {
+              shippingRuleId: Number(params.id),
+              deliveryTypeId: deliveryType.id,
+            },
+          })
+        ));
       } else {
+        console.log('RULE DATA', ruleData)
+        const shippingRules = await db.shippingRules.findMany({
+          where: {
+            isDefault: ruleData.isDefault,
+            zipRangeStart: {
+              lte: ruleData.zipRangeEnd,
+            },
+            ...(ruleData.zipRangeEnd && {
+              zipRangeEnd: {
+                gte: ruleData.zipRangeStart,
+              },
+            }),
+            locations: {
+              some: {
+                location: {
+                  locationId: {
+                    in: selectedLocationsArray.map((location: LocationT) => location.locationId),
+                  },
+                },
+              },
+            }
+          },
+        });
+
+        console.log('shippingRules', shippingRules)
+
+        if (shippingRules.length > 0) {
+          return json({ success: false, error: 'Rule already exists' });
+        }
+
         if (ruleData.isDefault) {
           const hasDefaultRule = await db.shippingRules.findFirst({
             where: {
@@ -288,6 +335,16 @@ export async function action({ request, params }: ActionFunctionArgs) {
             })
           )
         ))
+
+        await Promise.all(selectedDeliveryTypes.map(
+          async (deliveryType: DeliveryType) =>
+            await db.deliveryToShippingRule.create({
+              data: {
+                shippingRuleId: createdShippingRule.id,
+                deliveryTypeId: deliveryType.id,
+              },
+            })
+        ));
       }
 
       return json({ success: true });
@@ -303,10 +360,11 @@ const initialState: ShippingRulesReducerState = {
   ruleState: null,
   selectedLocations: [],
   zipCodeRanges: [],
+  deliveryTypes: [],
+  selectedDeliveryTypes: [],
   error: null,
   validationErrors: {},
   isLoading: false,
-  deliveryTypes: []
 };
 
 function reducer(state: ShippingRulesReducerState, action: Action) {
@@ -321,7 +379,9 @@ function reducer(state: ShippingRulesReducerState, action: Action) {
     case "SET_ZIP_CODE_RANGES":
       return { ...state, zipCodeRanges: action.payload };
     case "SET_DELIVERY_TYPES":
-      return { ...state, deliveryTypes: action.payload, madeChanges: true };
+      return { ...state, deliveryTypes: action.payload };
+    case "SET_SELECTED_DELIVERY_TYPES":
+      return { ...state, selectedDeliveryTypes: action.payload, ruleState: { ...state.ruleState, madeChanges: true } };
     case "SET_ERROR":
       return { ...state, error: action.payload };
     case "SET_VALIDATION_ERRORS":
@@ -354,6 +414,10 @@ export default function ShippingRuleForm() {
       dispatch({ type: "SET_LOCATIONS", payload: loaderData.locations });
     }
 
+    if (loaderData.deliveryTypes) {
+      dispatch({ type: "SET_DELIVERY_TYPES", payload: loaderData.deliveryTypes });
+    }
+
     if (loaderData.ruleState) {
       const editedRuleState: RuleState = { ...loaderData.ruleState };
       editedRuleState.madeChanges = false;
@@ -362,6 +426,7 @@ export default function ShippingRuleForm() {
       dispatch({ type: "SET_ZIP_CODE_RANGES", payload: loaderData.ruleState.zipCodeRanges });
       // @ts-ignore
       dispatch({ type: "SET_SELECTED_LOCATIONS", payload: loaderData.ruleState.locations });
+      dispatch({ type: "SET_SELECTED_DELIVERY_TYPES", payload: loaderData.ruleState.deliveryTypes })
     }
   }, [loaderData])
 
@@ -395,6 +460,20 @@ export default function ShippingRuleForm() {
       return;
     } else if (zipCodeRange.zipRangeEnd < zipCodeRange.zipRangeStart) {
       dispatch({ type: "SET_VALIDATION_ERRORS", payload: { zipRangeEndLessThanStart: true } });
+      return;
+    }
+
+    const hasOverlap = state.zipCodeRanges.some((range: ZipCodeRange) => {
+      return (
+        (zipCodeRange.zipRangeStart >= range.zipRangeStart && zipCodeRange.zipRangeStart <= range.zipRangeEnd) ||
+        (zipCodeRange.zipRangeEnd >= range.zipRangeStart && zipCodeRange.zipRangeEnd <= range.zipRangeEnd) ||
+        (range.zipRangeStart >= zipCodeRange.zipRangeStart && range.zipRangeStart <= zipCodeRange.zipRangeEnd) ||
+        (range.zipRangeEnd >= zipCodeRange.zipRangeStart && range.zipRangeEnd <= zipCodeRange.zipRangeEnd)
+      );
+    });
+
+    if (hasOverlap) {
+      shopify.toast.show("Zip Code Range overlaps with existing range", { isError: true, duration: 5000 });
       return;
     }
 
@@ -477,6 +556,7 @@ export default function ShippingRuleForm() {
         ...updatedRuleState,
         selectedLocations: JSON.stringify([...state.selectedLocations]),
         zipCodeRanges: JSON.stringify([...state.zipCodeRanges]),
+        selectedDeliveryTypes: JSON.stringify([...state.selectedDeliveryTypes]),
         action: actionType
       }, { method: "post" });
     } else {
@@ -484,6 +564,7 @@ export default function ShippingRuleForm() {
         ...state.ruleState,
         selectedLocations: JSON.stringify([...state.selectedLocations]),
         zipCodeRanges: JSON.stringify([...state.zipCodeRanges]),
+        selectedDeliveryTypes: JSON.stringify([...state.selectedDeliveryTypes]),
         action: actionType
       }, { method: "post" });
     }
@@ -522,7 +603,7 @@ export default function ShippingRuleForm() {
             <BlockStack gap="500">
               <Card>
                 <BlockStack gap="500">
-                  <Text as={"h2"} variant="headingLg">
+                  <Text as={"h3"} variant="headingLg">
                     Rule Name
                   </Text>
 
@@ -549,7 +630,7 @@ export default function ShippingRuleForm() {
 
               <Card>
                 <BlockStack gap="500">
-                  <Text as={"h2"} variant="headingLg">
+                  <Text as={"h3"} variant="headingLg">
                     Apply to Locations
                   </Text>
 
@@ -563,9 +644,13 @@ export default function ShippingRuleForm() {
                     <Divider/>
                   </Bleed>
 
+                  <Text as={"h3"} variant="headingLg">
+                    Delivery Types
+                  </Text>
+
                   <DeliverySelectCombobox
-                    locations={state.locations}
-                    selectedLocations={state.selectedLocations}
+                    deliveryTypes={state.deliveryTypes}
+                    selectedDeliveryTypes={state.selectedDeliveryTypes}
                     dispatch={dispatch}
                   />
 
@@ -661,7 +746,7 @@ export default function ShippingRuleForm() {
               <Card>
                 <BlockStack gap={"500"}>
                   <InlineStack gap="500" align={"space-between"}>
-                    <Text as={"h2"} variant="headingLg">
+                    <Text as={"h3"} variant="headingLg">
                       Zip Code Ranges
                     </Text>
 

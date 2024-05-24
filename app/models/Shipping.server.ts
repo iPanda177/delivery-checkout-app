@@ -72,6 +72,11 @@ export async function getShippingRule(id: number) {
         }
       },
       zipCodeRanges: true,
+      deliveryTypes: {
+        include: {
+          deliveryType: true
+        }
+      },
     }
   });
 
@@ -81,6 +86,9 @@ export async function getShippingRule(id: number) {
 
   const uniqueLocations = dbRuleData.locations.map((item: any) => item.location);
   dbRuleData.locations = Array.from(new Set(uniqueLocations));
+
+  const deliveryTypes = dbRuleData.deliveryTypes.map((item: any) => item.deliveryType);
+  dbRuleData.deliveryTypes = Array.from(new Set(deliveryTypes));
 
   return dbRuleData;
 }
@@ -160,6 +168,11 @@ export async function prepareShipmentsArray(
           }
         },
         zipCodeRanges: true,
+        deliveryTypes: {
+          include: {
+            deliveryType: true
+          }
+        }
       }
     });
 
@@ -223,6 +236,7 @@ export async function prepareShipmentsArray(
         ineligibleForLtl: selectedRule.ineligibleForLtl,
         containsFreightItem: selectedRule.addOnProductId,
         isLtl: isLtl,
+        deliveryTypes: selectedRule.deliveryTypes.map((deliveryType: any) => deliveryType.deliveryType.name),
       });
     }
   });

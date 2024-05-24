@@ -2,7 +2,7 @@
 
 client_id = "f1115783b0f51ee3fe7c0b50d2bdbfe6"
 name = "Poly & Bark Extensibility(PBE)"
-application_url = "https://circle-marvel-superintendent-head.trycloudflare.com"
+application_url = "https://freebsd-contacted-ongoing-note.trycloudflare.com"
 embedded = true
 
 [build]
@@ -16,9 +16,9 @@ scopes = "unauthenticated_read_checkouts,read_cart_transforms,write_cart_transfo
 
 [auth]
 redirect_urls = [
-  "https://circle-marvel-superintendent-head.trycloudflare.com/auth/callback",
-  "https://circle-marvel-superintendent-head.trycloudflare.com/auth/shopify/callback",
-  "https://circle-marvel-superintendent-head.trycloudflare.com/api/auth/callback"
+  "https://freebsd-contacted-ongoing-note.trycloudflare.com/auth/callback",
+  "https://freebsd-contacted-ongoing-note.trycloudflare.com/auth/shopify/callback",
+  "https://freebsd-contacted-ongoing-note.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
