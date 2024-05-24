@@ -21,8 +21,8 @@ import {
   Banner,
   useApplyAttributeChange,
   useAttributeValues,
-  useExtensionCapability,
-  useBuyerJourneyIntercept
+  useBuyerJourneyIntercept,
+  useExtension
 } from '@shopify/ui-extensions-react/checkout';
 import {useEffect, useState} from "react";
 
@@ -32,32 +32,23 @@ export default reactExtension(
 );
 
 function Extension() {
-  const APP_URL = 'https://freebsd-contacted-ongoing-note.trycloudflare.com';
+  const APP_URL = 'https://began-extract-una-valid.trycloudflare.com';
 
+  const { rendered: { current } } = useExtension();
   const { query } = useApi();
   const { myshopifyDomain } = useShop();
   const lines = useCartLines();
-  console.log('LINES', lines)
   const applyCartLinesChange = useApplyCartLinesChange();
   const orderAttributesChange = useApplyAttributeChange();
-  const { zip } = useShippingAddress();
+  const { zip } = useShippingAddress() || {};
   const zip_code_attr = useAttributeValues(['zip_code'])[0];
-  const canBlockProgress = useExtensionCapability("block_progress");
-  console.log('CAN BLOCK PROGRESS', canBlockProgress)
 
   const [shipments, setShipments] = useState<any[]>([]);
   const [ineligibleForLtl, setIneligibleForLtl] = useState<boolean>(true);
-  const [deliveryProduct, setDeliveryProduct] = useState<any>(null);
-  // const [selectedButton, setSelectedButton] = useState<string>(null);
-  // const [shipmentChoice, setShipmentChoice] = useState<string>('none');
   const [destinationTypeForm, setDestinationTypeForm] = useState<any>({});
-  const [cachedProducts, setCachedProducts] = useState<any>([]);
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
-  // const [ltlDeliveryProductPicked, setLTLDeliveryProductPicked] = useState<boolean>(false);
   const [validationErrors, setValidationErrors] = useState<any>({});
   const [haveLtl, setHaveLtl] = useState(null);
-
-  console.log('ineligibleForLtl', ineligibleForLtl)
 
   useBuyerJourneyIntercept(({ canBlockProgress }) => {
     if (canBlockProgress && haveLtl && ineligibleForLtl) {
@@ -88,20 +79,6 @@ function Extension() {
       };
     }
 
-    // if (canBlockProgress && haveLtl && !ltlDeliveryProductPicked) {
-    //   return {
-    //     behavior: "block",
-    //     reason: "Please choose a delivery type",
-    //     perform: (result) => {
-    //       if (result.behavior === "block") {
-    //         const errors = {...validationErrors};
-    //         errors.ltlDeliveryProductNotPicked = true;
-    //         setValidationErrors(errors);
-    //       }
-    //     },
-    //   };
-    // }
-
     return {
       behavior: "allow",
       perform: () => {
@@ -112,7 +89,7 @@ function Extension() {
 
   useEffect(() => {
     const checkForLtl = async (lines) => {
-      const products = await query(
+      const products: any = await query(
         `
         query getProductsByIds($ids: [ID!]!) {
           nodes(ids: $ids) {
@@ -128,8 +105,6 @@ function Extension() {
           }
         }
       );
-
-      console.log(lines.map((line) => line.merchandise.product.id));
 
       if (!products.data || !products.data.nodes.length) {
         return false;
@@ -148,134 +123,36 @@ function Extension() {
       }
     };
 
-    fetchData();
-  }, [lines]);
-
-  useEffect(() => {
-    if (!deliveryProduct) {
-      query(`
-        query getProducts($first: Int, $query: String) {
-          products(first: $first, query: $query) {
-            edges {
-              node {
-                id
-                title
-                variants(first: 4) {
-                  edges {
-                    node {
-                      id
-                      title
-                      price {
-                        amount
-                      }
-                      compareAtPrice {
-                        amount
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }` as string,
-        {
-          variables: {
-            first: 1,
-            query: "title:LTL Delivery Type"
-          }
-        }
-      ).then((res: any) => {
-        const product = res.data.products.edges[0].node;
-        setDeliveryProduct(product);
-      });
+    if (!current) {
+      fetchData();
     }
-  }, [deliveryProduct]);
+  }, [lines, current]);
 
   useEffect(() => {
-    if (zip) {
+    if (zip && !current) {
       if (zip_code_attr && zip_code_attr !== zip) {
-        console.log('ZIP CODE CHANGED');
         resetOrderChanges().then(() => {
-          console.log('RESET ORDER CHANGES');
           getShipmentData(zip);
         });
       } else {
-        console.log('ZIP CODE DID NOT CHANGE')
         getShipmentData(zip);
       }
     }
-  }, [zip])
-
-  // useEffect(() => {
-  //   console.log('SHIPMENTS USE EFFECT WORKS')
-  //   if (shipments.length) {
-  //     setIneligibleForLtl(shipments.some((shipment) => shipment.ineligibleForLtl));
-  //     const addedProducts = [];
-  //     const shipmentsArray = [...shipments];
-  //     const deliveryTypes = [];
-  //
-  //     const processShipments = async () => {
-  //       for (let index = 0; index < shipmentsArray.length; index++) {
-  //         const shipment = shipmentsArray[index];
-  //         console.log('SHIPMENT IN USE EFFECT', shipment);
-  //
-  //         if (shipment.containsFreightItem && !shipment.freightItemAdded) {
-  //           await addProduct(shipment.containsFreightItem, index);
-  //           shipmentsArray[index].freightItemAdded = true;
-  //           addedProducts.push(shipment.containsFreightItem);
-  //         }
-  //
-  //         console.log('SHIPMENT DELIVERY TYPES', shipment.deliveryTypes, shipment);
-  //         deliveryTypes.push(...shipment.deliveryTypes);
-  //         console.log('DELIVERY TYPES', deliveryTypes);
-  //       }
-  //
-  //       console.log('ADDED PRODUCTS', addedProducts);
-  //
-  //       const uniqueDeliveryTypes = Array.from(new Set(deliveryTypes));
-  //       console.log('UNIQUE DELIVERY TYPES', uniqueDeliveryTypes);
-  //
-  //       const availableDeliveryMethods = {
-  //         'Standard': false,
-  //         'Premium': false,
-  //         'Enhanced': false,
-  //         'White-glove': false
-  //       };
-  //
-  //       for (const method of uniqueDeliveryTypes) {
-  //         console.log('METHOD', deliveryTypes, availableDeliveryMethods);
-  //         if (availableDeliveryMethods.hasOwnProperty(method)) {
-  //           availableDeliveryMethods[method] = true;
-  //         }
-  //       }
-  //
-  //       console.log('AVAILABLE DELIVERY METHODS', availableDeliveryMethods);
-  //
-  //       if (Object.values(availableDeliveryMethods).some(value => value === false)) {
-  //         await addDisableDeliveryMethodsAttribute(availableDeliveryMethods);
-  //       }
-  //
-  //       if (addedProducts.length) {
-  //         setShipments(shipmentsArray);
-  //       }
-  //
-  //     };
-  //
-  //     processShipments();
-  //   }
-  // }, [shipments]);
+  }, [zip, current])
 
   useEffect(() => {
-    console.log('SHIPMENTS USE EFFECT WORKS')
-
     const processShipments = async () => {
       if (shipments.length) {
-        setIneligibleForLtl(shipments.some((shipment) => shipment.ineligibleForLtl));
-        const addedProducts = [];
-        const shipmentsArray = [...shipments];
+        const isEligibleForLtl = shipments.some((shipment) => shipment.ineligibleForLtl);
+
+        if (isEligibleForLtl && !ineligibleForLtl) {
+          setIneligibleForLtl(true);
+          return;
+        }
+
         const deliveryTypes = [];
 
-        await Promise.all(lines.map(async (line) => {
+        await Promise.allSettled(lines.map(async (line) => {
           let shippingGroup = 0;
 
           const shipment = shipments.find((shipment, index) => {
@@ -286,34 +163,23 @@ function Extension() {
             return false;
           });
 
-          console.log('---SHIPMENT', shipment);
-
           if (shipment) {
             await new Promise(resolve => setTimeout(resolve, 1000));
             await retryApplyCartLinesChange(line, shipment, shippingGroup);
           }
         }));
 
-
-        for (let index = 0; index < shipmentsArray.length; index++) {
-          const shipment = shipmentsArray[index];
-          console.log('SHIPMENT IN USE EFFECT', shipment);
+        for (let index = 0; index < shipments.length; index++) {
+          const shipment = shipments[index];
 
           if (shipment.containsFreightItem && !shipment.freightItemAdded) {
             await addProduct(shipment.containsFreightItem, index);
-            shipmentsArray[index].freightItemAdded = true;
-            addedProducts.push(shipment.containsFreightItem);
           }
 
-          console.log('SHIPMENT DELIVERY TYPES', shipment.deliveryTypes, shipment);
           deliveryTypes.push(...shipment.deliveryTypes);
-          console.log('DELIVERY TYPES', deliveryTypes);
         }
 
-        console.log('ADDED PRODUCTS', addedProducts);
-
         const uniqueDeliveryTypes = Array.from(new Set(deliveryTypes));
-        console.log('UNIQUE DELIVERY TYPES', uniqueDeliveryTypes);
 
         const availableDeliveryMethods = {
           'Standard': false,
@@ -323,26 +189,23 @@ function Extension() {
         };
 
         for (const method of uniqueDeliveryTypes) {
-          console.log('METHOD', deliveryTypes, availableDeliveryMethods);
           if (availableDeliveryMethods.hasOwnProperty(method)) {
             availableDeliveryMethods[method] = true;
           }
         }
 
-        console.log('AVAILABLE DELIVERY METHODS', availableDeliveryMethods);
-
         if (Object.values(availableDeliveryMethods).some(value => value === false)) {
           await addDisableDeliveryMethodsAttribute(availableDeliveryMethods);
-        }
-
-        if (addedProducts.length) {
-          setShipments(shipmentsArray);
         }
       }
     }
 
     processShipments();
   }, [shipments]);
+
+  if (!zip) {
+    return null;
+  }
 
   const retryApplyCartLinesChange = async (line, shipment, shippingGroup, retries = 3) => {
     for (let attempt = 1; attempt <= retries; attempt++) {
@@ -376,71 +239,56 @@ function Extension() {
   };
 
   const addDisableDeliveryMethodsAttribute = async (methods) => {
-    console.log('METHODS', methods)
-    await applyCartLinesChange({
-      type: 'updateCartLine',
-      id: lines[0].id,
-      attributes: [
-        ...lines[0].attributes,
-        {
-          key: '_disable_methods',
-          value: `${Object.keys(methods).filter((method) => !methods[method]).join(', ')}`
-        }
-      ]
-    });
+    try {
+      console.log('METHODS', methods)
+      const disableMethodRequest = await applyCartLinesChange({
+        type: 'updateCartLine',
+        id: lines[0].id,
+        attributes: [
+          ...lines[0].attributes,
+          {
+            key: '_disable_methods',
+            value: `${Object.keys(methods).filter((method) => !methods[method]).join(', ')}`
+          }
+        ]
+      });
+
+      console.log('DISABLE METHOD REQUEST', disableMethodRequest);
+    } catch (error) {
+      console.error('Error adding disable delivery methods attribute', error);
+    }
   };
 
   const resetOrderChanges = async () => {
-    if (!cachedProducts.length) {
-      return;
-    }
-
-    console.log('CACHED PRODUCTS', cachedProducts)
-
-    const cachedLinesIds = cachedProducts.map((productId) => {
-      return lines.find((line) => line.merchandise.id === productId).id;
-    });
-    console.log('CACHED PRODUCT IDS', cachedProducts)
-    console.log('CACHED LINES IDS', cachedLinesIds)
+    const cachedLinesIds = lines
+      .filter((line) => line.merchandise.title.includes('Extended Area Delivery'))
+      .map((line) => line.id);
 
     const removeProducts = await Promise.all(cachedLinesIds.map( async (lineId) => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return applyCartLinesChange({
-        type: 'removeCartLine',
-        id: lineId,
-        quantity: 1
-      });
+      const retries = 3;
+
+      for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+          await applyCartLinesChange({
+            type: 'removeCartLine',
+            id: lineId,
+            quantity: 1
+          });
+
+          console.log("cart line removed")
+          return;
+        } catch (error) {
+          console.log("Error applying cart line change", error.message);
+          if (error.message.includes("Negotiation was stale") && attempt < retries) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          } else {
+            throw error;
+          }
+        }
+      }
     }));
 
     console.log('REMOVE PRODUCTS',removeProducts);
-
-    if (removeProducts.some((product) => product.type === 'error')) {
-      let tries = 0;
-
-      while (tries < 3) {
-        const retryRemoveProducts = await Promise.all(removeProducts.map( async (product, index) => {
-          if (product.type === 'error') {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            return applyCartLinesChange({
-              type: 'removeCartLine',
-              id: cachedLinesIds[index],
-              quantity: 1
-            });
-          }
-          return product;
-        }));
-
-        console.log('RETRY REMOVE PRODUCTS', retryRemoveProducts);
-
-        if (!retryRemoveProducts.some((product) => product.type === 'error')) {
-          break;
-        }
-
-        tries++;
-      }
-    }
-
-    setCachedProducts([]);
   };
 
   const countDeliveryDateFromToday = (shipment) => {
@@ -483,90 +331,36 @@ function Extension() {
       return;
     }
 
-    // const retryApplyCartLinesChange = async (line, shipment, shippingGroup, retries = 3) => {
-    //   for (let attempt = 1; attempt <= retries; attempt++) {
-    //     try {
-    //       await applyCartLinesChange({
-    //         type: 'updateCartLine',
-    //         id: line.id,
-    //         attributes: [
-    //           {
-    //             key: 'ETA',
-    //             value: `${countDeliveryDateFromToday(shipment)}`
-    //           },
-    //           {
-    //             key: '_shipping_group',
-    //             value: `${shippingGroup + 1}`
-    //           }
-    //         ]
-    //       });
-    //
-    //       console.log("Applied cart line change")
-    //       return;
-    //     } catch (error) {
-    //       console.log("Error applying cart line change", error.message);
-    //       if (error.message.includes("Negotiation was stale") && attempt < retries) {
-    //         await new Promise(resolve => setTimeout(resolve, 500));
-    //       } else {
-    //         throw error;
-    //       }
-    //     }
-    //   }
-    // };
-    //
-    // await Promise.all(lines.map(async (line) => {
-    //   let shippingGroup = 0;
-    //
-    //   const shipment = shipments.find((shipment, index) => {
-    //     if (shipment.lineItems.some((item) => item.id === line.merchandise.id)) {
-    //       shippingGroup = index;
-    //       return true;
-    //     }
-    //     return false;
-    //   });
-    //
-    //   console.log('---SHIPMENT', shipment);
-    //
-    //   if (shipment) {
-    //     await new Promise(resolve => setTimeout(resolve, 500));
-    //     await retryApplyCartLinesChange(line, shipment, shippingGroup);
-    //   }
-    // }));
-
     setShipments(shipments);
   }
 
   const addProduct = async (productId: string, index: number) => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    await applyCartLinesChange({
-      type: 'addCartLine',
-      merchandiseId: productId,
-      quantity: 1,
-      attributes: [
-        {
-          key: '_shipping_group',
-          value: `${index + 1}`
-        }
-      ]
-    })
+    const retries = 2;
 
-    const cachedProductsArray = [...cachedProducts];
-    cachedProductsArray.push(productId);
-    console.log('CACHED PRODUCTS WHEN PRODUCT ADDED', cachedProductsArray)
-    setCachedProducts(cachedProductsArray);
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      const addProduct = await applyCartLinesChange({
+        type: 'addCartLine',
+        merchandiseId: productId,
+        quantity: 1,
+        attributes: [
+          {
+            key: '_shipping_group',
+            value: `${index + 1}`
+          }
+        ]
+      })
+
+      if (addProduct.type === 'error') {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        continue;
+      }
+
+      console.log("Applied cart line change")
+      return;
+    }
   }
-
-  // //**TO_DO**//
-  // // handle adding product to shipment group in order list (need to decide the approach of task)
-  // const handleConfirm = () => {
-  //   const shipmentsArray = [...shipments];
-  //   const index = Number(selectedButton.split('-')[1]);
-  //   addProduct(shipmentChoice);
-  //   shipmentsArray[index].ltl_delivery_product_picked = true;
-  //   setShipments(shipmentsArray);
-  //   setSelectedButton(null);
-  //   setLTLDeliveryProductPicked(true);
-  // }
 
   const handleFormChange = (type: string, value: string) => {
     if (type === 'destinationType') {
@@ -581,7 +375,6 @@ function Extension() {
   };
 
   const disableSubmitButton = () => {
-    console.log('destinationTypeForm', destinationTypeForm)
     if (destinationTypeForm.destinationType === 'house') {
       return !destinationTypeForm.confirm
         || destinationTypeForm.confirm === 'false'
@@ -604,20 +397,35 @@ function Extension() {
     return !destinationTypeForm.destinationType;
   }
 
-  console.log('disableSubmitButton', disableSubmitButton())
-
-  const submitForm = () => {
+  const submitForm = async () => {
     for (const key in destinationTypeForm) {
-      orderAttributesChange({
-        key: key,
-        type: 'updateAttribute',
-        value: destinationTypeForm[key]
-      });
+      const retries = 3;
+
+      try {
+        await orderAttributesChange({
+          key: key,
+          type: 'updateAttribute',
+          value: destinationTypeForm[key]
+        });
+
+        console.log('Attribute updated', key, destinationTypeForm[key])
+      } catch (error) {
+        console.error('Error updating attribute', key, destinationTypeForm[key], error);
+
+        if (error.message.includes("Negotiation was stale") && retries <= 3) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
+          await orderAttributesChange({
+            key: key,
+            type: 'updateAttribute',
+            value: destinationTypeForm[key]
+          });
+        }
+      }
     }
+
     setFormSubmitted(true);
   };
-
-  console.log('haveLtl && !ineligibleForLtl', haveLtl, ineligibleForLtl)
 
   return (
     haveLtl && !ineligibleForLtl && (
@@ -816,70 +624,6 @@ function Extension() {
                   )}
               </InlineStack>
             </Form>
-
-            {/*<BlockStack border={"base"} cornerRadius={"base"}>*/}
-            {/*  {validationErrors.ltlDeliveryProductNotPicked && (*/}
-            {/*    <Banner*/}
-            {/*      status={"critical"}*/}
-            {/*      title={"Please choose a delivery type before proceeding"}*/}
-            {/*    />*/}
-            {/*  )}*/}
-
-            {/*  <ToggleButtonGroup*/}
-            {/*    value={selectedButton}*/}
-            {/*    onChange={(value) => setSelectedButton(value)}*/}
-            {/*  >*/}
-            {/*    <InlineLayout spacing="base">*/}
-            {/*      {shipments.map((shipment, index) => (*/}
-            {/*        <ToggleButton*/}
-            {/*          id={`toggleBtn-${index}`}*/}
-            {/*          key={`toggleBtn-${index}`}*/}
-            {/*          disabled={shipment.ltl_delivery_product_picked}*/}
-            {/*        >*/}
-            {/*          <View*/}
-            {/*            blockAlignment="center"*/}
-            {/*            inlineAlignment="center"*/}
-            {/*            minBlockSize="fill"*/}
-            {/*          >*/}
-            {/*            {`Shipment ${index + 1}`}*/}
-            {/*          </View>*/}
-            {/*        </ToggleButton>*/}
-            {/*      ))}*/}
-            {/*    </InlineLayout>*/}
-            {/*  </ToggleButtonGroup>*/}
-
-            {/*  <InlineStack minInlineSize={"fill"} minBlockSize={'fill'}>*/}
-            {/*    {shipments.map((shipment, index) => (*/}
-            {/*      selectedButton === `toggleBtn-${index}` && (*/}
-            {/*        <View key={`toggleBtn-${index}`} inlineAlignment={"end"}>*/}
-            {/*          <ChoiceList*/}
-            {/*            name="shipment"*/}
-            {/*            variant="group"*/}
-            {/*            value={shipmentChoice}*/}
-            {/*            onChange={(value: string) => setShipmentChoice(value)}*/}
-            {/*          >*/}
-            {/*            {deliveryProduct.variants.edges.map((variant, index) => (*/}
-            {/*              <Choice id={variant.node.id} key={index} disabled={shipment.ltl_delivery_product_picked}>*/}
-            {/*                <InlineStack spacing={"base"}>*/}
-            {/*                  <Text>{`${variant.node.title} Delivery - delivered to the outside entrance of your home or building at the ground level`}</Text>*/}
-
-            {/*                  <BlockStack spacing={"none"}>*/}
-            {/*                    <Text>{`Regular Price: $${Number(variant.node.compareAtPrice.amount).toFixed()}`}</Text>*/}
-            {/*                    <Text>{`Discounted Price: $${Number(variant.node.price.amount).toFixed()}`}</Text>*/}
-            {/*                  </BlockStack>*/}
-            {/*                </InlineStack>*/}
-            {/*              </Choice>*/}
-            {/*            ))}*/}
-            {/*          </ChoiceList>*/}
-
-            {/*          <View padding={"base"}>*/}
-            {/*            <Button onPress={() => handleConfirm()}>Confirm</Button>*/}
-            {/*          </View>*/}
-            {/*        </View>*/}
-            {/*      )*/}
-            {/*    ))}*/}
-            {/*  </InlineStack>*/}
-            {/*</BlockStack>*/}
           </>
         )}
       </BlockStack>
