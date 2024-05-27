@@ -218,10 +218,10 @@ function Extension() {
               key: 'ETA',
               value: `${countDeliveryDateFromToday(shipment)}`
             },
-            {
-              key: '_shipping_group',
-              value: `${shippingGroup + 1}`
-            }
+            // {
+            //   key: '_shipping_group',
+            //   value: `${shippingGroup + 1}`
+            // }
           ]
         });
 
@@ -344,12 +344,12 @@ function Extension() {
         type: 'addCartLine',
         merchandiseId: productId,
         quantity: 1,
-        attributes: [
-          {
-            key: '_shipping_group',
-            value: `${index + 1}`
-          }
-        ]
+        // attributes: [
+        //   {
+        //     key: '_shipping_group',
+        //     value: `${index + 1}`
+        //   }
+        // ]
       })
 
       if (addProduct.type === 'error') {
