@@ -6,6 +6,12 @@ query RunInput {
       shipping_group: attribute(key: "_shipping_group") {
         value
       }
+      estimation_time: attribute(key: "ETA") {
+        value
+      }
+      disable_methods: attribute(key: "_disable_methods") {
+        value
+      }
     }
   }
 }

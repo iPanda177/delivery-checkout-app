@@ -66,7 +66,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
     for (const row of parsedData) {
       const selectedLocations = JSON.parse(row.selectedLocations as string);
-      console.log('SELECTED LOCATIONS', selectedLocations)
 
       const selectedLocationsArray = await Promise.all(selectedLocations.map(async (locationId: string) => {
         const location = await db.location.findFirst({
@@ -81,8 +80,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         return await getLocationData(locationId, admin.graphql);
       }));
-
-      console.log('SELECTED LOCATIONS ARRAY', selectedLocationsArray);
 
       const zipCodeRangesData = JSON.parse(row.zipCodeRanges as string);
 
@@ -99,30 +96,54 @@ export async function action({ request, params }: ActionFunctionArgs) {
         addOnProductId: String(row.addOnProductId),
       };
 
-      const shippingRules = await db.shippingRules.findMany({
-        where: {
-          zipRangeStart: {
-            lte: ruleData.zipRangeStart,
-          },
-          zipRangeEnd: {
-            gte: ruleData.zipRangeEnd,
-          },
-          locations: {
-            some: {
-              location: {
-                locationId: {
-                  in: selectedLocationsArray.map((location: LocationT) => location.locationId),
+      console.log('ruleData', ruleData);
+
+      if (ruleData.zipRangeStart !== 'Infinity' && ruleData.zipRangeEnd !== '-Infinity') {
+        const shippingRules = await db.shippingRules.findMany({
+          where: {
+            zipRangeStart: {
+              lte: ruleData.zipRangeStart,
+            },
+            zipRangeEnd: {
+              gte: ruleData.zipRangeEnd,
+            },
+            locations: {
+              some: {
+                location: {
+                  locationId: {
+                    in: selectedLocationsArray.map((location: LocationT) => location.locationId),
+                  },
                 },
               },
-            },
-          }
-        },
-      });
+            }
+          },
+        });
 
-      if (shippingRules.length > 0) {
-        console.error('Rule already exists:', ruleData.ruleName);
-        rejectedRulesCount++;
-        continue;
+        if (shippingRules.length > 0) {
+          rejectedRulesCount++;
+          continue;
+        }
+      } else {
+        const shippingRules = await db.shippingRules.findMany({
+          where: {
+            zipRangeStart: 'Infinity',
+            zipRangeEnd: '-Infinity',
+            locations: {
+              some: {
+                location: {
+                  locationId: {
+                    in: selectedLocationsArray.map((location: LocationT) => location.locationId),
+                  },
+                },
+              },
+            }
+          },
+        });
+
+        if (shippingRules.length > 0) {
+          rejectedRulesCount++;
+          continue;
+        }
       }
 
       const createdShippingRule  = await db.shippingRules.create({
@@ -192,7 +213,6 @@ export default function Index() {
   const navigate = useNavigate();
   const submit = useSubmit();
   const shippingRules = useLoaderData<typeof loader>();
-  console.log(shippingRules)
   const actionData: { success: boolean, created?: number, rejected?: number} | undefined = useActionData<typeof action>();
 
   const [groupedShippingRules, setGroupedShippingRules] = useState<groupedShippingRules>({});
@@ -226,6 +246,7 @@ export default function Index() {
   useEffect(() => {
     if (file) {
       handleFileChange(file);
+      setFile(undefined)
     }
   }, [file]);
 
@@ -279,7 +300,6 @@ export default function Index() {
   const exportCSV = async () => {
     const csvData = shippingRules.map((rule: ShippingRules | any) => {
       const locations = rule.locations.map((location: any) => location.location.locationId.split('/').pop()).join(', ');
-      console.log('----LOCATIONS----', locations, JSON.stringify(locations))
 
       const zipCodeRanges = rule.zipCodeRanges.map((range: any) => `${range.zipRangeStart}-${range.zipRangeEnd}`).join(', ');
 
@@ -295,12 +315,8 @@ export default function Index() {
       ];
     });
 
-    console.log(csvData);
-
     const csvContent = 'RuleName;IsDefault;Locations;ZipCodeRanges;SmallParcelLow;SmallParcelHigh;FreightLow;FreightHigh;\n'
       + csvData.map(e => e.join(';') + ';').join('\n');
-
-    console.log(csvContent);
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -326,7 +342,6 @@ export default function Index() {
         const ruleName = values[0];
         const isDefault = values[1] === 'true';
         const locations = JSON.parse(values[2]).split(', ')
-        console.log('PARSED LOCATIONS', locations)
         const zipCodeRanges = values[3].split(',').map(range => {
           const [startStr, endStr] = range.trim().split('-');
           const start = parseInt(startStr);
@@ -363,8 +378,6 @@ export default function Index() {
 
         parsedData.push(ruleObject);
       }
-
-      console.log(parsedData);
 
       await submit({ data: JSON.stringify(parsedData) }, { method: 'POST' })
 

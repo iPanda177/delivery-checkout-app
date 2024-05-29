@@ -30,7 +30,6 @@ export async function getShopLocations(graphql: GraphQLClient<AdminOperations>) 
 }
 
 export async function getProductVariantData(id: string, graphql: GraphQLClient<AdminOperations>) {
-  console.log(id)
   const response = await graphql(
     `
       query getProductVariant($id: ID!) {
@@ -62,7 +61,6 @@ export async function getProductVariantData(id: string, graphql: GraphQLClient<A
 }
 
 export async function getShippingRule(id: number) {
-  console.log(id)
   const dbRuleData: any = await db.shippingRules.findFirst({
     where: { id },
     include: {
@@ -143,7 +141,6 @@ export async function prepareShipmentsArray(
     const locations = Array.from(
       new Set(variantsData.map((variant: any) => variant.inventoryItem.inventoryLevels.edges.map((edge: any) => edge.node.location.name)).flat())
     );
-    console.log('locations', locations)
     if (locations.length === 0) {
       return false;
     }
@@ -175,8 +172,6 @@ export async function prepareShipmentsArray(
         }
       }
     });
-
-    console.log('defaultShippingRules', defaultShippingRules)
 
     if (defaultShippingRules.length === 0) {
       return false;
@@ -245,7 +240,6 @@ export async function prepareShipmentsArray(
 }
 
 export const getLocationData = async (locationId: string, graphql: GraphQLClient<AdminOperations>) => {
-  console.log('locationId', locationId)
   const gid = `gid://shopify/Location/${locationId}`;
   const response = await graphql(
     `
@@ -266,7 +260,6 @@ export const getLocationData = async (locationId: string, graphql: GraphQLClient
   const {
     data: { location },
   } = await response.json();
-  console.log(location)
 
   return { locationId: location.id, locationName: location.name };
 };

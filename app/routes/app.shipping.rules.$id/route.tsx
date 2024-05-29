@@ -47,7 +47,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const locations = await getShopLocations(admin.graphql);
   const deliveryTypes = await db.deliveryType.findMany();
-  console.log('locations', locations);
 
   if (params.id !== 'new') {
     const ruleState = await getShippingRule(Number(params.id));
@@ -234,7 +233,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
           })
         ));
       } else {
-        console.log('RULE DATA', ruleData)
         const shippingRules = await db.shippingRules.findMany({
           where: {
             isDefault: ruleData.isDefault,
@@ -257,8 +255,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             }
           },
         });
-
-        console.log('shippingRules', shippingRules)
 
         if (shippingRules.length > 0) {
           return json({ success: false, error: 'Rule already exists' });
@@ -368,7 +364,6 @@ const initialState: ShippingRulesReducerState = {
 };
 
 function reducer(state: ShippingRulesReducerState, action: Action) {
-  console.log('reducer', action)
   switch (action.type) {
     case "SET_LOCATIONS":
       return { ...state, locations: action.payload };
@@ -396,7 +391,6 @@ function reducer(state: ShippingRulesReducerState, action: Action) {
 export default function ShippingRuleForm() {
   const loaderData = useLoaderData<ShippingRulesLoaderData>();
   const actionData = useActionData<ShippingRulesActionData>();
-  console.log('loaderData', loaderData);
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const [zipCodeRange, setZipCodeRange] = useState({ zipRangeStart: '', zipRangeEnd: '' });

@@ -26,7 +26,6 @@ export default function DeliverySelectCombobox({
 
   useEffect(() => {
     if (!selectedDeliveryTypes || selectedDeliveryTypes.length === 0) return;
-    console.log('SELECTED DELIVERY TYPES',selectedDeliveryTypes)
     const selectedDeliveryTypesNames = selectedDeliveryTypes.map((deliveryType: any) => deliveryType.name);
 
     setSelectedTags(selectedDeliveryTypesNames);
@@ -114,7 +113,6 @@ export default function DeliverySelectCombobox({
 
   const formatOptionText = useCallback(
     (option: string) => {
-      console.log('OPTION',option)
       const trimValue = value.trim().toLocaleLowerCase();
       const matchIndex = option.toLocaleLowerCase().indexOf(trimValue);
 
@@ -155,7 +153,6 @@ export default function DeliverySelectCombobox({
 
     return [...list.filter((tag) => !!tag)];
   }, [value, getAllDeliveryTypes, escapeSpecialRegExCharacters]);
-  console.log('OPTIONS',options)
 
   const verticalContentMarkup =
     selectedTags.length > 0 ? (

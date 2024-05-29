@@ -75,7 +75,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         }
       }
     });
-    console.log('SHIPPING RULES', shippingRules)
 
     const shipments = await prepareShipmentsArray(shippingRules as any[], lineItems, admin.graphql);
 

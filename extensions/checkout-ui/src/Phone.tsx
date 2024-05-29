@@ -3,7 +3,7 @@ import {
   reactExtension,
   useShippingAddress,
   useBuyerJourneyIntercept,
-  useExtensionCapability
+  useExtensionCapability,
 } from "@shopify/ui-extensions-react/checkout";
 import {useEffect, useState} from "react";
 
